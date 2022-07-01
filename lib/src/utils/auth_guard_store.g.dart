@@ -17,19 +17,19 @@ mixin _$AuthGuardStore on _AuthGuardStoreBase, Store {
               name: '_AuthGuardStoreBase.breadCrumbItems'))
       .value;
 
-  late final _$_partsAtom =
-      Atom(name: '_AuthGuardStoreBase._parts', context: context);
+  late final _$partsAtom =
+      Atom(name: '_AuthGuardStoreBase.parts', context: context);
 
   @override
-  List<String> get _parts {
-    _$_partsAtom.reportRead();
-    return super._parts;
+  List<String> get parts {
+    _$partsAtom.reportRead();
+    return super.parts;
   }
 
   @override
-  set _parts(List<String> value) {
-    _$_partsAtom.reportWrite(value, super._parts, () {
-      super._parts = value;
+  set parts(List<String> value) {
+    _$partsAtom.reportWrite(value, super.parts, () {
+      super.parts = value;
     });
   }
 
@@ -66,6 +66,7 @@ mixin _$AuthGuardStore on _AuthGuardStoreBase, Store {
   @override
   String toString() {
     return '''
+parts: ${parts},
 lang: ${lang},
 breadCrumbItems: ${breadCrumbItems}
     ''';

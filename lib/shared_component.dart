@@ -32,6 +32,8 @@ export 'src/utils/size_config.dart';
 export 'src/utils/spacer.dart';
 export 'src/themes/default.dart';
 export 'src/themes/theme.dart';
+export 'src/utils/client_repository.dart';
+export 'src/utils/table.dart';
 // export 'src/utils/table.dart';
 export 'src/utils/dataTable.dart';
 export 'package:google_ui/google_ui.dart';
@@ -41,11 +43,12 @@ export 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
 export 'package:flutter_svg/flutter_svg.dart';
 export 'package:hive/hive.dart';
 export 'package:hive_flutter/hive_flutter.dart';
-export 'package:gql_http_link/gql_http_link.dart';
+// export 'package:gql_http_link/gql_http_link.dart';
 export 'package:ferry/ferry.dart';
 export 'package:ferry_hive_store/ferry_hive_store.dart';
 export 'package:ferry_flutter/ferry_flutter.dart';
 export 'package:flutter_mobx/flutter_mobx.dart';
+export 'package:dio/dio.dart';
 
 
 

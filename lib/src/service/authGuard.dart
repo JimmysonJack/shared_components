@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:shared_component/src/utils/auth_guard_store.dart';
 
@@ -13,12 +14,13 @@ class AuthGuard extends RouteGuard{
   @override
   FutureOr<bool> canActivate(String path, ParallelRoute route) {
    //TODO Implement return to where i was after being kicked out with login management
+   var newData = path.substring(1).split('/');
+   if(newData.isNotEmpty){
 
-   if(path.substring(1).split('/').toString().length != 2){
-    AuthGuardStore().setBreadCrumb(path.substring(1).split('/'));
+    if(['home','profile','help'].contains(newData.elementAt(0)) || newData.length > 1){
+     AuthGuardStore.getInstance().setBreadCrumb(newData);
+    }
    }
-   // print(route.name);
-   // print(Modular.to.navigateHistory.map((e) => e.name).toList());
     return true;
   }
   

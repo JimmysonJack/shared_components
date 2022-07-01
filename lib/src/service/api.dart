@@ -17,6 +17,7 @@ class Api {
 
   Api(this.context) {
     lang = '';
+    Toast.init(context);
   }
 
   Future<String> userToken(bool login) async {
@@ -80,7 +81,7 @@ class Api {
         Options(contentType: 'application/x-www-form-urlencoded', headers: {
       'Accept': 'application/json',
       'Authorization':
-          'Basic ${base64Encode(utf8.encode(clientId + ':' + clientSecret))}'
+          'Basic ${base64Encode(utf8.encode('$clientId:$clientSecret'))}'
     });
     Map<String, dynamic> res = await request(
         type: 'post',
@@ -126,14 +127,14 @@ class Api {
         } else if (res['message'].contains('First login')) {
           return res['data'];
         }
-        Toast.error(res['message'], context);
+        Toast.error(res['message']);
       }
       return res['data'];
     } on DioError catch (e) {
       if (e.response != null) {
         var res = e.response!.data as Map<String, dynamic>;
         if (res['error_description'] != null) {
-          Toast.error(Intl.trans(res['error_description'], lang), context);
+          Toast.error(Intl.trans(res['error_description'], lang));
           return null;
         }
         if (res['status'] == false) {
@@ -142,7 +143,7 @@ class Api {
             options.headers!['Authorization'] = 'Bearer ${await clientToken()}';
             return request(type: type, url: url, data: data, options: options);
           } else {
-            Toast.error(res['message'], context);
+            Toast.error(res['message']);
           }
         }
         return res['data'];

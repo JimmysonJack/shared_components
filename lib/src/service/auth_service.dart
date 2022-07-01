@@ -8,13 +8,24 @@ import '../components/toast.dart';
 import '../environment/system.env.dart';
 import '../models/token.dart';
 import 'api.dart';
+import 'package:mobx/mobx.dart';
 
-class AuthService {
-  late BuildContext context;
+part 'auth_service.g.dart';
+
+class AuthServiceStore extends _AuthServiceStoreBase with _$AuthServiceStore{
+
+}
+abstract class _AuthServiceStoreBase with Store{
+
   late Api api;
-  AuthService(this.context) {
+  @action
+  getContext(context) {
     api = Api(context);
+    Toast.init(context);
+    return context;
   }
+
+  @action
   Future<bool> loginUser(
       {required String username, required String password}) async {
     Map<String, String> credentials = {
@@ -38,16 +49,17 @@ class AuthService {
         StorageService.setJson('user_token', res);
         return true;
       } else if (res['error_description'] != null) {
-        Toast.error(res['error_description'], context);
+        Toast.error(res['error_description']);
         return false;
       }
       return false;
     } else {
-      Toast.error('Error contacting server', context);
+      Toast.error('Error contacting server');
       return false;
     }
   }
 
+  @action
   Future<bool> getUser() async {
     var res = await api.get('/user');
     if (res != null) {
@@ -62,6 +74,7 @@ class AuthService {
     return false;
   }
 
+  @action
   Future<bool> changePassword(
       {required String uid,
       required String oldPassword,
@@ -80,6 +93,7 @@ class AuthService {
     return false;
   }
 
+  @action
   Future<bool> logoutUser(
       {required String accessToken, required String refreshToken}) async {
     var jsonToken = await StorageService.getJson('user_token');

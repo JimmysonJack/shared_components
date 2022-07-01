@@ -6,16 +6,20 @@ import 'package:flutter/material.dart';
 typedef StringCallback = void Function(String);
 
 class Toast {
-  static void info(String message, BuildContext context) {
-    ToastViewContainer.show(ToastViewContainer.INFO, message, context);
+   static BuildContext? _context;
+  static init(context){
+    _context = context;
+  }
+  static void info(String message) {
+    ToastViewContainer.show(ToastViewContainer.INFO, message, _context!);
   }
 
-  static void warn(String message, BuildContext context) {
-    ToastViewContainer.show(ToastViewContainer.WARN, message, context);
+  static void warn(String message) {
+    ToastViewContainer.show(ToastViewContainer.WARN, message, _context!);
   }
 
-  static void error(String message, BuildContext context) {
-    ToastViewContainer.show(ToastViewContainer.ERROR, message, context);
+  static void error(String message) {
+    ToastViewContainer.show(ToastViewContainer.ERROR, message, _context!);
   }
 }
 

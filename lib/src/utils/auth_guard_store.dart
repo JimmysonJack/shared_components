@@ -6,17 +6,26 @@ import '../languages/intl.dart';
 
 part 'auth_guard_store.g.dart';
 
-class AuthGuardStore = _AuthGuardStoreBase with _$AuthGuardStore;
+class AuthGuardStore extends _AuthGuardStoreBase with _$AuthGuardStore{
+  static AuthGuardStore? _instance;
+
+  static AuthGuardStore getInstance(){
+    _instance ??= AuthGuardStore();
+    return _instance!;
+  }
+}
 abstract class _AuthGuardStoreBase with Store {
 
+
+
   @observable
-  List<String> _parts = Modular.to.path.substring(1).split("/");
+  List<String> parts = Modular.to.path.substring(1).split("/");
 
   @observable
   String lang = '';
 
   @computed
-  List<BreadCrumbItem> get breadCrumbItems =>_parts
+  List<BreadCrumbItem> get breadCrumbItems => parts
       .asMap()
       .map((i, e) {
     return MapEntry(
@@ -26,8 +35,8 @@ abstract class _AuthGuardStoreBase with Store {
               child: Text(Intl.trans(e, lang)),
               onTap: () {
                 String url = '';
-                for (var j = 1; j <= i; j++) {
-                  url += '/${_parts[j]}';
+                for (var j = 0; j <= i; j++) {
+                  url += '/${parts[j]}';
                 }
                 Modular.to.navigate(url);
               },
@@ -35,5 +44,5 @@ abstract class _AuthGuardStoreBase with Store {
   }).values.toList();
 
   @action
-  setBreadCrumb(path) => _parts = path;
+  setBreadCrumb(path) => parts = path;
 }
