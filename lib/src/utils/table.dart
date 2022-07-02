@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_modular/flutter_modular.dart';
 
 import '../popUpMenu/custom_pop_up_menu.dart';
-// import 'package:xagent/app/shared/is_null.dart';
-// import 'package:xagent/app/shared/popUpMenu/custom_pop_up_menu.dart';
-// import 'package:xagent/app/shared/shared_store/paging_store.dart';
 
 
 
 class TableCustom<T> extends StatefulWidget {
-  const TableCustom({Key? key,required this.dataList,this.onCreate,this.onDelete, required this.headTitles, this.deleteData = false, this.actionButton, this.paginatePage, required this.onPageSize, this.onDeleteLoader = false}) : super(key: key);
+  const TableCustom({Key? key,this.color,required this.dataList,this.onCreate,this.onDelete, required this.headTitles, this.deleteData = false, this.actionButton, this.paginatePage, required this.onPageSize, this.onDeleteLoader = false}) : super(key: key);
   final List<dynamic> dataList;
   final void Function(dynamic)? onCreate;
   final void Function(String value)? onDelete;
@@ -19,6 +15,7 @@ class TableCustom<T> extends StatefulWidget {
   final PaginatePage? paginatePage;
   final void Function(dynamic) onPageSize;
   final bool onDeleteLoader;
+  final Color? color;
 
   @override
   _TableCustomState<T> createState() => _TableCustomState<T>();
@@ -81,6 +78,7 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
               itemCount: widget.dataList.length,
               itemBuilder: (_, index) {
                 return Card(
+                  color: widget.color ?? Theme.of(context).primaryColor,
                   child: ListTile(
                     dense: true,
 

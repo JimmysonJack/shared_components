@@ -5,6 +5,7 @@ import '../../shared_component.dart';
 class DataSourceTable<T> extends StatefulWidget {
   const DataSourceTable(
       {Key? key,
+        this.tableColor,
       this.buttonActivities,
       this.onDeleteLoader = false,
       required this.title,
@@ -30,6 +31,7 @@ class DataSourceTable<T> extends StatefulWidget {
   final PaginatePage paginatePage;
   final List<Map<String,dynamic>> dataList;
   final bool onDeleteLoader;
+  final Color? tableColor;
 
   @override
   _DataSourceTableState<T> createState() => _DataSourceTableState<T>();
@@ -61,6 +63,7 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
             ///DATA TABLE
             Expanded(
               child: GCard(
+                color: widget.tableColor ?? Theme.of(context).primaryColor,
                   child: Column(
                     children: [
                       SizedBox(
@@ -93,6 +96,7 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
                       Expanded(
                         child: TableCustom<T>(
                           onDeleteLoader: widget.onDeleteLoader,
+                          color: widget.tableColor,
                           headTitles: HeardTitle(
                               serialNumberTitle: widget.serialNumberTitle,
                               actionTitle: widget.actionTitle,
