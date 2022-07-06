@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
 
 class DialogManager extends StatelessWidget {
@@ -27,7 +28,7 @@ class DialogManager extends StatelessWidget {
             borderRadius: BorderRadius.only(topLeft: Radius.circular(4),topRight: Radius.circular(4))
         ),
         automaticallyImplyLeading: formValidator.hasErrors ? false : false,
-        backgroundColor: Theme.of(context).cardColor,
+        backgroundColor: Theme.of(context).primaryColor,
         title: Text(title.toUpperCase(),style: Theme.of(context).textTheme.button,),
         actions:  [
           Padding(
@@ -36,7 +37,7 @@ class DialogManager extends StatelessWidget {
               message: 'Close',
               child: InkWell(
                 borderRadius: BorderRadius.circular(20),
-                child: const Icon(CupertinoIcons.clear),
+                child: Icon(CupertinoIcons.clear,color:Theme.of(context).cardColor),
                 onTap: (){
                   Modular.to.pop();
                 },
@@ -45,32 +46,36 @@ class DialogManager extends StatelessWidget {
           )
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            LayoutBuilder(
-              builder:(context, buildSize) {
-                return Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: SizedBox(
-                    width: buildSize.maxWidth,
-                    child: Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      runSpacing: 20,
-                      children: List.generate(elementWidgets.length, (index) => SizedBox(
-                        width:elementSizes?.length == 1
-                            ? (buildSize.maxWidth / elementSizes![0]) - 20
-                            : (buildSize.maxWidth / (elementSizes?[index] ?? 1)) - (elementSizes == null ? 0 : 20),
-                        child: elementWidgets[index],
-                      )),
-                    ),
-                  ),
-                );
-              },
-            ),
+      body: Observer(
+        builder: (context) {
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                LayoutBuilder(
+                  builder:(context, buildSize) {
+                    return Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: SizedBox(
+                        width: buildSize.maxWidth,
+                        child: Wrap(
+                          alignment: WrapAlignment.spaceBetween,
+                          runSpacing: 20,
+                          children: List.generate(elementWidgets.length, (index) => SizedBox(
+                            width:elementSizes?.length == 1
+                                ? (buildSize.maxWidth / elementSizes![0]) - 20
+                                : (buildSize.maxWidth / (elementSizes?[index] ?? 1)) - (elementSizes == null ? 0 : 20),
+                            child: elementWidgets[index],
+                          )),
+                        ),
+                      ),
+                    );
+                  },
+                ),
 
-          ],
-        ),
+              ],
+            ),
+          );
+        }
       ),
     );
 

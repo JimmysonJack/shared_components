@@ -52,9 +52,11 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
               child: Container(
                 width: size.width / 5,
                 padding: const EdgeInsets.symmetric(horizontal: 5),
-                child: const TextField(
+                child: TextField(
                   decoration: InputDecoration(
                     hintText: 'Search',
+                    fillColor: Theme.of(context).cardColor,
+                    filled: true
                   ),
                 ),
               ),

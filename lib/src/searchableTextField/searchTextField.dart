@@ -22,7 +22,10 @@ class SearchTextField<T> extends StatefulWidget {
     required this.findFn,
     this.enabled = true,
     this.filled = false,
+    this.isChipInputs = false,
     this.subObject,
+    this.updateEntry,
+    this.chipList,
     this.objectTitle
   }) : super(key: key);
   final VoidCallback? onTap;
@@ -39,9 +42,12 @@ class SearchTextField<T> extends StatefulWidget {
   final bool isNetworkData;
   final bool enabled;
   final bool filled;
+  final bool isChipInputs;
   final String? subObject;
   final String? objectTitle;
   final String? hintText;
+  final List<Map<String,dynamic>>? chipList;
+  final String? updateEntry;
   final Future<List<Map<String, dynamic>>> Function(String) findFn;
 
   @override
@@ -53,6 +59,9 @@ class SearchFieldCustomState<T> extends State<SearchTextField> {
   Widget build(BuildContext context) {
     return SearchField(
       enabled: widget.enabled,
+      updateEntry: widget.updateEntry,
+      isChipInputs: widget.isChipInputs,
+      chipList: widget.chipList ?? [],
       isNetworkData: widget.isNetworkData,
       findFn: widget.findFn,
       onTap: (value){

@@ -25,6 +25,7 @@ export 'src/service/auth_service.dart';
 export 'src/service/storage_service.dart';
 export 'src/shared_store/paging_store.dart';
 export 'src/textField/customTextField.dart';
+export 'src/textField/custom_text_field_store.dart';
 export 'src/utils/auth_guard_store.dart';
 export 'src/utils/is_null.dart';
 export 'src/utils/loadingndicator.dart';
@@ -34,6 +35,9 @@ export 'src/themes/default.dart';
 export 'src/themes/theme.dart';
 export 'src/utils/client_repository.dart';
 export 'src/utils/table.dart';
+export 'src/utils/widgetInsertGroup.dart';
+export 'src/tabs_bar/tabs_bar.dart';
+export 'src/tabs_bar/tabs.dart';
 // export 'src/utils/table.dart';
 export 'src/utils/dataTable.dart';
 export 'package:google_ui/google_ui.dart';
@@ -47,7 +51,7 @@ export 'package:hive_flutter/hive_flutter.dart';
 export 'package:ferry/ferry.dart';
 export 'package:ferry_hive_store/ferry_hive_store.dart';
 export 'package:ferry_flutter/ferry_flutter.dart';
-export 'package:flutter_mobx/flutter_mobx.dart';
+// export 'package:flutter_mobx/flutter_mobx.dart';
 export 'package:dio/dio.dart';
 
 

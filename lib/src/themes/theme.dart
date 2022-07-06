@@ -26,6 +26,9 @@ ThemeData customTheme(bool isDarkTheme) {
   return base.copyWith(
     colorScheme: defaultColorScheme,
     primaryColor: color.shade100,
+    // buttonTheme: const ButtonThemeData(
+    //   buttonColor: Colors.blue
+    // ),
     // accentColor: color.shade600,
     appBarTheme: AppBarTheme(backgroundColor: color.shade50),
     // buttonColor: color.shade100,
@@ -44,7 +47,12 @@ ThemeData customTheme(bool isDarkTheme) {
         unselectedLabelColor: text.shade100),
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(color.shade50))),
+            // backgroundColor: MaterialStateProperty.all<Color>(color.shade50),
+          enableFeedback: true,
+            fixedSize: MaterialStateProperty.all<Size?>(const Size(20,40)),
+          foregroundColor: MaterialStateProperty.all<Color?>(const Color(0xfff2f2f2))
+        ),
+    ),
     toggleableActiveColor: color.shade200,
 
     // //  primaryColor: isDarkTheme ? Color(0xFF0054BB) : Color(0xFF4285F4),

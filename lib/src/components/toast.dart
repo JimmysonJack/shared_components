@@ -56,7 +56,7 @@ class ToastViewContainer {
     if (overlayEntry != null) overlayEntry!.remove();
     overlayEntry = OverlayEntry(
         builder: (BuildContext context) => Positioned(
-            top: 20,
+            top: 0,
             left: 20,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,7 +78,7 @@ class ToastViewContainer {
 class ToastView {
   static Widget createView(
       int type, String message, StringCallback onClose, String index) {
-    Color bgColor = Colors.lightBlue;
+    Color bgColor = Colors.green;
     if (type == ToastViewContainer.WARN) {
       bgColor = Colors.orange;
     } else if (type == ToastViewContainer.ERROR) {
@@ -87,7 +87,7 @@ class ToastView {
     return Container(
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(0),
         border: Border.all(color: bgColor),
       ),
       margin: const EdgeInsets.only(bottom: 5),

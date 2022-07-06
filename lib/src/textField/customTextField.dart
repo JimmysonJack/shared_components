@@ -19,7 +19,7 @@ class CustomTextField extends StatefulWidget {
   State<CustomTextField> createState() => _CustomTextFieldState();
 }
 
-class _CustomTextFieldState extends ModularState<CustomTextField, CustomTextStore> {
+class _CustomTextFieldState extends State<CustomTextField> {
 
    FocusNode focusNode = FocusNode();
 
@@ -34,11 +34,12 @@ class _CustomTextFieldState extends ModularState<CustomTextField, CustomTextStor
        validator: widget.validator,
        decoration: InputDecoration(
          hintText: widget.hintText,
+         filled: true,
+         fillColor: Theme.of(context).cardColor
        ),
        keyboardType: widget.keyboardType ?? TextInputType.text,
        enabled: widget.enabled,
        onChanged: (value){
-         store.fieldValue = value;
          widget.onChanged == null ? (){} : widget.onChanged!(value) ;
        },
      );

@@ -6,6 +6,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 // import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_ui/google_ui.dart';
+import 'package:shared_component/shared_component.dart';
 
 import 'dialogManager.dart';
 // import 'package:xagent/app/shared/dialog/dialogManager.dart';
@@ -50,14 +51,14 @@ class DialogService {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if(loader.loading) const LinearProgressIndicator(),
+                    if(loader.loading)  IndicateProgress.linear(),
                     formValidator.hasErrors ? const SizedBox() : const SizedBox(),
                     if(min) AppBar(
                       shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(topLeft: Radius.circular(4),topRight: Radius.circular(4))
                       ),
                       automaticallyImplyLeading: formValidator.hasErrors ? false : false,
-                      backgroundColor: Theme.of(context).cardColor,
+                      backgroundColor: Theme.of(context).primaryColor,
                       title: Text(title.toUpperCase(),style: Theme.of(context).textTheme.button,),
                       actions:  [
                         Padding(
@@ -66,7 +67,7 @@ class DialogService {
                             message: 'Close',
                             child: InkWell(
                               borderRadius: BorderRadius.circular(20),
-                              child: const Icon(CupertinoIcons.clear),
+                              child: Icon(CupertinoIcons.clear,color: Theme.of(context).secondaryHeaderColor,),
                               onTap: (){
                                 Modular.to.pop();
                               },

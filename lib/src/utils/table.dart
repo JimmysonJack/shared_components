@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_component/shared_component.dart';
 
 import '../popUpMenu/custom_pop_up_menu.dart';
 
@@ -225,12 +227,22 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
   }
 
   deleteConfirm(index){
+    var size = MediaQuery.of(context).size;
     showDialog(
       barrierDismissible: false,
         context: context,
         builder: (context){
           return AlertDialog(
-            title: const Center(child: Text('Are you sure?')),
+            title: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  height: size.height / 9,
+                  width: size.height / 9,
+                    child: SvgPicture.asset('assets/file.svg',package: 'shared_component',)),
+                const Center(child: Text('Are you sure?')),
+              ],
+            ),
             actions: [
               Row(
                 mainAxisSize: MainAxisSize.max,

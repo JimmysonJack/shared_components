@@ -22,7 +22,7 @@ enum SuggestionAction {
   unfocus,
 }
 
-class SearchField extends StatefulWidget {
+class SearchField<T> extends StatefulWidget {
   /// Data source to perform search.
  List<Map<String,dynamic>>? suggestions;
 
@@ -167,11 +167,20 @@ class SearchField extends StatefulWidget {
   final bool isNetworkData;
   final bool enabled;
 
+  final bool isChipInputs ;
+
+  final String? updateEntry;
+
+  final List<Map<String,dynamic>> chipList;
+
   final Future<List<Map<String, dynamic>>> Function(String) findFn;
 
   SearchField({
     Key? key,
      this.suggestions,
+    required this.chipList,
+    this.updateEntry,
+    this.isChipInputs = false,
     this.initialValue,
     this.hint,
     this.hasOverlay = true,
@@ -221,6 +230,7 @@ class _SearchFieldState extends State<SearchField> {
 
   void initialize() {
 
+    widget.controller?.text = widget.updateEntry ?? '';
     _focus.addListener(() {
       setState(() {
         Future.delayed(Duration.zero,()async{
@@ -263,10 +273,12 @@ class _SearchFieldState extends State<SearchField> {
   }
 
   late OverlayEntry _overlayEntry;
+
   @override
   void initState() {
     super.initState();
     sourceController = widget.controller ?? TextEditingController();
+
     initialize();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.initialValue == null || widget.initialValue!.isEmpty) {
@@ -369,7 +381,11 @@ class _SearchFieldState extends State<SearchField> {
                 elevation: 4,
                 child: InkWell(
                   onTap: () {
-                    sourceController!.text = snapshot.data![index]?[widget.titleKey]!;
+                    // snapshot.data?.elementAt(index)?.map((key, value) {
+                    //   widget.chipList.add({key:value});
+                    //   return MapEntry(key, value);
+                    // });
+                    sourceController!.text = widget.isChipInputs ? '' :snapshot.data![index]?[widget.titleKey]!;
                     sourceController!.selection = TextSelection.fromPosition(
                       TextPosition(
                         offset: sourceController!.text.length,
@@ -412,38 +428,6 @@ class _SearchFieldState extends State<SearchField> {
                   ),
                 ),
 
-                // ListTile(
-                //   dense: true,
-                //   subtitle: Text('Thi is Subtitle'),
-                //   onTap: () {
-                //     sourceController!.text = snapshot.data![index]!;
-                //     sourceController!.selection = TextSelection.fromPosition(
-                //       TextPosition(
-                //         offset: sourceController!.text.length,
-                //       ),
-                //     );
-                //
-                //     // suggestion action
-                //     if (widget.suggestionAction != null) {
-                //       if (widget.suggestionAction == SuggestionAction.next) {
-                //         _focus.nextFocus();
-                //       } else if (widget.suggestionAction ==
-                //           SuggestionAction.unfocus) {
-                //         _focus.unfocus();
-                //       }
-                //     }
-                //
-                //     // hide the suggestions
-                //     sourceStream.sink.add(null);
-                //     if (widget.onTap != null) {
-                //       widget.onTap!(snapshot.data![index]);
-                //     }
-                //   },
-                //   title:Text(
-                //     snapshot.data![index]!,
-                //     style: widget.suggestionStyle,
-                //   ),
-                // ),
               ),
             ),
           );
@@ -526,79 +510,110 @@ class _SearchFieldState extends State<SearchField> {
       children: [
         CompositedTransformTarget(
           link: _layerLink,
-          child: TextFormField(
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            enabled: widget.enabled,
-            onTap: () {
-              /// only call that if [SuggestionState.onTap] is selected
-              if (!sourceFocused &&
-                  widget.suggestionState == SuggestionState.onTap) {
-                setState(() {
-                  sourceFocused = true;
-                });
-                Future.delayed(const Duration(milliseconds: 100), () {
-                  if(widget.suggestions != []) sourceStream.sink.add(widget.suggestions);
-                });
-              }
-            },
-            controller: widget.controller ?? sourceController,
-            focusNode: _focus,
-            validator: widget.validator,
-            style: widget.searchStyle,
-            textInputAction: widget.textInputAction,
-            decoration: InputDecoration(
-                hintText: widget.hint,
-                suffixIcon: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    widget.controller!.text.isNotEmpty ? InkWell(
-                        hoverColor: Colors.transparent,
-                        onTap: (){
-                          widget.onTap(null);
-                          widget.controller?.clear();
-                          sourceController?.clear();
+          child: Container(
+            padding: EdgeInsets.only(top:widget.isChipInputs && widget.chipList.isNotEmpty ? 4 : 0),
+            color: widget.isChipInputs && widget.chipList.isNotEmpty ? Theme.of(context).cardColor : Colors.transparent,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if(widget.isChipInputs && widget.chipList.isNotEmpty) Padding(
+                  padding: const EdgeInsets.only(left: 10.0,right: 10),
+                  child: SizedBox(
+                    child: Wrap(
+                      runSpacing: 5,
+                      spacing: 5,
+                      children: List.generate(widget.chipList.length, (index) => Chip(
+                        deleteButtonTooltipMessage: 'Remove',
+                        deleteIcon: const Icon(Icons.clear),
+                        onDeleted: (){
+                          setState(() {
+                            widget.chipList.removeWhere((element) => element == widget.chipList.elementAt(index));
+                          });
                         },
-                        child: Icon(CupertinoIcons.clear_circled_solid,color: Theme.of(context).disabledColor,)
-                    ):Container(),
-                    Container(width: 5,),
-                    const Icon(Icons.arrow_drop_down)
-                  ],
-                )
-            ),
-            onChanged: (item) async{
-              setState(() {});
-              final searchResult = <Map<String,dynamic>>[];
-              if(widget.isNetworkData){
-                var obtainedData = await widget.findFn(item);
-                sourceStream.sink.add(obtainedData);
-                widget.onChange(item);
-
-
-
-              }else{
-
-                if (item.isEmpty) {
-                  if(widget.suggestions != []) sourceStream.sink.add(widget.suggestions);
-                  return ;
-                }
-                if(widget.suggestions != [])
-                  for (final suggestion in widget.suggestions!) {
-                    if(widget.objectTitleKey == null){
-                      if (suggestion[widget.titleKey].toLowerCase().contains(item.toLowerCase())) {
-                        searchResult.add(suggestion);
-                      }
+                        label: Text(widget.chipList.elementAt(index)[widget.titleKey]),
+                      )),
+                    ),
+                  ),
+                ),
+                TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  enabled: widget.enabled,
+                  onTap: () {
+                    /// only call that if [SuggestionState.onTap] is selected
+                    if (!sourceFocused &&
+                        widget.suggestionState == SuggestionState.onTap) {
+                      setState(() {
+                        sourceFocused = true;
+                      });
+                      Future.delayed(const Duration(milliseconds: 100), () {
+                        if(widget.suggestions != []) sourceStream.sink.add(widget.suggestions);
+                      });
+                    }
+                  },
+                  controller: widget.controller ?? sourceController,
+                  focusNode: _focus,
+                  validator: widget.validator,
+                  style: widget.searchStyle,
+                  textInputAction: widget.textInputAction,
+                  decoration: InputDecoration(
+                      hintText: widget.hint,
+                      filled: true,
+                      fillColor: Theme.of(context).cardColor,
+                      suffixIcon: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          widget.controller!.text.isNotEmpty ? InkWell(
+                              hoverColor: Colors.transparent,
+                              onTap: (){
+                                widget.onTap(null);
+                                widget.controller?.clear();
+                                sourceController?.clear();
+                              },
+                              child: Icon(CupertinoIcons.clear_circled_solid,color: Theme.of(context).disabledColor,)
+                          ):Container(),
+                          Container(width: 5,),
+                          const Icon(Icons.arrow_drop_down)
+                        ],
+                      )
+                  ),
+                  onChanged: (item) async{
+                    setState(() {});
+                    final searchResult = <Map<String,dynamic>>[];
+                    if(widget.isNetworkData){
+                      var obtainedData = await widget.findFn(item);
+                      sourceStream.sink.add(obtainedData);
+                      widget.onChange(item);
                     }else{
-                      if (suggestion[widget.titleKey][widget.objectTitleKey].toLowerCase().contains(item.toLowerCase())) {
-                        searchResult.add(suggestion);
+                      if (item.isEmpty) {
+                        if(widget.suggestions != []){
+                          sourceStream.sink.add(widget.suggestions);
+                        }
+                        return ;
                       }
+                      if(widget.suggestions != []){
+                        for (final suggestion in widget.suggestions!) {
+                          if(widget.objectTitleKey == null){
+                            if (suggestion[widget.titleKey].toLowerCase().contains(item.toLowerCase())) {
+                              searchResult.add(suggestion);
+                            }
+                          }else{
+                            if (suggestion[widget.titleKey][widget.objectTitleKey].toLowerCase().contains(item.toLowerCase())) {
+                              searchResult.add(suggestion);
+                            }
+                          }
+
+                        }
+                      }
+
+                      sourceStream.sink.add(searchResult);
+                      widget.onChange(item);
                     }
 
-                }
-                sourceStream.sink.add(searchResult);
-                widget.onChange(item);
-              }
-
-            },
+                  },
+                ),
+              ],
+            ),
           ),
         ),
         if (!widget.hasOverlay)
