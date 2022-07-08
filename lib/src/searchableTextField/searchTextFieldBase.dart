@@ -145,7 +145,7 @@ class SearchField<T> extends StatefulWidget {
   ///
   ///
   ///
-  final String? Function(String?)? validator;
+  final String? Function(String?) validator;
 
   /// if false the suggestions will be shown below
   /// the searchfield along the Y-axis.
@@ -187,7 +187,7 @@ class SearchField<T> extends StatefulWidget {
     this.searchStyle,
     this.marginColor,
     this.controller,
-    this.validator,
+    required this.validator,
     this.suggestionState = SuggestionState.hidden,
     this.itemHeight = 35.0,
     this.suggestionsDecoration,
@@ -278,6 +278,7 @@ class _SearchFieldState extends State<SearchField> {
   void initState() {
     super.initState();
     sourceController = widget.controller ?? TextEditingController();
+    widget.validator(widget.updateEntry);
 
     initialize();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -406,6 +407,7 @@ class _SearchFieldState extends State<SearchField> {
                     sourceStream.sink.add(null);
                     if (widget.onTap != null) {
                       widget.onTap(snapshot.data![index]);
+                      widget.validator(widget.updateEntry);
                     }
                   },
                   child: Container(
@@ -528,7 +530,10 @@ class _SearchFieldState extends State<SearchField> {
                         deleteIcon: const Icon(Icons.clear),
                         onDeleted: (){
                           setState(() {
-                            widget.chipList.removeWhere((element) => element == widget.chipList.elementAt(index));
+                            widget.chipList.removeWhere((element) {
+                              widget.validator(widget.chipList.elementAt(index)['uid']);
+                              return element == widget.chipList.elementAt(index);
+                            });
                           });
                         },
                         label: Text(widget.chipList.elementAt(index)[widget.titleKey]),
@@ -566,9 +571,10 @@ class _SearchFieldState extends State<SearchField> {
                           widget.controller!.text.isNotEmpty ? InkWell(
                               hoverColor: Colors.transparent,
                               onTap: (){
-                                widget.onTap(null);
+                                widget.onTap({});
                                 widget.controller?.clear();
                                 sourceController?.clear();
+                                widget.validator(widget.updateEntry);
                               },
                               child: Icon(CupertinoIcons.clear_circled_solid,color: Theme.of(context).disabledColor,)
                           ):Container(),

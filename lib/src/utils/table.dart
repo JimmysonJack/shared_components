@@ -131,7 +131,7 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
                                     mini: true,
                                     elevation: 10,
                                     onPressed: null,
-                                    child: const Icon(Icons.more_vert_sharp, size: 15,),
+                                    child: Icon(Icons.more_vert_sharp, size: 15,color: Theme.of(context).cardColor,),
                                   ),
                                 ),
                                 if(widget.actionButton!.isNotEmpty) Container(width: 5,),
@@ -347,7 +347,7 @@ class _PaginatePageState extends State<PaginatePage> {
           backgroundColor: widget.currentPageColors,
             elevation: 7,
           mini: true,
-            child: Text((widget.currentPage).toString(),style: TextStyle(fontSize: Theme.of(context).textTheme.caption!.fontSize),),
+            child: Text((widget.currentPage).toString(),style: TextStyle(fontSize: Theme.of(context).textTheme.caption!.fontSize,color: Theme.of(context).cardColor),),
             onPressed: (){}),
 
         Container(width: 5,),

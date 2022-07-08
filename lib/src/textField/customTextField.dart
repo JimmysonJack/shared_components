@@ -6,7 +6,7 @@ import 'custom_text_field_store.dart';
 // import 'package:xagent/app/shared/textField/custom_text_field_store.dart';
 
 class CustomTextField extends StatefulWidget {
-   const CustomTextField({Key? key, required this.hintText, this.enabled = true, this.keyboardType, this.onChanged, this.inputFormatters, required this.validator, this.controller,}) : super(key: key);
+   const CustomTextField({Key? key,this.updateEntry, required this.hintText, this.enabled = true, this.keyboardType, this.onChanged, this.inputFormatters, required this.validator, this.controller,}) : super(key: key);
   final String hintText;
   final bool enabled;
   final TextEditingController? controller;
@@ -14,12 +14,23 @@ class CustomTextField extends StatefulWidget {
   final Function(String)? onChanged;
   final List<TextInputFormatter>? inputFormatters;
   final String? Function(String? value) validator;
+  final String? updateEntry;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
 }
 
 class _CustomTextFieldState extends State<CustomTextField> {
+
+  @override
+  void initState() {
+    ///it inserts value to [TextFormField] during updating process
+    widget.controller?.text = widget.updateEntry ?? '';
+
+    ///when the values are inserted in a [TextFormField], validator is called to validate the inserted data
+    widget.validator(widget.updateEntry);
+    super.initState();
+  }
 
    FocusNode focusNode = FocusNode();
 

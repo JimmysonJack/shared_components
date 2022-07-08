@@ -49,30 +49,25 @@ class DialogManager extends StatelessWidget {
       body: Observer(
         builder: (context) {
           return SingleChildScrollView(
-            child: Column(
-              children: [
-                LayoutBuilder(
-                  builder:(context, buildSize) {
-                    return Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: SizedBox(
-                        width: buildSize.maxWidth,
-                        child: Wrap(
-                          alignment: WrapAlignment.spaceBetween,
-                          runSpacing: 20,
-                          children: List.generate(elementWidgets.length, (index) => SizedBox(
-                            width:elementSizes?.length == 1
-                                ? (buildSize.maxWidth / elementSizes![0]) - 20
-                                : (buildSize.maxWidth / (elementSizes?[index] ?? 1)) - (elementSizes == null ? 0 : 20),
-                            child: elementWidgets[index],
-                          )),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-
-              ],
+            child: LayoutBuilder(
+              builder:(context, buildSize) {
+                return Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: SizedBox(
+                    width: buildSize.maxWidth,
+                    child: Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      runSpacing: 20,
+                      children: List.generate(elementWidgets.length, (index) => SizedBox(
+                        width:elementSizes?.length == 1
+                            ? (buildSize.maxWidth / elementSizes![0]) - 20
+                            : (buildSize.maxWidth / (elementSizes?[index] ?? 1)) - (elementSizes == null ? 0 : 20),
+                        child: elementWidgets[index],
+                      )),
+                    ),
+                  ),
+                );
+              },
             ),
           );
         }

@@ -7,31 +7,30 @@ class CircularProgress extends StatefulWidget {
   State<CircularProgress> createState() => _CircularProgressState();
 }
 
-class _CircularProgressState extends State<CircularProgress> {
+class _CircularProgressState extends State<CircularProgress>with TickerProviderStateMixin {
   late AnimationController animationController;
-  // @override
-  // void dispose() {
-  //   // TODO: implement dispose
-  //   super.dispose();
-  //   // animationController.dispose();
-  // }
+
   @override
   void initState() {
     super.initState();
-    // animationController =
-    //     AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
-    // animationController.repeat();
+    animationController =
+        AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
+    animationController.repeat();
+  }
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
   }
   @override
   Widget build(BuildContext context) {
-    return  const Scaffold(
-      body: Center(child: CircularProgressIndicator(
-        strokeWidth: 1,
-          // valueColor: animationController
-          //     .drive(ColorTween(begin: Colors.red, end: Theme.of(context).primaryColor)
-          // )
-      )),
-    );
+    return Center(child: CircularProgressIndicator(
+      backgroundColor: Theme.of(context).dividerColor,
+      strokeWidth: 1,
+      valueColor: animationController
+          .drive(ColorTween(begin: Colors.red, end: Theme.of(context).primaryColor)
+      )
+    ));
   }
 }
 
@@ -44,27 +43,29 @@ class LinearProgress extends StatefulWidget {
 
 class _LinearProgressState extends State<LinearProgress>with TickerProviderStateMixin {
   late AnimationController animationController;
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    // animationController.dispose();
-  }
+
   @override
   void initState() {
     super.initState();
-    // animationController =
-    //     AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
-    // animationController.repeat();
+    animationController =
+        AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
+    animationController.repeat();
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+
   }
   @override
   Widget build(BuildContext context) {
-    return const LinearProgressIndicator(
+    return  LinearProgressIndicator(
       backgroundColor: Colors.transparent,
-    valueColor: AlwaysStoppedAnimation(Colors.blueGrey),
-    //     valueColor: animationController
-    //         .drive(ColorTween(begin: Colors.red, end: Theme.of(context).primaryColor)
-    // )
+    // valueColor: AlwaysStoppedAnimation(Colors.blueGrey),
+        valueColor: animationController
+            .drive(ColorTween(begin: Colors.red, end: Theme.of(context).primaryColor)
+    )
     );
   }
 }

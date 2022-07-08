@@ -56,6 +56,11 @@ class SearchTextField<T> extends StatefulWidget {
 
 class SearchFieldCustomState<T> extends State<SearchTextField> {
   @override
+  void dispose() {
+    widget.controller?.clear();
+    super.dispose();
+  }
+  @override
   Widget build(BuildContext context) {
     return SearchField(
       enabled: widget.enabled,
@@ -78,7 +83,7 @@ class SearchFieldCustomState<T> extends State<SearchTextField> {
       initialValue: widget.initialValue,
       suggestions: const [],
       hint: widget.hintText,
-      validator: widget.validator,
+      validator: widget.validator!,
       hasOverlay: true,
       suggestionAction: SuggestionAction.unfocus,
       textInputAction: TextInputAction.done,

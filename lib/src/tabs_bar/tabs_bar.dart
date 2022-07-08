@@ -32,6 +32,7 @@ class _TabsBarState extends State<TabsBar> {
 
   @override
   Widget build(BuildContext context) {
+    double appBarSiz = AppBar().preferredSize.height;
     BorderSide borderSide = BorderSide(color: Theme.of(context).primaryColor,width: 1);
     BorderSide emptyBorder = const BorderSide(color: Colors.transparent,width: 0);
     return Observer(
@@ -41,8 +42,8 @@ class _TabsBarState extends State<TabsBar> {
               padding: const EdgeInsets.only(top: 8.0),
               child: Column(
                 children: [
-                  Expanded(
-                    flex: 1,
+                  SizedBox(
+                    height: appBarSiz * 0.7,
                     child: ListView(
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,

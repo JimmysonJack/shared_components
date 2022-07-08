@@ -21,7 +21,7 @@ class AuthGuard extends RouteGuard{
 
     if(['home','profile','help'].contains(newData.elementAt(0)) || newData.length > 1){
      AuthGuardStore.getInstance().setBreadCrumb(newData);
-     print(newData);
+     // print(newData);
     }
    }
     return true;

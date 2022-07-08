@@ -17,20 +17,20 @@ class DialogService {
   final List<Widget> elementWidgets;
   final int dialogWidth;
   final String title;
-  final String buttonName;
+  final String? buttonName;
   final Icon? icon;
-  final Function() onPressed;
+  final Function()? onPressed;
   final bool min;
   final dynamic loader;
   final  dynamic formValidator;
 
   DialogService(
-      {required this.buttonName,
+      {this.buttonName,
         this.icon,
         this.loader = false,
         this.formValidator,
         this.min = false,
-        required this.onPressed,
+        this.onPressed,
         required this.title,
         required this.context,
         this.elementSizes,
@@ -81,8 +81,8 @@ class DialogService {
                       child: DialogManager(
                         title: title,
                         formValidator: formValidator,
-                        onPressed: onPressed,
-                        buttonName: buttonName,
+                        onPressed: onPressed ?? (){},
+                        buttonName: buttonName ?? '',
                         dialogWidth: dialogWidth,
                         elementWidgets: elementWidgets,
                         elementSizes: elementSizes,
@@ -109,7 +109,7 @@ class DialogService {
                         );
                       },
                     ),
-                    LayoutBuilder(
+                    if(buttonName != null)LayoutBuilder(
                       builder: (context,buildSize) => Padding(
                         padding: const EdgeInsets.only(left: 10.0,right: 10,bottom: 10),
                         child: Align(
@@ -117,9 +117,9 @@ class DialogService {
                           child: SizedBox(
                             width: buildSize.maxWidth / 4,
                             child:  GElevatedButton(
-                                buttonName,
+                                buttonName!,
                                 onPressed:!formValidator.hasErrors ? !loader.loading ? (){
-                                  onPressed();
+                                  onPressed!();
 
                                 } : null : null,
                                 icon: icon

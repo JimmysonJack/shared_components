@@ -17,7 +17,13 @@ class AuthServiceStore extends _AuthServiceStoreBase with _$AuthServiceStore{
 }
 abstract class _AuthServiceStoreBase with Store{
 
-  late Api api;
+  @observable
+  bool loading = false;
+
+  @action
+  setLoading(bool value) => loading = value;
+
+  Api? api;
   @action
   getContext(context) {
     api = Api(context);
@@ -28,40 +34,42 @@ abstract class _AuthServiceStoreBase with Store{
   @action
   Future<bool> loginUser(
       {required String username, required String password}) async {
-    Map<String, String> credentials = {
-      'grant_type': 'password',
-      'username': username,
-      'password': password
-    };
-    Options requestOptions =
-        Options(contentType: 'application/x-www-form-urlencoded', headers: {
-      'Accept': 'application/json',
-      'Authorization':
-          'Basic ${base64Encode(utf8.encode('$clientId:$clientSecret'))}'
-    });
-    var res = await api.request(
-        type: 'post',
-        url: '/oauth/token',
-        data: credentials,
-        options: requestOptions);
-    if (res != null && res is Map) {
-      if (res['access_token'] != null) {
-        StorageService.setJson('user_token', res);
-        return true;
-      } else if (res['error_description'] != null) {
-        Toast.error(res['error_description']);
+
+      Map<String, String> credentials = {
+        'grant_type': 'password',
+        'username': username,
+        'password': password
+      };
+      Options requestOptions =
+          Options(contentType: 'application/x-www-form-urlencoded', headers: {
+        'Accept': 'application/json',
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('$clientId:$clientSecret'))}'
+      });
+      var res = await api?.request(
+          type: 'post',
+          url: '/oauth/token',
+          data: credentials,
+          options: requestOptions);
+      if (res != null && res is Map) {
+        if (res['access_token'] != null) {
+          StorageService.setJson('user_token', res);
+          setLoading(false);
+          return true;
+        } else if (res['error_description'] != null) {
+          Toast.error(res['error_description']);
+          return false;
+        }
+        return false;
+      } else {
+        Toast.error('Error contacting server');
         return false;
       }
-      return false;
-    } else {
-      Toast.error('Error contacting server');
-      return false;
-    }
   }
 
   @action
   Future<bool> getUser() async {
-    var res = await api.get('/user');
+    var res = await api?.get('/user');
     if (res != null) {
       if (res is String) {
         StorageService.setString('user_uid', res);
@@ -80,7 +88,7 @@ abstract class _AuthServiceStoreBase with Store{
       required String oldPassword,
       required String newPassword,
       required String confirmPassword}) async {
-    var res = await api.clientPost('/user/changePassword', {
+    var res = await api?.clientPost('/user/changePassword', {
       'uid': uid,
       'currentPassword': oldPassword,
       'newPassword': newPassword,
@@ -102,7 +110,7 @@ abstract class _AuthServiceStoreBase with Store{
       return true;
     }
     Token t = Token.fromJson(jsonToken);
-    var res = await api.clientPost(
+    var res = await api?.clientPost(
         '/oauth/token/revoke?access_token=${t.accessToken}&refresh_token=${t.refreshToken}',
         {});
     if (res != null) {
