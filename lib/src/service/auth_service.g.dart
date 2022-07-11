@@ -38,7 +38,7 @@ mixin _$AuthServiceStore on _AuthServiceStoreBase, Store {
       AsyncAction('_AuthServiceStoreBase.getUser', context: context);
 
   @override
-  Future<bool> getUser() {
+  Future<Checking> getUser() {
     return _$getUserAsyncAction.run(() => super.getUser());
   }
 
@@ -83,7 +83,7 @@ mixin _$AuthServiceStore on _AuthServiceStoreBase, Store {
   }
 
   @override
-  dynamic getContext(dynamic context) {
+  dynamic getContext(BuildContext context) {
     final _$actionInfo = _$_AuthServiceStoreBaseActionController.startAction(
         name: '_AuthServiceStoreBase.getContext');
     try {

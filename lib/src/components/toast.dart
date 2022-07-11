@@ -56,7 +56,7 @@ class ToastViewContainer {
     if (overlayEntry != null) overlayEntry!.remove();
     overlayEntry = OverlayEntry(
         builder: (BuildContext context) => Positioned(
-            top: 0,
+            top: 4,
             left: 20,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

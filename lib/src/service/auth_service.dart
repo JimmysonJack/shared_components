@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_component/src/service/storage_service.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 
 import '../components/toast.dart';
 import '../environment/system.env.dart';
@@ -11,6 +12,8 @@ import 'api.dart';
 import 'package:mobx/mobx.dart';
 
 part 'auth_service.g.dart';
+
+enum Checking{proceed,doNotProceed,stay, idle}
 
 class AuthServiceStore extends _AuthServiceStoreBase with _$AuthServiceStore{
 
@@ -24,9 +27,11 @@ abstract class _AuthServiceStoreBase with Store{
   setLoading(bool value) => loading = value;
 
   Api? api;
+  BuildContext? cxt;
   @action
-  getContext(context) {
-    api = Api(context);
+  getContext(BuildContext context) {
+    cxt = context;
+    api = Api(context:context);
     Toast.init(context);
     return context;
   }
@@ -53,33 +58,42 @@ abstract class _AuthServiceStoreBase with Store{
           options: requestOptions);
       if (res != null && res is Map) {
         if (res['access_token'] != null) {
-          StorageService.setJson('user_token', res);
-          setLoading(false);
+          Token token = Token.fromJson(res as Map<String,dynamic>);
+          StorageService.setJson('user_token', token.toJson());
           return true;
         } else if (res['error_description'] != null) {
-          Toast.error(res['error_description']);
+          Toast.error(res['error']);
+          setLoading(false);
           return false;
         }
+        setLoading(false);
         return false;
       } else {
-        Toast.error('Error contacting server');
+        if(res is String){
+          Toast.error('Error contacting server');
+        }
+        setLoading(false);
         return false;
       }
   }
 
   @action
-  Future<bool> getUser() async {
+  Future<Checking> getUser() async {
     var res = await api?.get('/user');
     if (res != null) {
       if (res is String) {
         StorageService.setString('user_uid', res);
-        return false;
+        setLoading(false);
+        return Checking.doNotProceed;
       } else if (res is Map) {
         StorageService.setJson('user', res);
-        return true;
+        setLoading(false);
+        return Checking.proceed;
       }
     }
-    return false;
+    otpExpired(cxt);
+    setLoading(false);
+    return Checking.stay;
   }
 
   @action
@@ -96,8 +110,10 @@ abstract class _AuthServiceStoreBase with Store{
     });
     if (res != null) {
       StorageService.setString('user_uid', null);
+      setLoading(false);
       return true;
     }
+    setLoading(false);
     return false;
   }
 
@@ -119,5 +135,21 @@ abstract class _AuthServiceStoreBase with Store{
       return true;
     }
     return false;
+  }
+  otpExpired(context){
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context){
+          return AlertDialog(
+            title: Text('OTP Expired!',style: Theme.of(context).textTheme.titleMedium,),
+            content: Text('contact System Administrator',style: Theme.of(context).textTheme.labelMedium,),
+            actions: [
+              TextButton(
+                  onPressed: (){Modular.to.pop();},
+                  child: const Text('Okay'))
+            ],
+          );
+        });
   }
 }

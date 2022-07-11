@@ -6,7 +6,7 @@ import 'custom_text_field_store.dart';
 // import 'package:xagent/app/shared/textField/custom_text_field_store.dart';
 
 class CustomTextField extends StatefulWidget {
-   const CustomTextField({Key? key,this.updateEntry, required this.hintText, this.enabled = true, this.keyboardType, this.onChanged, this.inputFormatters, required this.validator, this.controller,}) : super(key: key);
+   const CustomTextField({Key? key,this.updateEntry,this.obscure = false, required this.hintText, this.enabled = true, this.keyboardType, this.onChanged, this.inputFormatters, required this.validator, this.controller,}) : super(key: key);
   final String hintText;
   final bool enabled;
   final TextEditingController? controller;
@@ -15,6 +15,7 @@ class CustomTextField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final String? Function(String? value) validator;
   final String? updateEntry;
+  final bool obscure;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -39,6 +40,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
      return TextFormField(
        autovalidateMode: AutovalidateMode.onUserInteraction,
        focusNode: focusNode,
+       obscureText: widget.obscure,
        controller: widget.controller ?? TextEditingController(),
        textCapitalization: TextCapitalization.sentences,
        inputFormatters: widget.inputFormatters ?? [],

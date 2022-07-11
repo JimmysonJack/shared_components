@@ -7,7 +7,7 @@ import '../popUpMenu/custom_pop_up_menu.dart';
 
 
 class TableCustom<T> extends StatefulWidget {
-  const TableCustom({Key? key,this.color,required this.dataList,this.onCreate,this.onDelete, required this.headTitles, this.deleteData = false, this.actionButton, this.paginatePage, required this.onPageSize, this.onDeleteLoader = false}) : super(key: key);
+  const TableCustom({Key? key,this.loadOnMoreButton = false,this.color,required this.dataList,this.onCreate,this.onDelete, required this.headTitles, this.deleteData = false, this.actionButton, this.paginatePage, required this.onPageSize, this.onDeleteLoader = false}) : super(key: key);
   final List<dynamic> dataList;
   final void Function(dynamic)? onCreate;
   final void Function(String value)? onDelete;
@@ -17,6 +17,7 @@ class TableCustom<T> extends StatefulWidget {
   final PaginatePage? paginatePage;
   final void Function(dynamic) onPageSize;
   final bool onDeleteLoader;
+  final bool loadOnMoreButton;
   final Color? color;
 
   @override
@@ -26,6 +27,7 @@ class TableCustom<T> extends StatefulWidget {
 class _TableCustomState<T> extends State<TableCustom<T>> {
   int pageSizeValue = PagingValues.getInstance().getPageSize();
   int pressedIndex = -10;
+  int loadingIndex = -0;
   @override
   void initState() {
       widget.actionButton?.removeWhere((element) => element.permissionGranted == false);
@@ -117,12 +119,25 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                if(widget.actionButton!.isNotEmpty) QudsPopupButton(
+                                if(widget.actionButton!.isNotEmpty)  widget.loadOnMoreButton && loadingIndex == index
+                                    ? Padding(
+                                  padding: const EdgeInsets.only(left: 10.0),
+                                  child: SizedBox(
+                                    height: 25,
+                                    width: 25,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 1,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                  ),
+                                )
+                                    :  QudsPopupButton(
                                   tooltip: 'More',
-                                  items: List.generate(widget.actionButton!.length, (pressIndex) => QudsPopupMenuItem(
+                                  items: List.generate(widget.actionButton!.length, (pressIndex) =>  QudsPopupMenuItem(
                                       leading: Icon(widget.actionButton![pressIndex].icon),
                                       title: Text(widget.actionButton![pressIndex].name),
                                       onPressed: () {
+                                        loadingIndex = index;
                                         widget.actionButton![pressIndex].onPressed(widget.dataList[index]);
                                       })),
                                   // widthSize: 200,

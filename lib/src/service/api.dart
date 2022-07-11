@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_component/shared_component.dart';
 import 'package:shared_component/src/service/storage_service.dart';
 
 import '../components/toast.dart';
@@ -12,12 +13,14 @@ typedef DynamicFunction = void Function(dynamic);
 
 class Api {
   final Dio http = Dio();
-  final BuildContext context;
+  final BuildContext? context;
   late String lang;
 
-  Api(this.context) {
+  Api({this.context}) {
     lang = '';
-    Toast.init(context);
+    if(context != null) {
+      Toast.init(context);
+    }
   }
 
   Future<String> userToken(bool login) async {
@@ -41,6 +44,29 @@ class Api {
   }
 
   Future<String> userLogin() async {
+    final navigatorKey = GlobalKey<NavigatorState>();
+    print('You should login ${navigatorKey.currentWidget}');
+    // var principle = await StorageService.getJson('user');
+    // var userName = principle['name'];
+    // var userEmail = principle['email'];
+    // showDialog<void>(
+    //   context: context!,
+    //   barrierDismissible: false,
+    //   // false = user must tap button, true = tap outside dialog
+    //   builder: (BuildContext dialogContext) {
+    //     return AlertDialog(
+    //       title: Text('Are you Jimmyson'),
+    //       actions: <Widget>[
+    //         GElevatedButton(
+    //           'Login',
+    //           onPressed: () {
+    //
+    //           },
+    //         ),
+    //       ],
+    //     );
+    //   },
+    // );
     return '';
   }
 
@@ -51,11 +77,11 @@ class Api {
       'Authorization':
           'Basic ${base64Encode(utf8.encode('$clientId:$clientSecret'))}'
     });
-    Map<String, dynamic> res = await post('/oauth/token',
+    Map<String, dynamic>? res = await post('/oauth/token',
         {'grant_type': 'refresh_token', 'refresh_token': token.refreshToken},
         options: requestOptions);
-    if (res['access_token'] != null) {
-      Token token = Token.fromJson(res);
+    if (res?['access_token'] != null) {
+      Token token = Token.fromJson(res!);
       StorageService.setJson('user_token', token.toJson());
       return token.accessToken!;
     }
@@ -125,7 +151,14 @@ class Api {
               'Bearer ${await userToken(false)}';
           return request(type: type, url: url, data: data, options: options);
         } else if (res['message'].contains('First login')) {
+
           return res['data'];
+        }else if (res['message'].contains('Password Expired')){
+
+          return res['data'];
+        }else if(res['message'] == 'OTP Expired'){
+
+          return null;
         }
         Toast.error(res['message']);
       }
@@ -223,4 +256,5 @@ class Api {
       }
     }
   }
+
 }

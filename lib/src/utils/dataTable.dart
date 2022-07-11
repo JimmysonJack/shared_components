@@ -8,6 +8,7 @@ class DataSourceTable<T> extends StatefulWidget {
         this.tableColor,
       this.buttonActivities,
       this.onDeleteLoader = false,
+      this.loadOnMoreButton = false,
       required this.title,
       required this.serialNumberTitle,
       this.actionTitle,
@@ -36,6 +37,7 @@ class DataSourceTable<T> extends StatefulWidget {
   final bool onDeleteLoader;
   final Color? tableColor;
   final bool noSearchResults;
+  final bool loadOnMoreButton;
 
   @override
   _DataSourceTableState<T> createState() => _DataSourceTableState<T>();
@@ -108,6 +110,7 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
                       Expanded(
                         child: !widget.noSearchResults ? TableCustom<T>(
                           onDeleteLoader: widget.onDeleteLoader,
+                          loadOnMoreButton: widget.loadOnMoreButton,
                           color: widget.tableColor,
                           headTitles: HeardTitle(
                               serialNumberTitle: widget.serialNumberTitle,
