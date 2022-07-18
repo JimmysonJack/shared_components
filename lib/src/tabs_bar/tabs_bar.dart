@@ -66,7 +66,7 @@ class _TabsBarState extends State<TabsBar> {
                               color: selectedIndex == index ? Theme.of(context).primaryColor : Colors.transparent,
                               border: Border(top: borderSide, left: borderSide,right: TabsBarStore.getInstance().tabsItems.elementAt(TabsBarStore.getInstance().tabsItems.length -1) == TabsBarStore.getInstance().tabsItems.elementAt(index) ? borderSide : emptyBorder)),
                           padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 10),
-                          child: Text(TabsBarStore.getInstance().tabsItems.elementAt(index).title,style: TextStyle(fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,color: selectedIndex == index ? Theme.of(context).cardColor : Theme.of(context).disabledColor),),
+                          child: Text(TabsBarStore.getInstance().tabsItems.elementAt(index).title,style: TextStyle(fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,color: selectedIndex == index ? Theme.of(context).cardColor : Theme.of(context).hintColor),),
                         ),
                       ),),
                     ),

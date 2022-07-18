@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:shared_component/shared_component.dart';
 
 typedef HoverCallBack = void Function(String);
 
@@ -11,6 +12,8 @@ class Tile extends StatefulWidget {
   String url;
   @override
   _TileState createState() => _TileState();
+
+  static String? libraryName;
 }
 
 class _TileState extends State<Tile> {
@@ -48,7 +51,7 @@ class _TileState extends State<Tile> {
                         'assets/images/svg/${widget.icon}.svg',
                         width: width,
                         color: Theme.of(context).backgroundColor,
-                        package: 'uaa_pack',
+                        package: Tile.libraryName,
                       ),
                     ),
                   ),

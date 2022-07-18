@@ -6,16 +6,19 @@ import 'custom_text_field_store.dart';
 // import 'package:xagent/app/shared/textField/custom_text_field_store.dart';
 
 class CustomTextField extends StatefulWidget {
-   const CustomTextField({Key? key,this.updateEntry,this.obscure = false, required this.hintText, this.enabled = true, this.keyboardType, this.onChanged, this.inputFormatters, required this.validator, this.controller,}) : super(key: key);
+   const CustomTextField({Key? key,this.focusNode,this.onTap,this.isDate = false,this.updateEntry,this.obscure = false, required this.hintText, this.enabled = true, this.keyboardType, this.onChanged, this.inputFormatters, required this.validator, this.controller,}) : super(key: key);
   final String hintText;
   final bool enabled;
   final TextEditingController? controller;
   final TextInputType? keyboardType;
   final Function(String)? onChanged;
+  final Function()? onTap;
   final List<TextInputFormatter>? inputFormatters;
   final String? Function(String? value) validator;
   final String? updateEntry;
   final bool obscure;
+  final bool isDate;
+  final FocusNode? focusNode;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -29,24 +32,27 @@ class _CustomTextFieldState extends State<CustomTextField> {
     widget.controller?.text = widget.updateEntry ?? '';
 
     ///when the values are inserted in a [TextFormField], validator is called to validate the inserted data
-    widget.validator(widget.updateEntry);
+    if(widget.updateEntry != null) {
+      widget.validator(widget.updateEntry);
+    }
     super.initState();
   }
-
-   FocusNode focusNode = FocusNode();
 
    @override
    Widget build(BuildContext context) {
      return TextFormField(
+       onTap: widget.onTap ?? (){},
        autovalidateMode: AutovalidateMode.onUserInteraction,
-       focusNode: focusNode,
+       focusNode: widget.focusNode ?? FocusNode(),
        obscureText: widget.obscure,
        controller: widget.controller ?? TextEditingController(),
        textCapitalization: TextCapitalization.sentences,
        inputFormatters: widget.inputFormatters ?? [],
        validator: widget.validator,
        decoration: InputDecoration(
-         hintText: widget.hintText,
+         labelText: widget.hintText,
+           // labelText: widget.hintText,
+           suffixIcon: widget.isDate ? const Icon(Icons.date_range) : null,
          filled: true,
          fillColor: Theme.of(context).cardColor
        ),

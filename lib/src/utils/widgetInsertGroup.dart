@@ -27,11 +27,15 @@ class WidgetsGroup{
               return SizedBox(
                 width: buildSize.maxWidth,
                 child: Wrap(
-                  alignment: WrapAlignment.spaceBetween,
+                  // alignment: WrapAlignment.spaceBetween,
+                  // spacing: 10,
                   runSpacing: 20,
-                  children: List.generate(elementWidgets.length, (index) => elementSizes?.length == 1 && elementSizes?.elementAt(0) == 1 || elementSizes?.elementAt(index) == null ? elementWidgets.elementAt(index)! : SizedBox(
-                    width:(buildSize.maxWidth / (elementSizes?.elementAt(index) ?? 1)) - (elementSizes == null ? 0 : 10),
-                    child: elementWidgets[index],
+                  children: List.generate(elementWidgets.length, (index) => elementSizes?.length == 1 && elementSizes?.elementAt(0) == 1 || elementSizes?.elementAt(index) == null ? elementWidgets.elementAt(index)! : Padding(
+                    padding: const EdgeInsets.only(left: 10,right: 10),
+                    child: SizedBox(
+                      width:(buildSize.maxWidth / (elementSizes?.elementAt(index) ?? 1)) - (elementSizes == null || elementSizes!.elementAt(index) == 1 ? 0 :  20),
+                      child: elementWidgets[index],
+                    ),
                   )),
                 ),
               );

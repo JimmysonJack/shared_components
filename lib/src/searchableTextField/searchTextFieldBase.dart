@@ -562,7 +562,7 @@ class _SearchFieldState extends State<SearchField> {
                   style: widget.searchStyle,
                   textInputAction: widget.textInputAction,
                   decoration: InputDecoration(
-                      hintText: widget.hint,
+                      labelText: widget.hint,
                       filled: true,
                       fillColor: Theme.of(context).cardColor,
                       suffixIcon: Row(

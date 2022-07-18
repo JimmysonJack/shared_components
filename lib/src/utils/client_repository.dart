@@ -26,6 +26,7 @@ class ClientRepository {
 
     final link = HttpLink('$serverUrl/graphql',defaultHeaders: {
       "authorization": 'Bearer $token',
+      // "authorization": 'Bearer 63a79436-a83a-47c8-b352-40ab289fc5f9',
     });
 
     final client = Client(link: link,cache: cache);

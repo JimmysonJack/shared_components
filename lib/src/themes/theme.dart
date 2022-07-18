@@ -49,7 +49,7 @@ ThemeData customTheme(bool isDarkTheme) {
         style: ButtonStyle(
             // backgroundColor: MaterialStateProperty.all<Color>(color.shade50),
           enableFeedback: true,
-            fixedSize: MaterialStateProperty.all<Size?>(const Size(20,40)),
+            fixedSize: MaterialStateProperty.all<Size?>(const Size(1000,40)),
           foregroundColor: MaterialStateProperty.all<Color?>(const Color(0xfff2f2f2))
         ),
     ),

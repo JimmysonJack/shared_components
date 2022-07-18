@@ -16,12 +16,29 @@ part 'auth_service.g.dart';
 enum Checking{proceed,doNotProceed,stay, idle}
 
 class AuthServiceStore extends _AuthServiceStoreBase with _$AuthServiceStore{
+  static AuthServiceStore? _instance;
+  static AuthServiceStore getInstance(){
+    _instance ??= AuthServiceStore();
+    return _instance!;
+  }
 
 }
 abstract class _AuthServiceStoreBase with Store{
 
   @observable
   bool loading = false;
+
+  @observable
+  String? passwordValue;
+
+  @computed
+  bool get passwordHasError => passwordValue == null || passwordValue!.isEmpty;
+
+  @action
+  setPass(String value) {
+  passwordValue = value;
+}
+
 
   @action
   setLoading(bool value) => loading = value;

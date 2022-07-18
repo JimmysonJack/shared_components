@@ -1,27 +1,35 @@
 import 'dart:convert';
+import 'dart:js';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
+import 'package:shared_component/src/service/authService.dart';
 import 'package:shared_component/src/service/storage_service.dart';
 
 import '../components/toast.dart';
 import '../environment/system.env.dart';
 import '../languages/intl.dart';
 import '../models/token.dart';
+import 'package:flutter_modular/flutter_modular.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
 typedef DynamicFunction = void Function(dynamic);
 
 class Api {
   final Dio http = Dio();
+  AuthServiceStore authService = AuthServiceStore();
   final BuildContext? context;
+  static BuildContext? _dialogContext;
   late String lang;
 
   Api({this.context}) {
     lang = '';
-    if(context != null) {
+    if (context != null) {
       Toast.init(context);
     }
   }
+
+  static getContext(BuildContext cxt) => _dialogContext = cxt;
 
   Future<String> userToken(bool login) async {
     var jsonToken = await StorageService.getJson('user_token');
@@ -44,29 +52,115 @@ class Api {
   }
 
   Future<String> userLogin() async {
-    final navigatorKey = GlobalKey<NavigatorState>();
-    print('You should login ${navigatorKey.currentWidget}');
-    // var principle = await StorageService.getJson('user');
-    // var userName = principle['name'];
-    // var userEmail = principle['email'];
-    // showDialog<void>(
-    //   context: context!,
-    //   barrierDismissible: false,
-    //   // false = user must tap button, true = tap outside dialog
-    //   builder: (BuildContext dialogContext) {
-    //     return AlertDialog(
-    //       title: Text('Are you Jimmyson'),
-    //       actions: <Widget>[
-    //         GElevatedButton(
-    //           'Login',
-    //           onPressed: () {
-    //
-    //           },
-    //         ),
-    //       ],
-    //     );
-    //   },
-    // );
+    print('userLogin is called');
+    var principal = await StorageService.getJson('user');
+    var userName;
+    var userEmail;
+    if(principal.isNotEmpty){
+      userName = principal['principal']['name'];
+      userEmail = principal['principal']['email'];
+    }
+    showDialog<void>(
+      context: _dialogContext!,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return SizedBox(
+          width: MediaQuery.of(context).size.width /3.5,
+          child: Observer(builder: (context) {
+            return SimpleDialog(
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              title: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      userName == null ? 'LOGIN' : 'Confirm Your Identity',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  Text(
+                    userName ?? '',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  CustomTextField(
+                      hintText: 'Password',
+                      controller: TextEditingController(),
+                      obscure: true,
+                      onChanged: authService.setPass,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Password must be provided';
+                        }
+                        return null;
+                      })
+                ],
+              ),
+              children: <Widget>[
+                Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 23),
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width /4,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (authService.loading)
+                                IndicateProgress.linear(),
+                              GElevatedButton(
+                                'Confirm',
+                                onPressed: authService
+                                    .passwordHasError
+                                    ? null
+                                    : authService.loading
+                                    ? null
+                                    : () async {
+                                  authService.getContext(context);
+                                  authService.setLoading(true);
+                                  if(await authService.loginUser(username: userEmail, password: authService.passwordValue!)){
+                                    authService.setLoading(false);
+                                    Modular.to.pop();
+                                  }else{
+                                    authService.setLoading(false);
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          if (!authService.loading)
+                            GElevatedButton(
+                              'Go To Start Over',
+                              color: Theme.of(context).errorColor,
+                              onPressed: () async{
+                                var jsonToken = await StorageService.getJson('user_token');
+
+                                if(jsonToken.isNotEmpty){
+                                  Token t = Token.fromJson(jsonToken);
+                                  authService.logoutUser(accessToken: t.accessToken!, refreshToken: t.refreshToken!);
+                                }else{
+                                  Modular.to.navigate('/login/');
+                                }
+                              },
+                            )
+                        ],
+                      ),
+                    )),
+              ],
+            );
+          }),
+        );
+      },
+    );
     return '';
   }
 
@@ -151,13 +245,10 @@ class Api {
               'Bearer ${await userToken(false)}';
           return request(type: type, url: url, data: data, options: options);
         } else if (res['message'].contains('First login')) {
-
           return res['data'];
-        }else if (res['message'].contains('Password Expired')){
-
+        } else if (res['message'].contains('Password Expired')) {
           return res['data'];
-        }else if(res['message'] == 'OTP Expired'){
-
+        } else if (res['message'] == 'OTP Expired') {
           return null;
         }
         Toast.error(res['message']);
@@ -256,5 +347,4 @@ class Api {
       }
     }
   }
-
 }
