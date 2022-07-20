@@ -10,7 +10,7 @@ environment:
 dependencies:
   google_ui:
     git:
-      url: "git@github.com:JimmysonJack/google_ui.git"
+      url: "git@git.uat.mil.tz:dhms/dhms-web-group/google-ui.git"
       ref: master
   flutter:
     sdk: flutter
