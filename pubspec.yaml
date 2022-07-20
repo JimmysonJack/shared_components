@@ -25,9 +25,9 @@ dependencies:
   ferry: ^0.10.5-dev.3
   ferry_hive_store: ^0.4.4
   ferry_flutter: ^0.5.4
-  syncfusion_flutter_datepicker: ^20.1.56
+  syncfusion_flutter_datepicker: 20.1.56
   syncfusion_flutter_pdfviewer: ^20.1.56-beta
-  freezed: ^2.0.3+1
+  freezed: 2.0.3+1
   json_serializable: ^6.2.0
 
 
