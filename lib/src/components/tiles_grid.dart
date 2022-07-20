@@ -6,9 +6,10 @@ import '../models/tile_model.dart';
 import 'tile.dart';
 
 class TilesGrid extends StatefulWidget {
-  const TilesGrid({Key? key, required this.tiles}): super(key: key);
+  const TilesGrid({Key? key, required this.tiles,required this.packageName}): super(key: key);
 
   final List<TileModel> tiles;
+  final String? packageName;
   @override
   _TilesGridState createState() => _TilesGridState();
 }
@@ -17,6 +18,12 @@ class _TilesGridState extends State<TilesGrid> {
   List<TileModel> visibleTiles = [];
   TextEditingController searchController = TextEditingController();
   String? lang;
+
+  @override
+  void initState() {
+    Tile.libraryName = widget.packageName;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
