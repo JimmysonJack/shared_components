@@ -52,92 +52,91 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
         padding: EdgeInsets.only(left:size.width / 70,right: size.width / 70,bottom: size.width / 70),
         child: Column(
           children: <Widget>[
-            ///SEARCH FIELD
-            Align(
-              alignment: Alignment.topRight,
-              child: Container(
-                width: size.width / 5,
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search',
-                    fillColor: Theme.of(context).cardColor,
-                    filled: true
-                  ),
-                  onChanged: (value){
-                    if(widget.onSearch != null) widget.onSearch!(value);
-                  },
-                ),
-              ),
-            ),
-
-            ///DATA TABLE
             Expanded(
               child: GCard(
                 color: widget.tableColor ?? Theme.of(context).primaryColor,
-                  child: Column(
-                    children: [
-                     if(!widget.noSearchResults) SizedBox(
-                        height: size.width / 45,
-                        child: Container(
-                          color: Theme.of(context).hoverColor,
-                          height: size.height / 20,
-                          padding: const EdgeInsets.only(left: 10),
-                          width: size.width,
-                          child: Row(
-                            children: [
-                              Text(widget.title.replaceAll('ComponentPage', '').toUpperCase(),style: Theme.of(context).textTheme.button),
-                              Expanded(child: Padding(
-                                padding: const EdgeInsets.only(right: 10.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: List.generate(widget.buttonActivities == null ? 0 : widget.buttonActivities!.length, (index) => Padding(
-                                    padding: const EdgeInsets.only(left: 8.0),
-                                    child: Tooltip(
-                                      message: widget.buttonActivities![index].toolTip ?? '',
-                                      child: InkWell(
-                                        onTap: widget.buttonActivities![index].onTap,
-                                        child: widget.buttonActivities![index].icon ?? widget.buttonActivities![index].textName,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: size.width / 45,
+                          child: Container(
+                            color: Theme.of(context).hoverColor,
+                            height: size.height / 20,
+                            padding: const EdgeInsets.only(left: 10),
+                            width: size.width,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  ///Search field
+                                    child: TextField(
+                                      decoration: const InputDecoration(
+                                        prefixIcon: Icon(Icons.search),
+                                        border: InputBorder.none,
+                                        hintText: 'Search',
+                                        // fillColor: Theme.of(context).cardColor,
+                                        // filled: true
                                       ),
-                                    ),
-                                  )),
-                                ),
-                              ))
-                            ],
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: !widget.noSearchResults ? TableCustom<T>(
-                          onDeleteLoader: widget.onDeleteLoader,
-                          loadOnMoreButton: widget.loadOnMoreButton,
-                          color: widget.tableColor,
-                          headTitles: HeardTitle(
-                              serialNumberTitle: widget.serialNumberTitle,
-                              actionTitle: widget.actionTitle,
-                              heardTileItems: widget.heardTileItems
-                          ),
-                          onPageSize: widget.onPageSize!,
-                          deleteData: widget.deleteData!,
-                          actionButton: widget.actionButton,
-                          paginatePage: widget.paginatePage,
-                          onDelete: widget.onDelete,
-                          dataList: widget.dataList,): Center(
-                          child: GErrorMessage(
-                            icon: SvgPicture.asset(
-                              'assets/empty.svg',
-                              package: 'shared_component',
-                              width: (size.width / 4) * 0.2,
-                              height: (size.width / 4) * 0.2,
-                              // color: Theme.of(context).errorColor,
+                                      onChanged: (value){
+                                        if(widget.onSearch != null) widget.onSearch!(value);
+                                      },
+                                    )),
+                                ///activities buttons
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 10.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      ...List.generate(widget.buttonActivities == null ? 0 : widget.buttonActivities!.length, (index) => Padding(
+                                        padding: const EdgeInsets.only(left: 8.0),
+                                        child: Tooltip(
+                                          message: widget.buttonActivities![index].toolTip ?? '',
+                                          child: InkWell(
+                                            onTap: widget.buttonActivities![index].onTap,
+                                            child: widget.buttonActivities![index].icon ?? widget.buttonActivities![index].textName,
+                                          ),
+                                        ),
+                                      ))
+                                    ],
+                                  ),
+                                )
+                              ],
                             ),
-                            title: 'Sorry! No Data Found',
-                            subtitle: 'Consider changing the keywords',
-
                           ),
                         ),
-                      ),
-                    ],
+                        Expanded(
+                          child: !widget.noSearchResults ? TableCustom<T>(
+                            onDeleteLoader: widget.onDeleteLoader,
+                            loadOnMoreButton: widget.loadOnMoreButton,
+                            color: widget.tableColor,
+                            headTitles: HeardTitle(
+                                serialNumberTitle: widget.serialNumberTitle,
+                                actionTitle: widget.actionTitle,
+                                heardTileItems: widget.heardTileItems
+                            ),
+                            onPageSize: widget.onPageSize!,
+                            deleteData: widget.deleteData!,
+                            actionButton: widget.actionButton,
+                            paginatePage: widget.paginatePage,
+                            onDelete: widget.onDelete,
+                            dataList: widget.dataList,): Center(
+                            child: GErrorMessage(
+                              icon: SvgPicture.asset(
+                                'assets/empty.svg',
+                                package: 'shared_component',
+                                width: (size.width / 4) * 0.2,
+                                height: (size.width / 4) * 0.2,
+                                // color: Theme.of(context).errorColor,
+                              ),
+                              title: 'Sorry! No Data Found',
+                              subtitle: 'Consider changing the keywords',
+
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   )),
             )
           ],

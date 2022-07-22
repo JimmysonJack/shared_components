@@ -301,8 +301,8 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "495fd9cfa28190157e161e664c2865bda2096f35"
-      url: "git@github.com:JimmysonJack/google_ui.git"
+      resolved-ref: "0e3054291326fea6ebceacdf37a7037922ea07e5"
+      url: "git@git.uat.mil.tz:dhms/dhms-web-group/google-ui.git"
     source: git
     version: "2.7.0"
   gql:
@@ -750,7 +750,7 @@ packages:
       name: syncfusion_flutter_datepicker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "20.2.38"
+    version: "20.1.56"
   syncfusion_flutter_pdf:
     dependency: transitive
     description:

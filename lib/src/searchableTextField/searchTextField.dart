@@ -8,17 +8,17 @@ class SearchTextField<T> extends StatefulWidget {
     Key? key,
     this.onTap,
     required this.onSelected,
-    this.validator,
-    this.accessTitleValueKey,
+    required this.validator,
+    required this.accessTitleValueKey,
     this.accessDiscValueKey,
     this.labelText,
     this.borderRadius,
     this.focusBorder,
     this.initialValue,
-    this.controller,
-    this.hintText,
+    required this.controller,
+    required this.hintText,
     required this.onChange,
-    this.isNetworkData = false,
+    required this.isNetworkData,
     required this.findFn,
     this.enabled = true,
     this.filled = false,
@@ -30,14 +30,14 @@ class SearchTextField<T> extends StatefulWidget {
   }) : super(key: key);
   final VoidCallback? onTap;
   final void Function(dynamic) onSelected;
-  final String? Function(String? value)? validator;
-  final String? accessTitleValueKey;
+  final String? Function(String? value) validator;
+  final String accessTitleValueKey;
   final String? accessDiscValueKey;
   final String? labelText;
   final double? borderRadius;
   final double? focusBorder;
   final Map<String,dynamic>? initialValue;
-  final TextEditingController? controller;
+  final TextEditingController controller;
   final Function(String value) onChange;
   final bool isNetworkData;
   final bool enabled;
@@ -45,7 +45,7 @@ class SearchTextField<T> extends StatefulWidget {
   final bool isChipInputs;
   final String? subObject;
   final String? objectTitle;
-  final String? hintText;
+  final String hintText;
   final List<Map<String,dynamic>>? chipList;
   final String? updateEntry;
   final Future<List<Map<String, dynamic>>> Function(String) findFn;
@@ -57,7 +57,7 @@ class SearchTextField<T> extends StatefulWidget {
 class SearchFieldCustomState<T> extends State<SearchTextField> {
   @override
   void dispose() {
-    widget.controller?.clear();
+    widget.controller.clear();
     super.dispose();
   }
   @override
@@ -83,7 +83,7 @@ class SearchFieldCustomState<T> extends State<SearchTextField> {
       initialValue: widget.initialValue,
       suggestions: const [],
       hint: widget.hintText,
-      validator: widget.validator!,
+      validator: widget.validator,
       hasOverlay: true,
       suggestionAction: SuggestionAction.unfocus,
       textInputAction: TextInputAction.done,
