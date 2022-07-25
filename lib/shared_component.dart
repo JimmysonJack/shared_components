@@ -42,6 +42,7 @@ export 'src/customDate/date.dart';
 export 'src/filePicker/filePicker.dart';
 export 'src/filePickerCross/file_picker_cross.dart';
 export 'src/customSwitchState/customSwitchState.dart';
+export 'src/utils/upper_case_text_formatter.dart';
 // export 'src/utils/table.dart';
 export 'src/utils/dataTable.dart';
 export 'package:google_ui/google_ui.dart';

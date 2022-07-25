@@ -179,7 +179,7 @@ class _CustomDateState extends State<CustomDate> {
         // autovalidateMode: widget.autoValidate ?  AutovalidateMode.onUserInteraction : AutovalidateMode.disabled,
         // autofillHints: widget.autoFillHints ?? null,
         // maxLength: widget.maxLength ?? null,
-        controller: widget.textController,
+        controller: widget.textController ?? TextEditingController(),
         inputFormatters: widget.formatInputs ?? <TextInputFormatter>[
           FilteringTextInputFormatter.singleLineFormatter
         ],
