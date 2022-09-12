@@ -1,25 +1,29 @@
 import 'dart:math';
 
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 typedef StringCallback = void Function(String);
 
 class Toast {
-   static BuildContext? _context;
-  static init(context){
+  static BuildContext? _context;
+  static init(context) {
     _context = context;
   }
-  static void info(String message) {
-    ToastViewContainer.show(ToastViewContainer.INFO, message, _context!);
+
+  static void info(String title, {String? subTitle,bool? strip}) {
+    ToastViewContainer.show(
+        ToastViewContainer.INFO, title, _context!, subTitle,strip);
   }
 
-  static void warn(String message) {
-    ToastViewContainer.show(ToastViewContainer.WARN, message, _context!);
+  static void warn(String title, {String? subTitle,bool? strip}) {
+    ToastViewContainer.show(
+        ToastViewContainer.WARN, title, _context!, subTitle,strip);
   }
 
-  static void error(String message) {
-    ToastViewContainer.show(ToastViewContainer.ERROR, message, _context!);
+  static void error(String title, {String? subTitle,bool? strip}) {
+    ToastViewContainer.show(
+        ToastViewContainer.ERROR, title, _context!, subTitle,strip);
   }
 }
 
@@ -40,15 +44,15 @@ class ToastViewContainer {
   static OverlayEntry? overlayEntry;
   static List<ToastWidgetHolder> widgets = [];
   static Future<void> show(
-      int type, String message, BuildContext context) async {
+      int type, String message, BuildContext context, String? content, bool? strip) async {
     String id = Random.secure().nextDouble().toString();
     widgets.add(ToastWidgetHolder(
         id: id,
-        widget: ToastView.createView(type, message, dismiss,
-            id))); // pos, ToastView.createView(type, message, dismiss, pos)});
+        widget: ToastView.createView(type, message, dismiss, id, context,
+            content, strip))); // pos, ToastView.createView(type, message, dismiss, pos)});
     overlayState ??= Overlay.of(context);
     addEntry();
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 6));
     dismiss(id);
   }
 
@@ -76,27 +80,75 @@ class ToastViewContainer {
 }
 
 class ToastView {
-  static Widget createView(
-      int type, String message, StringCallback onClose, String index) {
+  static Widget createView(int type, String message, StringCallback onClose,
+      String index, BuildContext context, String? content, bool? strip) {
     Color bgColor = Colors.green;
+    IconData bgIcon = Icons.task_alt;
+    strip ??= false;
     if (type == ToastViewContainer.WARN) {
       bgColor = Colors.orange;
+      bgIcon = Icons.error_outline;
     } else if (type == ToastViewContainer.ERROR) {
       bgColor = Colors.red;
+      bgIcon = Icons.cancel_outlined;
     }
     return Container(
       decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(0),
-        border: Border.all(color: bgColor),
+        color: strip ? Colors.transparent : bgColor,
+        // borderRadius: BorderRadius.circular(0),
+        border: strip
+            ? Border(
+                left: BorderSide(
+                  width: 10,
+                  color: bgColor,
+                ),
+                top: BorderSide(
+                  width: 2,
+                  color: bgColor,
+                ),
+                right: BorderSide(
+                  width: 2,
+                  color: bgColor,
+                ),
+                bottom: BorderSide(
+                  width: 2,
+                  color: bgColor,
+                ))
+            : Border.all(color: bgColor),
       ),
+      constraints:
+          BoxConstraints(minWidth: MediaQuery.of(context).size.width * 0.2),
       margin: const EdgeInsets.only(bottom: 5),
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
       child: Material(
           color: Colors.transparent,
-          child: Text(message,
-              softWrap: true,
-              style: const TextStyle(fontSize: 18, color: Colors.white))),
+          child: Row(
+            children: [
+              Icon(
+                bgIcon,
+                color: strip ? bgColor: Theme.of(context).cardColor,
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(message,
+                      softWrap: true,
+                      style: TextStyle(
+                          fontSize: 16, color: strip ? Theme.of(context).hintColor : Theme.of(context).cardColor)),
+                  // if(content != null) const SizedBox(height: 10,),
+                  if (content != null)
+                    Text(content,
+                        softWrap: true,
+                        style: TextStyle(
+                            fontSize: 12, color: strip ? Theme.of(context).hintColor : Theme.of(context).cardColor)),
+                ],
+              ),
+            ],
+          )),
     );
   }
 }

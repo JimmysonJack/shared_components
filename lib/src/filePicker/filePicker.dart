@@ -1,13 +1,15 @@
-
-import 'package:flutter/foundation.dart';
+import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/material.dart';
 
-import '../filePickerCross/file_picker_cross.dart';
 import '../utils/customButton.dart';
 
 class FilePicker extends StatefulWidget {
   const FilePicker(
-      {Key? key, required this.onFileSelected, this.widthByScreenSize = 1, this.labelText, this.fileType})
+      {Key? key,
+      required this.onFileSelected,
+      this.widthByScreenSize = 1,
+      this.labelText,
+      this.fileType})
       : super(key: key);
   final double? widthByScreenSize;
   final String? labelText;
@@ -28,7 +30,8 @@ class _FilePickerState extends State<FilePicker> {
     return Center(
       child: Container(
         decoration: BoxDecoration(
-            border: Border.all(color: Theme.of(context).primaryColor.withOpacity(0.6))),
+            border: Border.all(
+                color: Theme.of(context).primaryColor.withOpacity(0.6))),
         width: size.width / widget.widthByScreenSize!,
         height: 43,
         child: LayoutBuilder(
@@ -48,13 +51,13 @@ class _FilePickerState extends State<FilePicker> {
                 ),
                 Expanded(
                     child: Center(
-                      child: Text(
-                        fileName ?? '',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontStyle: FontStyle.italic),
-                      ),
-                    ))
+                  child: Text(
+                    fileName ?? '',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                ))
               ],
             );
           },
@@ -64,20 +67,18 @@ class _FilePickerState extends State<FilePicker> {
   }
 
   pickFile() async {
-    FilePickerCross result = await FilePickerCross.importFromStorage(type:widget.fileType ?? FileTypeCross.pdf);
+    FilePickerCross result = await FilePickerCross.importFromStorage(
+        type: widget.fileType ?? FileTypeCross.any);
     setState(() {
       fileName = result.fileName;
       widget.onFileSelected(PickerFileData(
-          fileName: result.fileName,
-          fileData: result.toBase64()
-      )
-      );
+          fileName: result.fileName, fileData: result.toBase64()));
     });
     FilePickerCross.delete(path: result.path!);
   }
 }
 
-class PickerFileData{
+class PickerFileData {
   final String? fileName;
   final String? fileData;
 

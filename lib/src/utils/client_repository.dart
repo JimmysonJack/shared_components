@@ -22,11 +22,11 @@ class ClientRepository {
 
     final cache = Cache(store: store);
 
-    String? token = await api.userToken(true);
+    // String? token = await api.userToken(true);
 
     final link = HttpLink('$serverUrl/graphql',defaultHeaders: {
-      "authorization": 'Bearer $token',
-      // "authorization": 'Bearer ba98159d-28e2-4537-baae-8a1c97b50d0d',
+      // "authorization": 'Bearer $token',
+      "authorization": 'Bearer f19fb4aa-7b9f-48fc-a729-114c63b505e1',
     });
 
     final client = Client(link: link,cache: cache);

@@ -40,9 +40,15 @@ export 'src/tabs_bar/tabs_bar.dart';
 export 'src/tabs_bar/tabs.dart';
 export 'src/customDate/date.dart';
 export 'src/filePicker/filePicker.dart';
-export 'src/filePickerCross/file_picker_cross.dart';
+// export 'src/filePickerCross/file_picker_cross.dart';
 export 'src/customSwitchState/customSwitchState.dart';
 export 'src/utils/upper_case_text_formatter.dart';
+export 'src/utils/new-widgets-component/form-group.dart';
+export 'src/utils/new-widgets-component/pop-up-model.dart';
+export 'src/utils/new-widgets-component/text-inputs.dart';
+export 'src/utils/new-widgets-component/graphql_service.dart';
+export 'src/utils/new-widgets-component/settings_service.dart';
+export 'src/utils/new-widgets-component/notification_service.dart';
 // export 'src/utils/table.dart';
 export 'src/utils/dataTable.dart';
 export 'package:google_ui/google_ui.dart';
@@ -58,6 +64,3 @@ export 'package:ferry_hive_store/ferry_hive_store.dart';
 export 'package:ferry_flutter/ferry_flutter.dart';
 // export 'package:flutter_mobx/flutter_mobx.dart';
 export 'package:dio/dio.dart';
-
-
-

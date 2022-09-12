@@ -7,10 +7,10 @@ import '../popUpMenu/custom_pop_up_menu.dart';
 
 
 class TableCustom<T> extends StatefulWidget {
-  const TableCustom({Key? key,this.loadOnMoreButton = false,this.color,required this.dataList,this.onCreate,this.onDelete, required this.headTitles, this.deleteData = false, this.actionButton, this.paginatePage, required this.onPageSize, this.onDeleteLoader = false}) : super(key: key);
+  const TableCustom({Key? key,this.loadingOnUpdateData = false,required this.currentPageSize,this.loadOnMoreButton = false,this.color,required this.dataList,this.onCreate,this.onDelete, required this.headTitles, this.deleteData = false, this.actionButton, this.paginatePage, required this.onPageSize, this.onDeleteLoader = false}) : super(key: key);
   final List<dynamic> dataList;
   final void Function(dynamic)? onCreate;
-  final void Function(String value)? onDelete;
+  final void Function(Map<String,dynamic> value)? onDelete;
   final HeardTitle headTitles;
   final bool deleteData;
   final List<ActionButtonItem<T>>? actionButton;
@@ -19,13 +19,14 @@ class TableCustom<T> extends StatefulWidget {
   final bool onDeleteLoader;
   final bool loadOnMoreButton;
   final Color? color;
+  final int currentPageSize;
+  final bool loadingOnUpdateData;
 
   @override
   _TableCustomState<T> createState() => _TableCustomState<T>();
 }
 
 class _TableCustomState<T> extends State<TableCustom<T>> {
-  int pageSizeValue = PagingValues.getInstance().getPageSize();
   int pressedIndex = -10;
   int loadingIndex = -0;
   @override
@@ -35,7 +36,6 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
   }
   @override
   Widget build(BuildContext context) {
-    // int serialNumber = widget.paginatePage != null ?(((widget.paginatePage!.currentPage - 1) * widget.paginatePage!.pageSize)): 0;
     return Column(
       children: [
         ///TITLE TILE
@@ -66,7 +66,7 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
                     )
                 )
                 ),
-                if(widget.headTitles.actionTitle != null && widget.actionButton!.isNotEmpty ) Container(
+                if(widget.headTitles.actionTitle != null && widget.actionButton!.isNotEmpty ||  widget.deleteData ) Container(
                   width: 122,
                   alignment: Alignment.center,
                   child: Text(widget.headTitles.actionTitle!,overflow: TextOverflow.ellipsis,maxLines: 2,style: const TextStyle(fontWeight: FontWeight.w400),),
@@ -75,6 +75,7 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
             ),
           ),
         ),
+        if(widget.loadingOnUpdateData) IndicateProgress.linear(),
         Expanded(
           child: ListView.builder(
             controller: ScrollController(),
@@ -200,7 +201,7 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
                         DropdownButton(
                           isDense: true,
                           underline: Container(),
-                          value: pageSizeValue,
+                          value: widget.currentPageSize,
                             items: const [
                               DropdownMenuItem(
                                 value: 10,
@@ -217,7 +218,7 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
                             ],
                             onChanged: (value){
                             setState(() {
-                              pageSizeValue = int.parse(value.toString());
+                              // widget.currentPageSize = int.parse(value.toString());
                               widget.onPageSize(value);
                             });
 
@@ -252,10 +253,12 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
-                  height: size.height / 9,
-                  width: size.height / 9,
-                    child: SvgPicture.asset('assets/file.svg',package: 'shared_component',)),
-                const Center(child: Text('Are you sure?')),
+                  height: size.height / 17,
+                  width: size.height / 17,
+                    child: SvgPicture.asset('assets/wonder.svg',package: 'shared_component',)),
+                 Center(child: Text('Deleting...',style: Theme.of(context).textTheme.titleMedium,)),
+                 const SizedBox(height: 10,),
+                 Center(child: Text('Are you sure?',style: Theme.of(context).textTheme.labelSmall,)),
               ],
             ),
             actions: [
@@ -266,7 +269,7 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
                   TextButton(
                       onPressed: (){
                         pressedIndex = index;
-                        widget.onDelete!(widget.dataList[index]['uid']);
+                        widget.onDelete!(widget.dataList[index]);
                         Navigator.pop(context);
                       },
                       style: ButtonStyle(
@@ -322,7 +325,8 @@ class _PaginatePageState extends State<PaginatePage> {
       children: [
         ///PREVIOUS PAGES
         if(widget.currentPage > 2) FloatingActionButton(
-            backgroundColor: Colors.white,
+            backgroundColor: Theme.of(context).canvasColor,
+            tooltip: 'Total Previous Pages',
             elevation: 7,
             mini: true,
             child: Text((1).toString(),style: Theme.of(context).textTheme.caption,),
@@ -348,7 +352,8 @@ class _PaginatePageState extends State<PaginatePage> {
 
         ///PREVIOUS PAGE
        if(widget.currentPage > 1) FloatingActionButton(
-            backgroundColor: Colors.white,
+            backgroundColor: Theme.of(context).canvasColor,
+           tooltip: 'Previous Page',
           elevation: 7,
           mini: true,
             child: Text((widget.currentPage - 1).toString(),style: Theme.of(context).textTheme.caption),
@@ -359,6 +364,7 @@ class _PaginatePageState extends State<PaginatePage> {
         Container(width: 5,),
         ///CURRENT PAGE
         FloatingActionButton(
+          tooltip: 'Current Page',
           backgroundColor: widget.currentPageColors,
             elevation: 7,
           mini: true,
@@ -368,7 +374,8 @@ class _PaginatePageState extends State<PaginatePage> {
         Container(width: 5,),
         ///NEXT PAGE
        if(widget.totalPages > widget.currentPage) FloatingActionButton(
-            backgroundColor: Colors.white,
+            backgroundColor: Theme.of(context).canvasColor,
+           tooltip: 'Next Page',
             elevation: 7,
           mini: true,
             child: Text((widget.currentPage + 1).toString(),style: Theme.of(context).textTheme.caption,),
@@ -394,7 +401,8 @@ class _PaginatePageState extends State<PaginatePage> {
 
         ///TOTAL PAGES
         if(widget.totalPages > (widget.currentPage + 1)) FloatingActionButton(
-            backgroundColor: Colors.white,
+            backgroundColor: Theme.of(context).canvasColor,
+            tooltip: 'Total Pages',
             elevation: 7,
             mini: true,
             child: Text((widget.totalPages).toString(),style: Theme.of(context).textTheme.caption,),

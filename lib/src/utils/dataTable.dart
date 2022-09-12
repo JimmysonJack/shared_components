@@ -9,6 +9,7 @@ class DataSourceTable<T> extends StatefulWidget {
       this.buttonActivities,
       this.onDeleteLoader = false,
       this.loadOnMoreButton = false,
+      this.loadingOnUpdateData = false,
       required this.title,
       required this.serialNumberTitle,
       this.actionTitle,
@@ -18,8 +19,10 @@ class DataSourceTable<T> extends StatefulWidget {
       this.actionButton,
       this.onSearch,
       this.onDelete,
+      this.onEmptySearch,
       this.noSearchResults = false,
       required this.paginatePage,
+      required this.currentPageSize,
       required this.dataList})
       : super(key: key);
   final List<ButtonActivities>? buttonActivities;
@@ -28,8 +31,9 @@ class DataSourceTable<T> extends StatefulWidget {
   final String? actionTitle;
   final List<HeardTitleItem> heardTileItems;
   final Function(dynamic value)? onPageSize;
-  final Function(dynamic value)? onDelete;
+  final Function(Map<String,dynamic> value)? onDelete;
   final Function(String value)? onSearch;
+  final Function()? onEmptySearch;
   final bool? deleteData;
   final List<ActionButtonItem<T>>? actionButton;
   final PaginatePage paginatePage;
@@ -38,12 +42,21 @@ class DataSourceTable<T> extends StatefulWidget {
   final Color? tableColor;
   final bool noSearchResults;
   final bool loadOnMoreButton;
+  final int currentPageSize;
+  final bool loadingOnUpdateData;
 
   @override
   _DataSourceTableState<T> createState() => _DataSourceTableState<T>();
 }
 
 class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
+  TextEditingController searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -60,26 +73,52 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
                     child: Column(
                       children: [
                         SizedBox(
-                          height: size.width / 45,
+                          // height: size.width / 45,
                           child: Container(
                             color: Theme.of(context).hoverColor,
-                            height: size.height / 20,
-                            padding: const EdgeInsets.only(left: 10),
+                            // height: size.height / 15,
+                            // padding: const EdgeInsets.only(left: 10),
                             width: size.width,
                             child: Row(
                               children: [
                                 Expanded(
                                   ///Search field
-                                    child: TextField(
-                                      decoration: const InputDecoration(
-                                        prefixIcon: Icon(Icons.search),
+                                    child: TextFormField(
+                                      controller: searchController,
+                                      decoration: InputDecoration(
+                                        prefixIcon: const Icon(Icons.search),
+                                        suffixIcon: searchController.text.isEmpty ? null : Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Tooltip(
+                                            message: 'Clear Search',
+                                            child: InkWell(
+                                              borderRadius: BorderRadius.circular(100),
+                                              child: const Icon(Icons.close),
+                                              onTap: (){
+                                                setState(() {
+                                                  searchController.clear();
+                                                  if(widget.noSearchResults && widget.onEmptySearch != null){
+                                                    widget.onEmptySearch!();
+                                                  }
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                        isDense: true,
                                         border: InputBorder.none,
-                                        hintText: 'Search',
-                                        // fillColor: Theme.of(context).cardColor,
+                                        labelText: 'Search',
+                                        // fillColor: Theme.of(context).secondaryHeaderColor,
                                         // filled: true
                                       ),
-                                      onChanged: (value){
+                                      onFieldSubmitted: (value){
                                         if(widget.onSearch != null) widget.onSearch!(value);
+                                      },
+                                      onChanged: (value){
+                                        setState(() {});
+                                        if(value.isEmpty && widget.onEmptySearch != null){
+                                          widget.onEmptySearch!();
+                                        }
                                       },
                                     )),
                                 ///activities buttons
@@ -94,7 +133,7 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
                                           message: widget.buttonActivities![index].toolTip ?? '',
                                           child: InkWell(
                                             onTap: widget.buttonActivities![index].onTap,
-                                            child: widget.buttonActivities![index].icon ?? widget.buttonActivities![index].textName,
+                                            child: widget.buttonActivities![index].textName ?? widget.buttonActivities![index].icon,
                                           ),
                                         ),
                                       ))
@@ -108,6 +147,8 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
                         Expanded(
                           child: !widget.noSearchResults ? TableCustom<T>(
                             onDeleteLoader: widget.onDeleteLoader,
+                            loadingOnUpdateData: widget.loadingOnUpdateData,
+                            currentPageSize: widget.currentPageSize,
                             loadOnMoreButton: widget.loadOnMoreButton,
                             color: widget.tableColor,
                             headTitles: HeardTitle(
@@ -116,7 +157,7 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
                                 heardTileItems: widget.heardTileItems
                             ),
                             onPageSize: widget.onPageSize!,
-                            deleteData: widget.deleteData!,
+                            deleteData: widget.deleteData ?? false,
                             actionButton: widget.actionButton,
                             paginatePage: widget.paginatePage,
                             onDelete: widget.onDelete,
@@ -152,6 +193,6 @@ class ButtonActivities {
   final String? toolTip;
   final Function() onTap;
 
-  ButtonActivities({this.toolTip,this.icon, this.textName, required this.onTap})
-      : assert(icon == null || textName == null,'Can not use both icon and textName');
+  ButtonActivities({required this.toolTip,this.icon, this.textName, required this.onTap});
+      // : assert(icon == null || textName == null,'Can not use both icon and textName');
 }
