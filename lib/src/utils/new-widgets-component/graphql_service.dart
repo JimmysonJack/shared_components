@@ -3,11 +3,17 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:shared_component/shared_component.dart' hide FetchPolicy;
 
 import 'base_fields.dart';
-import 'client.dart';
-import 'other_parameters.dart';
 
 class GraphQLService {
   static Map<String, dynamic>? _otherParams;
+  static GraphQLService? _instance;
+  static GraphQLService _getInstance(){
+    _instance ??= GraphQLService();
+    return _instance!;
+  }
+  static GraphQLService get getService => _getInstance();
+  String? endPoint;
+  String? endPointName;
 
   static Future<List<Map<String,dynamic>>> queryPageable(
       {required String endPointName,
@@ -36,7 +42,7 @@ class GraphQLService {
       fetchPolicy: FetchPolicy.cacheAndNetwork,
     );
 
-    final client = graphClient();
+    final client = await graphClient(context);
 
     final QueryResult result = await client.value.query(options);
 
@@ -72,7 +78,7 @@ class GraphQLService {
             List errorsList = result.exception!.graphqlErrors;
             NotificationService.errors(
                 title: 'GraphQL Errors!',
-                context: context!,
+                context: context,
                 contents: errorsList);
 
           }
@@ -106,7 +112,7 @@ class GraphQLService {
       fetchPolicy: FetchPolicy.cacheAndNetwork,
     );
 
-    final client = graphClient();
+    final client = await graphClient(context);
 
     final QueryResult result = await client.value.query(options);
 
@@ -141,7 +147,7 @@ class GraphQLService {
         List errorsList = result.exception!.graphqlErrors;
         NotificationService.errors(
             title: 'GraphQL Errors!',
-            context: context!,
+            context: context,
             contents: errorsList);
 
       }
@@ -155,21 +161,38 @@ class GraphQLService {
       {required Function(Map<String,dynamic>?,bool)? response,
       required String endPointName,
       required String queryFields,
+        String? successMessage,
         required List<InputParameter> inputs,
         required BuildContext context,
       String? optionResponseFields}) async{
 
      Map<String,dynamic> otherParams = {};
+     Map mapVariables = {};
+     Map inputVariables ={};
+     String? input_Variable;
+     String? map_Variable;
      if (inputs.isNotEmpty) {
+
+
        for (var element in inputs) {
-         otherParams.addAll({element.fieldName: element.fieldValue});
+         mapVariables.addAll({'\$${element.fieldName}': element.inputType});
+         inputVariables.addAll({element.fieldName: '\$${element.fieldName}'});
+         if(element.objectValues != null){
+           otherParams.addAll({element.fieldName: convertListToMap(element.objectValues!)
+          });
+         }else{
+           otherParams.addAll({element.fieldName: element.fieldValue});
+         }
        }
+       map_Variable = mapVariables.toString().replaceAll('{','').replaceAll('}','');
+       input_Variable = inputVariables.toString().replaceAll('{','').replaceAll('}','');
+
      }
 
     final MutationOptions options = MutationOptions(
             document: gql('''
-  mutation $endPointName{
-    $endPointName{
+  mutation $endPointName($map_Variable){
+    $endPointName($input_Variable){
         $baseResponseFields
         data{
             ${optionResponseFields ?? queryFields}
@@ -182,13 +205,19 @@ class GraphQLService {
             },
             operationName: endPointName,
             fetchPolicy: FetchPolicy.networkOnly,
-        /*    update: (GraphQLDataProxy? cache, QueryResult? result) {
-              print(result!.isLoading);
-              return cache;
-            },*/
+            update: (GraphQLDataProxy? cache, QueryResult? result) {
+              if(result?.data != null)UpdateTable.change.setUpdateTable(true);
+              // final queryRequest = QueryOptions(document: gql(GraphQLService.getService.endPoint ?? "")).asRequest;
+              // final newResult = result?.data?[endPointName]['data'];
+              // final  data = cache?.readQuery(queryRequest);
+              // final List<Map<String,dynamic>> dataList = data?[GraphQLService.getService.endPointName]['data'].map((element) => element).cast<Map<String,dynamic>>().toList();
+              // final List<Map<String,dynamic>> items = dataList..insert(0, newResult);
+              // data?[GraphQLService.getService.endPointName]['data'] = items;
+              // cache?.writeQuery(queryRequest, data: data!);
+            },
             );
 
-     final client = graphClient();
+     final client = await graphClient(context);
 
      final QueryResult result = await client.value.mutate(options);
 
@@ -231,7 +260,7 @@ class GraphQLService {
 
      if(result.data != null){
        if(result.data?[endPointName]['status']){
-         Toast.info(result.data?[endPointName]['message'],subTitle: 'Data Saved Successfully');
+         Toast.info(result.data?[endPointName]['message'],subTitle: successMessage ?? 'Changes Saved Successfully');
        }else {
          Toast.error('Error',subTitle:result.data?[endPointName]['message']);
        }
@@ -240,13 +269,25 @@ class GraphQLService {
 
    return result.data?[endPointName]['data'];
   }
+
+
+}
+
+Map<String,dynamic> convertListToMap(List<InputParameter> list){
+  Map<String,dynamic> convertedListToMap = {};
+  for(InputParameter element in list){
+    convertedListToMap.addAll({element.fieldName: element.fieldValue});
+  }
+  return convertedListToMap;
 }
 
 class InputParameter {
   final String fieldName;
+  final List<InputParameter>? objectValues;
+  final String inputType;
   final dynamic fieldValue;
 
-  InputParameter({required this.fieldName, required this.fieldValue});
+  InputParameter({required this.fieldName, this.fieldValue, this.objectValues,required this.inputType});
 
 }
 

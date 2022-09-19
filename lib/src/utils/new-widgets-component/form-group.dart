@@ -9,8 +9,8 @@ class FormGroup extends StatefulWidget {
     Field.updateFieldList = List.generate(
         updateFields?.length ?? 0,
         (index) => {
-              '${updateFields![index].keys.first}_':
-                  updateFields![index].values.first
+              '${updateFields?[index].keys.first}_':
+                  updateFields?[index].values.first
             });
   }
   final List<Group>? group;
@@ -115,6 +115,7 @@ class Group extends StatelessWidget {
                         fontSize: 10, color: Theme.of(context).hintColor),
                   ),
                 )),
+          if(header == null) const SizedBox(height: 10,),
           SizedBox(
             width: MediaQuery.of(context).size.width,
             child: Wrap(

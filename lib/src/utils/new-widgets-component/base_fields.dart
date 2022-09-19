@@ -12,3 +12,7 @@ String baseResponseFields = '''
     status
 ''';
 
+String pageableFields = '\$size: Int, \$page: Int, \$searchKey: String,';
+
+String pageableValue = 'size: \$size, page:\$page, searchKey:\$searchKey,';
+

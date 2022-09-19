@@ -156,7 +156,7 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
                                 actionTitle: widget.actionTitle,
                                 heardTileItems: widget.heardTileItems
                             ),
-                            onPageSize: widget.onPageSize!,
+                            onPageSize: widget.onPageSize,
                             deleteData: widget.deleteData ?? false,
                             actionButton: widget.actionButton,
                             paginatePage: widget.paginatePage,

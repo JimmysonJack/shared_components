@@ -53,9 +53,12 @@ mixin _$AuthServiceStore on _AuthServiceStoreBase, Store {
       AsyncAction('_AuthServiceStoreBase.loginUser', context: context);
 
   @override
-  Future<bool> loginUser({required String username, required String password}) {
-    return _$loginUserAsyncAction
-        .run(() => super.loginUser(username: username, password: password));
+  Future<bool> loginUser(
+      {required String username,
+      required String password,
+      bool showLoading = false}) {
+    return _$loginUserAsyncAction.run(() => super.loginUser(
+        username: username, password: password, showLoading: showLoading));
   }
 
   late final _$getUserAsyncAction =

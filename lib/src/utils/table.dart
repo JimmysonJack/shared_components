@@ -4,18 +4,31 @@ import 'package:shared_component/shared_component.dart';
 
 import '../popUpMenu/custom_pop_up_menu.dart';
 
-
-
 class TableCustom<T> extends StatefulWidget {
-  const TableCustom({Key? key,this.loadingOnUpdateData = false,required this.currentPageSize,this.loadOnMoreButton = false,this.color,required this.dataList,this.onCreate,this.onDelete, required this.headTitles, this.deleteData = false, this.actionButton, this.paginatePage, required this.onPageSize, this.onDeleteLoader = false}) : super(key: key);
+  const TableCustom(
+      {Key? key,
+      this.loadingOnUpdateData = false,
+      required this.currentPageSize,
+      this.loadOnMoreButton = false,
+      this.color,
+      required this.dataList,
+      this.onCreate,
+      this.onDelete,
+      required this.headTitles,
+      this.deleteData = false,
+      this.actionButton,
+      this.paginatePage,
+      required this.onPageSize,
+      this.onDeleteLoader = false})
+      : super(key: key);
   final List<dynamic> dataList;
   final void Function(dynamic)? onCreate;
-  final void Function(Map<String,dynamic> value)? onDelete;
+  final void Function(Map<String, dynamic> value)? onDelete;
   final HeardTitle headTitles;
   final bool deleteData;
   final List<ActionButtonItem<T>>? actionButton;
   final PaginatePage? paginatePage;
-  final void Function(dynamic) onPageSize;
+  final void Function(dynamic)? onPageSize;
   final bool onDeleteLoader;
   final bool loadOnMoreButton;
   final Color? color;
@@ -26,14 +39,35 @@ class TableCustom<T> extends StatefulWidget {
   _TableCustomState<T> createState() => _TableCustomState<T>();
 }
 
-class _TableCustomState<T> extends State<TableCustom<T>> {
+class _TableCustomState<T> extends State<TableCustom<T>> with SingleTickerProviderStateMixin{
+  late AnimationController _animationController;
+  late Animation<double> _animationTween;
   int pressedIndex = -10;
   int loadingIndex = -0;
+  bool hover = false;
+  int hoverIndex = -1;
   @override
   void initState() {
-      widget.actionButton?.removeWhere((element) => element.permissionGranted == false);
+    widget.actionButton
+        ?.removeWhere((element) => element.permissionGranted == false);
     super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _animationTween =
+        Tween(begin: 5.0, end: 1.0).animate(_animationController);
+    _animationController.addListener(() {
+      setState(() {});
+    });
   }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -46,266 +80,464 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
             elevation: 0,
             child: Row(
               children: [
-                if(widget.headTitles.serialNumberTitle != null) Container(
-                  width: 50,
-                  alignment: Alignment.centerLeft,
-                  child: Text(widget.headTitles.serialNumberTitle!,overflow: TextOverflow.ellipsis,maxLines: 2,style: const TextStyle(fontWeight: FontWeight.w400),),
-                ),
-                ...List.generate(widget.headTitles.heardTileItems!.length, (x) =>   widget.headTitles.heardTileItems?[x].columnSize != null
-                    ? Container(
-                  width: widget.headTitles.heardTileItems?[x].columnSize,
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  alignment:  widget.headTitles.heardTileItems?[x].alignment != null ? widget.headTitles.heardTileItems![x].alignment: Alignment.centerLeft,
-                  child: Text(widget.headTitles.heardTileItems![x].titleName!,overflow: TextOverflow.ellipsis,maxLines: 2,),
-                )
-                    : Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      alignment:  widget.headTitles.heardTileItems?[x].alignment != null ? widget.headTitles.heardTileItems![x].alignment: Alignment.centerLeft,
-                      child: Text(widget.headTitles.heardTileItems![x].titleName!,overflow: TextOverflow.ellipsis,maxLines: 2,),
-                    )
-                )
-                ),
-                if(widget.headTitles.actionTitle != null && widget.actionButton!.isNotEmpty ||  widget.deleteData ) Container(
-                  width: 122,
-                  alignment: Alignment.center,
-                  child: Text(widget.headTitles.actionTitle!,overflow: TextOverflow.ellipsis,maxLines: 2,style: const TextStyle(fontWeight: FontWeight.w400),),
-                ),
+                if (widget.headTitles.serialNumberTitle != null)
+                  Container(
+                    width: 50,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      widget.headTitles.serialNumberTitle!,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      style: const TextStyle(fontWeight: FontWeight.w400),
+                    ),
+                  ),
+                ...List.generate(
+                    widget.headTitles.heardTileItems!.length,
+                    (x) => widget.headTitles.heardTileItems?[x].columnSize !=
+                            null
+                        ? Container(
+                            width:
+                                widget.headTitles.heardTileItems?[x].columnSize,
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            alignment: widget.headTitles.heardTileItems?[x]
+                                        .alignment !=
+                                    null
+                                ? widget.headTitles.heardTileItems![x].alignment
+                                : Alignment.centerLeft,
+                            child: Text(
+                              widget.headTitles.heardTileItems![x].titleName!,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ),
+                          )
+                        : Expanded(
+                            child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            alignment: widget.headTitles.heardTileItems?[x]
+                                        .alignment !=
+                                    null
+                                ? widget.headTitles.heardTileItems![x].alignment
+                                : Alignment.centerLeft,
+                            child: Text(
+                              widget.headTitles.heardTileItems![x].titleName!,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ),
+                          ))),
+                if (widget.headTitles.actionTitle != null &&
+                        widget.actionButton!.isNotEmpty ||
+                    widget.deleteData)
+                  Container(
+                    width: 122,
+                    alignment: Alignment.center,
+                    child: Text(
+                      widget.headTitles.actionTitle!,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      style: const TextStyle(fontWeight: FontWeight.w400),
+                    ),
+                  ),
+                if(widget.headTitles.actionTitle == null &&
+                    widget.actionButton!.isEmpty ||
+                    !widget.deleteData) const SizedBox(width: 122)
               ],
             ),
           ),
         ),
-        if(widget.loadingOnUpdateData) IndicateProgress.linear(),
+        if (widget.loadingOnUpdateData) IndicateProgress.linear(),
         Expanded(
           child: ListView.builder(
-            controller: ScrollController(),
-            shrinkWrap: true,
+              controller: ScrollController(),
+              shrinkWrap: true,
               itemCount: widget.dataList.length,
               itemBuilder: (_, index) {
-                return Card(
-                  color: widget.color ?? Theme.of(context).primaryColor,
-                  child: ListTile(
-                    dense: true,
-
-                    title: Row(
-                      children: [
-                            if(widget.headTitles.serialNumberTitle != null) SizedBox(
-                          width: 50,
-                          child: Text('${(index +1) + ((widget.paginatePage!.currentPage - 1) * widget.paginatePage!.pageSize)}',overflow: TextOverflow.ellipsis,maxLines: 2,),
-                        ),
-
-                        ...List.generate( widget.headTitles.heardTileItems!.length, (i) =>  widget.headTitles.heardTileItems?[i].columnSize != null
-                            ? Container(
-                          width: widget.headTitles.heardTileItems?[i].columnSize,
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          alignment:  widget.headTitles.heardTileItems?[i].alignment != null ? widget.headTitles.heardTileItems![i].alignment: Alignment.centerLeft,
-                          ///SUB-OBJECT CAN BE ADDED HERE
-                          child: widget.headTitles.heardTileItems?[i].objectKeyField != null
-                              ? Text(widget.dataList[index][widget.headTitles.heardTileItems?[i].titleKey] == null ? '---':widget.dataList[index][widget.headTitles.heardTileItems?[i].titleKey][widget.headTitles.heardTileItems?[i].objectKeyField].toString().replaceAll('_', ' ').replaceAll('null', '---'),overflow: TextOverflow.ellipsis,maxLines: 2,)
-                              : Text(widget.dataList[index][widget.headTitles.heardTileItems?[i].titleKey].toString().replaceAll('_', ' ').replaceAll('null', '---'),overflow: TextOverflow.ellipsis,maxLines: 2,),
-                        ): Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 4),
-                              alignment: widget.headTitles.heardTileItems?[i].alignment != null ? widget.headTitles.heardTileItems![i].alignment: Alignment.centerLeft,
-                              child: widget.headTitles.heardTileItems?[i].objectKeyField != null
-                                  ? Text(widget.dataList[index][widget.headTitles.heardTileItems?[i].titleKey] == null ? '---':widget.dataList[index][widget.headTitles.heardTileItems?[i].titleKey][widget.headTitles.heardTileItems?[i].objectKeyField].toString().replaceAll('_', ' ').replaceAll('null', '---'),overflow: TextOverflow.ellipsis,maxLines: 2,)
-                                  : Text(widget.dataList[index][widget.headTitles.heardTileItems?[i].titleKey].toString().replaceAll('_', ' ').replaceAll('null', '---'),overflow: TextOverflow.ellipsis,maxLines: 2,),
-                            )
-                        )),
-                        if(widget.headTitles.actionTitle!.isNotEmpty) SizedBox(
-                          width: 122,
-                          height:30,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                if(widget.actionButton!.isNotEmpty)  widget.loadOnMoreButton && loadingIndex == index
-                                    ? Padding(
-                                  padding: const EdgeInsets.only(left: 10.0),
-                                  child: SizedBox(
-                                    height: 25,
-                                    width: 25,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 1,
-                                      color: Theme.of(context).primaryColor,
-                                    ),
-                                  ),
-                                )
-                                    :  QudsPopupButton(
-                                  tooltip: 'More',
-                                  items: List.generate(widget.actionButton!.length, (pressIndex) =>  QudsPopupMenuItem(
-                                      leading: Icon(widget.actionButton![pressIndex].icon),
-                                      title: Text(widget.actionButton![pressIndex].name),
-                                      onPressed: () {
-                                        loadingIndex = index;
-                                        widget.actionButton![pressIndex].onPressed(widget.dataList[index]);
-                                      })),
-                                  // widthSize: 200,
-                                  child: FloatingActionButton(
-                                    backgroundColor: Theme.of(context).primaryColor.withOpacity(0.7),
-                                    mini: true,
-                                    elevation: 10,
-                                    onPressed: null,
-                                    child: Icon(Icons.more_vert_sharp, size: 15,color: Theme.of(context).cardColor,),
-                                  ),
-                                ),
-                                if(widget.actionButton!.isNotEmpty) Container(width: 5,),
-                                widget.deleteData == true
-                                    ? widget.onDeleteLoader && pressedIndex == index
-                                    ? const Padding(
-                                      padding: EdgeInsets.only(left: 10.0),
-                                      child: SizedBox(
-                                        height: 25,
-                                        width: 25,
-                                        child: CircularProgressIndicator(
-                                  strokeWidth: 1,
-                                  color: Colors.red,
-                                ),
-                                      ),
-                                    ): FloatingActionButton(
-                                  mini: true,
-                                  backgroundColor: Colors.red,
-                                  tooltip: 'Delete',
-                                  child: const Icon(Icons.delete_outline,color: Colors.white,size: 17,),
-                                  onPressed: (){
-                                    deleteConfirm(index);
-                                  },
-                                ) : Container(),
-                              ],
+                return InkWell(
+                  onTap: (){},
+                  onHover: (value){
+                    setState(() {
+                      hoverIndex = index;
+                      hover = !hover;
+                      if(!hover){
+                        _animationController.forward();
+                      }else{
+                        _animationController.reverse();
+                      }
+                    });
+                  },
+                  child: Card(
+                    elevation: hoverIndex == index ? _animationTween.value :1,
+                    color: widget.dataList.elementAt(index)?['hasError'] ?? false ? Theme.of(context).errorColor.withOpacity(0.5) : widget.color ?? Theme.of(context).primaryColor,
+                    child: ListTile(
+                      dense: true,
+                      title: Row(
+                        children: [
+                          if (widget.headTitles.serialNumberTitle != null)
+                            SizedBox(
+                              width: 50,
+                              child: Text(
+                                '${(index + 1) + ((widget.paginatePage!.currentPage - 1) * widget.paginatePage!.pageSize)}',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                              ),
                             ),
-                          ),
-                        ),
-                      ],
+                          ...List.generate(
+                              widget.headTitles.heardTileItems!.length,
+                              (i) => widget.headTitles.heardTileItems?[i]
+                                          .columnSize !=
+                                      null
+                                  ? Container(
+                                      width: widget.headTitles.heardTileItems?[i]
+                                          .columnSize,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 4),
+                                      alignment: widget.headTitles
+                                                  .heardTileItems?[i].alignment !=
+                                              null
+                                          ? widget.headTitles.heardTileItems![i]
+                                              .alignment
+                                          : Alignment.centerLeft,
+
+                                      ///SUB-OBJECT CAN BE ADDED HERE
+                                      child: widget.headTitles.heardTileItems?[i]
+                                                  .objectKeyField !=
+                                              null
+                                          ? Text(
+                                              widget.dataList[index][widget
+                                                          .headTitles
+                                                          .heardTileItems?[i]
+                                                          .titleKey] ==
+                                                      null
+                                                  ? '---'
+                                                  : widget.dataList[index][widget
+                                                              .headTitles
+                                                              .heardTileItems?[i]
+                                                              .titleKey][
+                                                          widget
+                                                              .headTitles
+                                                              .heardTileItems?[i]
+                                                              .objectKeyField]
+                                                      .toString()
+                                                      .replaceAll('_', ' ')
+                                                      .replaceAll('null', '---'),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                            )
+                                          : Text(
+                                              widget.dataList[index][widget
+                                                      .headTitles
+                                                      .heardTileItems?[i]
+                                                      .titleKey]
+                                                  .toString()
+                                                  .replaceAll('_', ' ')
+                                                  .replaceAll('null', '---'),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                            ),
+                                    )
+                                  : Expanded(
+                                      child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 4),
+                                      alignment: widget.headTitles
+                                                  .heardTileItems?[i].alignment !=
+                                              null
+                                          ? widget.headTitles.heardTileItems![i]
+                                              .alignment
+                                          : Alignment.centerLeft,
+                                      child: widget.headTitles.heardTileItems?[i]
+                                                  .objectKeyField !=
+                                              null
+                                          ? Text(
+                                              widget.dataList[index][widget
+                                                          .headTitles
+                                                          .heardTileItems?[i]
+                                                          .titleKey] ==
+                                                      null
+                                                  ? '---'
+                                                  : widget.dataList[index][widget
+                                                              .headTitles
+                                                              .heardTileItems?[i]
+                                                              .titleKey][
+                                                          widget
+                                                              .headTitles
+                                                              .heardTileItems?[i]
+                                                              .objectKeyField]
+                                                      .toString()
+                                                      .replaceAll('_', ' ')
+                                                      .replaceAll('null', '---'),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                            )
+                                          : Text(
+                                              widget.dataList[index][widget
+                                                      .headTitles
+                                                      .heardTileItems?[i]
+                                                      .titleKey]
+                                                  .toString()
+                                                  .replaceAll('_', ' ')
+                                                  .replaceAll('null', '---'),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                            ),
+                                    ))),
+                          if (widget.headTitles.actionTitle!.isNotEmpty)
+                            SizedBox(
+                              width: 122,
+                              height: 30,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    if (widget.actionButton!.isNotEmpty)
+                                      widget.loadOnMoreButton &&
+                                              loadingIndex == index
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 10.0),
+                                              child: SizedBox(
+                                                height: 25,
+                                                width: 25,
+                                                child: CircularProgressIndicator(
+                                                  strokeWidth: 1,
+                                                  color: Theme.of(context)
+                                                      .primaryColor,
+                                                ),
+                                              ),
+                                            )
+                                          : QudsPopupButton(
+                                              tooltip: 'More',
+                                              items: List.generate(
+                                                  widget.actionButton!.length,
+                                                  (pressIndex) =>
+                                                      QudsPopupMenuItem(
+                                                          leading: Icon(widget
+                                                              .actionButton![
+                                                                  pressIndex]
+                                                              .icon),
+                                                          title: Text(widget
+                                                              .actionButton![
+                                                                  pressIndex]
+                                                              .name),
+                                                          onPressed: () {
+                                                            loadingIndex = index;
+                                                            widget.actionButton![
+                                                                    pressIndex]
+                                                                .onPressed(widget
+                                                                        .dataList[
+                                                                    index]);
+                                                          })),
+                                              // widthSize: 200,
+                                              child: FloatingActionButton(
+                                                backgroundColor: Theme.of(context)
+                                                    .primaryColor
+                                                    .withOpacity(0.7),
+                                                mini: true,
+                                                elevation: 10,
+                                                onPressed: null,
+                                                child: Icon(
+                                                  Icons.more_vert_sharp,
+                                                  size: 15,
+                                                  color:
+                                                      Theme.of(context).cardColor,
+                                                ),
+                                              ),
+                                            ),
+                                    if (widget.actionButton!.isNotEmpty)
+                                      Container(
+                                        width: 5,
+                                      ),
+                                    widget.deleteData == true
+                                        ? widget.onDeleteLoader &&
+                                                pressedIndex == index
+                                            ? const Padding(
+                                                padding:
+                                                    EdgeInsets.only(left: 10.0),
+                                                child: SizedBox(
+                                                  height: 25,
+                                                  width: 25,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    strokeWidth: 1,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              )
+                                            : FloatingActionButton(
+                                                elevation: 10,
+                                                mini: true,
+                                                backgroundColor: Colors.red,
+                                                tooltip: 'Delete',
+                                                child: const Icon(
+                                                  Icons.delete_outline,
+                                                  color: Colors.white,
+                                                  size: 17,
+                                                ),
+                                                onPressed: () {
+                                                  deleteConfirm(index);
+                                                },
+                                              )
+                                        : Container(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 );
               }),
         ),
 
-        if(widget.paginatePage != null) Padding(
-          padding: const EdgeInsets.only(top: 3.0),
-          child: Row(
-            children: [
-              Expanded(
-                  child: Container(
-                    alignment: Alignment.centerLeft,
-                    height: 30,
-                    child: Row(
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Text('Page Size'),
-                        ),
-                        Container(width: 10,),
-                        DropdownButton(
+        if (widget.paginatePage != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 3.0),
+            child: Row(
+              children: [
+                Expanded(
+                    child: Container(
+                  alignment: Alignment.centerLeft,
+                  height: 30,
+                  child: Row(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Text('Page Size'),
+                      ),
+                      Container(
+                        width: 10,
+                      ),
+                     if(widget.onPageSize != null) DropdownButton(
                           isDense: true,
                           underline: Container(),
                           value: widget.currentPageSize,
-                            items: const [
-                              DropdownMenuItem(
-                                value: 10,
-                                  child: Text('10')),
-                             DropdownMenuItem(
-                                value: 20,
-                                  child: Text('20')),
-                               DropdownMenuItem(
-                                value: 50,
-                                  child: Text('50')),
-                               DropdownMenuItem(
-                                value: 100,
-                                  child: Text('100')),
-                            ],
-                            onChanged: (value){
+                          items: const [
+                            DropdownMenuItem(value: 10, child: Text('10')),
+                            DropdownMenuItem(value: 20, child: Text('20')),
+                            DropdownMenuItem(value: 50, child: Text('50')),
+                            DropdownMenuItem(value: 100, child: Text('100')),
+                          ],
+                          onChanged: (value) {
                             setState(() {
                               // widget.currentPageSize = int.parse(value.toString());
-                              widget.onPageSize(value);
+                             if(widget.onPageSize != null) widget.onPageSize!(value);
                             });
-
-                            }
-                        )
-                      ],
-                    ),
-                  )),
-              Expanded(
-                child: Container(
-                  height: 40,
-                  padding: const EdgeInsets.only(bottom: 5),
-                  alignment: Alignment.centerRight,
-                  child: widget.paginatePage,
+                          }),
+                      if(widget.onPageSize == null) Text(widget.currentPageSize.toString())
+                    ],
+                  ),
+                )),
+                Expanded(
+                  child: Container(
+                    height: 40,
+                    padding: const EdgeInsets.only(bottom: 5),
+                    alignment: Alignment.centerRight,
+                    child: widget.paginatePage,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        )
+              ],
+            ),
+          )
       ],
     );
   }
 
-  deleteConfirm(index){
+  deleteConfirm(index) {
     var size = MediaQuery.of(context).size;
-    showDialog(
-      barrierDismissible: false,
+    NotificationService.confirmWarn(
         context: context,
-        builder: (context){
-          return AlertDialog(
-            title: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  height: size.height / 17,
-                  width: size.height / 17,
-                    child: SvgPicture.asset('assets/wonder.svg',package: 'shared_component',)),
-                 Center(child: Text('Deleting...',style: Theme.of(context).textTheme.titleMedium,)),
-                 const SizedBox(height: 10,),
-                 Center(child: Text('Are you sure?',style: Theme.of(context).textTheme.labelSmall,)),
-              ],
-            ),
-            actions: [
-              Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  TextButton(
-                      onPressed: (){
-                        pressedIndex = index;
-                        widget.onDelete!(widget.dataList[index]);
-                        Navigator.pop(context);
-                      },
-                      style: ButtonStyle(
-                          elevation: MaterialStateProperty.all<double>(0),
-                          overlayColor: MaterialStateProperty.all<Color>(Colors.transparent)
-                      ),
-                      child: const Text('Delete',style: TextStyle(color: Colors.red),)),
-                  TextButton(
-                      onPressed: (){
-                        Navigator.of(context).pop();
-                      },
-                      style: ButtonStyle(
-                          elevation: MaterialStateProperty.all<double>(0),
-                          overlayColor:  MaterialStateProperty.all<Color>(Colors.transparent)
-                      ),
-                      child: const Text('Cancel')),
-                ],
-              )
-            ],
-          );
-        }
-    );
+        buttonColor: Theme.of(context).errorColor,
+        cancelBtnText: 'Cancel',
+        confirmBtnText: 'Delete',
+        title: 'Deleting Record...',
+        content: 'Are You Sure?',
+        showCancelBtn: true,
+        onConfirmBtnTap: () {
+          pressedIndex = index;
+          widget.onDelete!(widget.dataList[index]);
+          Navigator.pop(context);
+        },
+        onCancelBtnTap: () {
+          Navigator.of(context).pop();
+        });
+    // showDialog(
+    //     barrierDismissible: false,
+    //     context: context,
+    //     builder: (context) {
+    //       return AlertDialog(
+    //         title: Column(
+    //           mainAxisSize: MainAxisSize.min,
+    //           children: [
+    //             SizedBox(
+    //                 height: size.height / 17,
+    //                 width: size.height / 17,
+    //                 child: SvgPicture.asset(
+    //                   'assets/wonder.svg',
+    //                   package: 'shared_component',
+    //                 )),
+    //             Center(
+    //                 child: Text(
+    //               'Deleting...',
+    //               style: Theme.of(context).textTheme.titleMedium,
+    //             )),
+    //             const SizedBox(
+    //               height: 10,
+    //             ),
+    //             Center(
+    //                 child: Text(
+    //               'Are you sure?',
+    //               style: Theme.of(context).textTheme.labelSmall,
+    //             )),
+    //           ],
+    //         ),
+    //         actions: [
+    //           Row(
+    //             mainAxisSize: MainAxisSize.max,
+    //             mainAxisAlignment: MainAxisAlignment.spaceAround,
+    //             children: [
+    //               TextButton(
+    //                   onPressed: () {
+    //                     pressedIndex = index;
+    //                     widget.onDelete!(widget.dataList[index]);
+    //                     Navigator.pop(context);
+    //                   },
+    //                   style: ButtonStyle(
+    //                       elevation: MaterialStateProperty.all<double>(0),
+    //                       overlayColor: MaterialStateProperty.all<Color>(
+    //                           Colors.transparent)),
+    //                   child: const Text(
+    //                     'Delete',
+    //                     style: TextStyle(color: Colors.red),
+    //                   )),
+    //               TextButton(
+    //                   onPressed: () {
+    //                     Navigator.of(context).pop();
+    //                   },
+    //                   style: ButtonStyle(
+    //                       elevation: MaterialStateProperty.all<double>(0),
+    //                       overlayColor: MaterialStateProperty.all<Color>(
+    //                           Colors.transparent)),
+    //                   child: const Text('Cancel')),
+    //             ],
+    //           )
+    //         ],
+    //       );
+    //     });
   }
 }
 
-
 ///PAGINATE CLASS
 class PaginatePage extends StatefulWidget {
-  const PaginatePage({
-    Key? key,
-    this.currentPage = 0,
-    this.totalPages = 0,
-    this.pageSize = 0,
-     this.onNavigateToPage,
-    this.currentPageColors = Colors.teal,
-    this.nextPage = 0}) : super(key: key);
+  const PaginatePage(
+      {Key? key,
+      this.currentPage = 0,
+      this.totalPages = 0,
+      this.pageSize = 0,
+      this.onNavigateToPage,
+      this.currentPageColors = Colors.teal,
+      this.nextPage = 0})
+      : super(key: key);
   final int currentPage;
   final int totalPages;
   final int pageSize;
@@ -324,107 +556,141 @@ class _PaginatePageState extends State<PaginatePage> {
       mainAxisSize: MainAxisSize.min,
       children: [
         ///PREVIOUS PAGES
-        if(widget.currentPage > 2) FloatingActionButton(
-            backgroundColor: Theme.of(context).canvasColor,
-            tooltip: 'Total Previous Pages',
-            elevation: 7,
-            mini: true,
-            child: Text((1).toString(),style: Theme.of(context).textTheme.caption,),
-            onPressed: (){
-             setState(() {
-               widget.onNavigateToPage!(const PaginatePage(nextPage: 1,));
-             });
-            }),
+        if (widget.currentPage > 2)
+          FloatingActionButton(
+              backgroundColor: Theme.of(context).canvasColor,
+              tooltip: 'Total Previous Pages',
+              elevation: 7,
+              mini: true,
+              child: Text(
+                (1).toString(),
+                style: Theme.of(context).textTheme.caption,
+              ),
+              onPressed: () {
+                setState(() {
+                  widget.onNavigateToPage!(const PaginatePage(
+                    nextPage: 1,
+                  ));
+                });
+              }),
 
         ///CONTINUES DOTS
-        if(widget.currentPage > 2) SizedBox(
-          width: 20,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(
-                  child: Container(
-                  )),
-              Text('.....',style: Theme.of(context).textTheme.bodyText2,)
-            ],
+        if (widget.currentPage > 2)
+          SizedBox(
+            width: 20,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(child: Container()),
+                Text(
+                  '.....',
+                  style: Theme.of(context).textTheme.bodyText2,
+                )
+              ],
+            ),
           ),
-        ),
 
         ///PREVIOUS PAGE
-       if(widget.currentPage > 1) FloatingActionButton(
-            backgroundColor: Theme.of(context).canvasColor,
-           tooltip: 'Previous Page',
-          elevation: 7,
-          mini: true,
-            child: Text((widget.currentPage - 1).toString(),style: Theme.of(context).textTheme.caption),
-            onPressed: (){
-              widget.onNavigateToPage!(PaginatePage(nextPage: widget.currentPage - 1,));
-            }),
+        if (widget.currentPage > 1)
+          FloatingActionButton(
+              backgroundColor: Theme.of(context).canvasColor,
+              tooltip: 'Previous Page',
+              elevation: 7,
+              mini: true,
+              child: Text((widget.currentPage - 1).toString(),
+                  style: Theme.of(context).textTheme.caption),
+              onPressed: () {
+                widget.onNavigateToPage!(PaginatePage(
+                  nextPage: widget.currentPage - 1,
+                ));
+              }),
 
-        Container(width: 5,),
-        ///CURRENT PAGE
-        FloatingActionButton(
-          tooltip: 'Current Page',
-          backgroundColor: widget.currentPageColors,
-            elevation: 7,
-          mini: true,
-            child: Text((widget.currentPage).toString(),style: TextStyle(fontSize: Theme.of(context).textTheme.caption!.fontSize,color: Theme.of(context).cardColor),),
-            onPressed: (){}),
-
-        Container(width: 5,),
-        ///NEXT PAGE
-       if(widget.totalPages > widget.currentPage) FloatingActionButton(
-            backgroundColor: Theme.of(context).canvasColor,
-           tooltip: 'Next Page',
-            elevation: 7,
-          mini: true,
-            child: Text((widget.currentPage + 1).toString(),style: Theme.of(context).textTheme.caption,),
-            onPressed: (){
-              setState(() {
-                widget.onNavigateToPage!(PaginatePage(nextPage: widget.currentPage + 1,));
-              });
-            }),
-
-        ///CONTINUES DOTS
-        if(widget.totalPages > (widget.currentPage + 1)) SizedBox(
-          width: 20,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(
-                  child: Container(
-                  )),
-              Text('.....',style: Theme.of(context).textTheme.bodyText2,)
-            ],
-          ),
+        Container(
+          width: 5,
         ),
 
-        ///TOTAL PAGES
-        if(widget.totalPages > (widget.currentPage + 1)) FloatingActionButton(
-            backgroundColor: Theme.of(context).canvasColor,
-            tooltip: 'Total Pages',
+        ///CURRENT PAGE
+        FloatingActionButton(
+            tooltip: 'Current Page',
+            backgroundColor: widget.currentPageColors,
             elevation: 7,
             mini: true,
-            child: Text((widget.totalPages).toString(),style: Theme.of(context).textTheme.caption,),
-            onPressed: (){
-              setState(() {
-                widget.onNavigateToPage!(PaginatePage(nextPage: widget.totalPages,));
-              });
-            }),
+            child: Text(
+              (widget.currentPage).toString(),
+              style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.caption!.fontSize,
+                  color: Theme.of(context).cardColor),
+            ),
+            onPressed: () {}),
+
+        Container(
+          width: 5,
+        ),
+
+        ///NEXT PAGE
+        if (widget.totalPages > widget.currentPage)
+          FloatingActionButton(
+              backgroundColor: Theme.of(context).canvasColor,
+              tooltip: 'Next Page',
+              elevation: 7,
+              mini: true,
+              child: Text(
+                (widget.currentPage + 1).toString(),
+                style: Theme.of(context).textTheme.caption,
+              ),
+              onPressed: () {
+                setState(() {
+                  widget.onNavigateToPage!(PaginatePage(
+                    nextPage: widget.currentPage + 1,
+                  ));
+                });
+              }),
+
+        ///CONTINUES DOTS
+        if (widget.totalPages > (widget.currentPage + 1))
+          SizedBox(
+            width: 20,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(child: Container()),
+                Text(
+                  '.....',
+                  style: Theme.of(context).textTheme.bodyText2,
+                )
+              ],
+            ),
+          ),
+
+        ///TOTAL PAGES
+        if (widget.totalPages > (widget.currentPage + 1))
+          FloatingActionButton(
+              backgroundColor: Theme.of(context).canvasColor,
+              tooltip: 'Total Pages',
+              elevation: 7,
+              mini: true,
+              child: Text(
+                (widget.totalPages).toString(),
+                style: Theme.of(context).textTheme.caption,
+              ),
+              onPressed: () {
+                setState(() {
+                  widget.onNavigateToPage!(PaginatePage(
+                    nextPage: widget.totalPages,
+                  ));
+                });
+              }),
       ],
     );
   }
 }
 
-class HeardTitle{
+class HeardTitle {
   final String? serialNumberTitle;
   final String? actionTitle;
   final List<HeardTitleItem>? heardTileItems;
 
-  HeardTitle(
-      {this.serialNumberTitle,
-      this.actionTitle,
-      this.heardTileItems});
+  HeardTitle({this.serialNumberTitle, this.actionTitle, this.heardTileItems});
 }
 
 class HeardTitleItem {
@@ -434,9 +700,7 @@ class HeardTitleItem {
   final double? columnSize;
   final Alignment? alignment;
 
-
   HeardTitleItem(
-
       {this.titleKey,
       this.titleName,
       this.objectKeyField,
@@ -444,23 +708,27 @@ class HeardTitleItem {
       this.alignment});
 }
 
-class ActionButtonItem<T>{
+class ActionButtonItem<T> {
   final IconData icon;
   final String name;
   final Function(T) onPressed;
   final bool permissionGranted;
   final bool isDate;
 
-  ActionButtonItem({this.isDate = false,this.permissionGranted = true, required this.icon, required this.name, required this.onPressed});
+  ActionButtonItem(
+      {this.isDate = false,
+      this.permissionGranted = true,
+      required this.icon,
+      required this.name,
+      required this.onPressed});
 }
 
-class PagingValues{
-
+class PagingValues {
   static PagingValues? _instance;
 
   int? _pageSize;
 
-  static PagingValues getInstance(){
+  static PagingValues getInstance() {
     _instance ??= PagingValues();
     return _instance!;
   }
@@ -473,4 +741,3 @@ class PagingValues{
 
   setPageSize(value) => _pageSize = value;
 }
-

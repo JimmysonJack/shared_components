@@ -9,6 +9,7 @@ class NotificationService{
       {required BuildContext context,
         String? cancelBtnText,
         String? confirmBtnText,
+        Color? buttonColor,
         Function()? onCancelBtnTap,
         bool showCancelBtn = false,
         String? title,
@@ -19,7 +20,7 @@ class NotificationService{
         barrierDismissible: false,
         cancelBtnText: cancelBtnText ?? '',
         confirmBtnText: confirmBtnText ?? '',
-        confirmBtnColor: Theme
+        confirmBtnColor: buttonColor ?? Theme
             .of(context)
             .primaryColor,
         onCancelBtnTap: onCancelBtnTap,
@@ -39,6 +40,7 @@ class NotificationService{
       {required BuildContext context,
         String? cancelBtnText,
         String? confirmBtnText,
+        Color? buttonColor,
         Function()? onCancelBtnTap,
         bool showCancelBtn = false,
         String? title,
@@ -49,7 +51,7 @@ class NotificationService{
         barrierDismissible: false,
         cancelBtnText: cancelBtnText ?? '',
         confirmBtnText: confirmBtnText ?? '',
-        confirmBtnColor: Theme
+        confirmBtnColor: buttonColor ?? Theme
             .of(context)
             .primaryColor,
         onCancelBtnTap: onCancelBtnTap,
@@ -69,6 +71,7 @@ class NotificationService{
       {required BuildContext context,
         String? cancelBtnText,
         String? confirmBtnText,
+        Color? buttonColor,
         Function()? onCancelBtnTap,
         bool showCancelBtn = false,
         String? title,
@@ -79,7 +82,7 @@ class NotificationService{
         barrierDismissible: false,
         cancelBtnText: cancelBtnText ?? '',
         confirmBtnText: confirmBtnText ?? '',
-        confirmBtnColor: Theme
+        confirmBtnColor: buttonColor ?? Theme
             .of(context)
             .primaryColor,
         onCancelBtnTap: onCancelBtnTap,
@@ -99,6 +102,7 @@ class NotificationService{
       {required BuildContext context,
         String? cancelBtnText,
         String? confirmBtnText,
+        Color? buttonColor,
         Function()? onCancelBtnTap,
         bool showCancelBtn = false,
         String? title,
@@ -109,7 +113,7 @@ class NotificationService{
         barrierDismissible: false,
         cancelBtnText: cancelBtnText ?? '',
         confirmBtnText: confirmBtnText ?? '',
-        confirmBtnColor: Theme
+        confirmBtnColor: buttonColor ?? Theme
             .of(context)
             .primaryColor,
         onCancelBtnTap: onCancelBtnTap,
@@ -129,6 +133,7 @@ class NotificationService{
       {required BuildContext context,
         String? cancelBtnText,
         String? confirmBtnText,
+        Color? buttonColor,
         Function()? onCancelBtnTap,
         bool showCancelBtn = false,
         String? title,
@@ -139,7 +144,7 @@ class NotificationService{
         barrierDismissible: false,
         cancelBtnText: cancelBtnText ?? '',
         confirmBtnText: confirmBtnText ?? '',
-        confirmBtnColor: Theme
+        confirmBtnColor:buttonColor ?? Theme
             .of(context)
             .primaryColor,
         onCancelBtnTap: onCancelBtnTap,

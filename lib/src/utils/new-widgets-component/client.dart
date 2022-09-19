@@ -1,9 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
- ValueNotifier<GraphQLClient> graphClient(){
-  final HttpLink httpLink = HttpLink('https://janju.herokuapp.com/graphql');
-  final AuthLink authLink = AuthLink(getToken: () async => 'Bearer f28ff526-4a60-4b29-9d78-5a2565c52df3');
+import '../../../shared_component.dart' hide HiveStore;
+
+ Future<ValueNotifier<GraphQLClient>> graphClient(context)async{
+   Api api = Api(context: context);
+   print('its =============== being================ called');
+   String token = await api.userToken(true);
+  final HttpLink httpLink = HttpLink('$serverUrl/graphql');
+  final AuthLink authLink = AuthLink(getToken: () async => 'Bearer $token');
   final Link link = authLink.concat(httpLink);
 
   ValueNotifier<GraphQLClient> client = ValueNotifier(

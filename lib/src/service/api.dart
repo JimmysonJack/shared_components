@@ -52,16 +52,20 @@ class Api {
   }
 
   Future<String> userLogin() async {
-    print('userLogin is called');
     var principal = await StorageService.getJson('user');
-    var userName;
-    var userEmail;
+    String? userName;
+    String? userEmail;
     if(principal.isNotEmpty){
       userName = principal['principal']['name'];
       userEmail = principal['principal']['email'];
     }
-    showDialog<void>(
-      context: _dialogContext!,
+    if(ModalState.modal().modelIsOpened == false) {
+      ModalState.modal().modelIsOpened = true;
+      Future.delayed(const Duration(seconds: 5),(){
+        ModalState.modal().modelIsOpened = false;
+      });
+      showDialog<void>(
+      context: context!,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return SizedBox(
@@ -86,10 +90,13 @@ class Api {
                   const SizedBox(
                     height: 10,
                   ),
-                  CustomTextField(
+                  TextFormField(
+                    decoration: InputDecoration(
                       hintText: 'Password',
-                      controller: TextEditingController(),
-                      obscure: true,
+                      fillColor: Theme.of(context).cardColor,
+                      filled: true,
+                    ),
+                      obscureText: true,
                       onChanged: authService.setPass,
                       validator: (value) {
                         if (value!.isEmpty) {
@@ -114,8 +121,10 @@ class Api {
                             children: [
                               if (authService.loading)
                                 IndicateProgress.linear(),
-                              GElevatedButton(
-                                'Confirm',
+                              Field.use.button(
+                                widthSize: WidthSize.col12,
+                                validate: false,
+                                label: 'Confirm',
                                 onPressed: authService
                                     .passwordHasError
                                     ? null
@@ -124,13 +133,13 @@ class Api {
                                     : () async {
                                   authService.getContext(context);
                                   authService.setLoading(true);
-                                  if(await authService.loginUser(username: userEmail, password: authService.passwordValue!)){
+                                  if(await authService.loginUser(username: userEmail ?? 'root@janju.com', password: authService.passwordValue!)){
                                     authService.setLoading(false);
                                     Modular.to.pop();
                                   }else{
                                     authService.setLoading(false);
                                   }
-                                },
+                                }, context: context,
                               ),
                             ],
                           ),
@@ -138,19 +147,20 @@ class Api {
                             height: 10,
                           ),
                           if (!authService.loading)
-                            GElevatedButton(
-                              'Go To Start Over',
-                              color: Theme.of(context).errorColor,
+                            Field.use.button(
+                              widthSize: WidthSize.col12,
+                              validate: false,
+                              label: 'Go To Start Over',
+                              backgroundColor: Theme.of(context).errorColor,
                               onPressed: () async{
                                 var jsonToken = await StorageService.getJson('user_token');
-
                                 if(jsonToken.isNotEmpty){
                                   Token t = Token.fromJson(jsonToken);
                                   authService.logoutUser(accessToken: t.accessToken!, refreshToken: t.refreshToken!);
                                 }else{
                                   Modular.to.navigate('/login/');
                                 }
-                              },
+                              }, context: context,
                             )
                         ],
                       ),
@@ -161,6 +171,7 @@ class Api {
         );
       },
     );
+    }
     return '';
   }
 
@@ -197,6 +208,7 @@ class Api {
   }
 
   Future<String> clientLogin() async {
+
     Options requestOptions =
         Options(contentType: 'application/x-www-form-urlencoded', headers: {
       'Accept': 'application/json',
@@ -258,7 +270,7 @@ class Api {
       if (e.response != null) {
         var res = e.response!.data as Map<String, dynamic>;
         if (res['error_description'] != null) {
-          Toast.error(Intl.trans(res['error_description'], lang));
+          Toast.error(res['error'],subTitle:Intl.trans(res['error_description'], lang));
           return null;
         }
         if (res['status'] == false) {
@@ -346,5 +358,14 @@ class Api {
         StorageService.setJson('client_token', null);
       }
     }
+  }
+}
+
+class ModalState{
+  static ModalState? _instance;
+  bool modelIsOpened = false;
+  static ModalState modal(){
+    _instance ??= ModalState();
+    return _instance!;
   }
 }

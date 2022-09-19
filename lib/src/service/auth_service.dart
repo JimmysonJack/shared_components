@@ -55,8 +55,8 @@ abstract class _AuthServiceStoreBase with Store{
 
   @action
   Future<bool> loginUser(
-      {required String username, required String password}) async {
-
+      {required String username, required String password, bool showLoading = false}) async {
+    if(showLoading) setLoading(true);
       Map<String, String> credentials = {
         'grant_type': 'password',
         'username': username,
@@ -79,7 +79,7 @@ abstract class _AuthServiceStoreBase with Store{
           StorageService.setJson('user_token', token.toJson());
           return true;
         } else if (res['error_description'] != null) {
-          Toast.error(res['error']);
+          Toast.error(res['error'],subTitle: res['error_description']);
           setLoading(false);
           return false;
         }
@@ -119,6 +119,7 @@ abstract class _AuthServiceStoreBase with Store{
       required String oldPassword,
       required String newPassword,
       required String confirmPassword}) async {
+    setLoading(true);
     var res = await api?.clientPost('/user/changePassword', {
       'uid': uid,
       'currentPassword': oldPassword,
@@ -127,9 +128,11 @@ abstract class _AuthServiceStoreBase with Store{
     });
     if (res != null) {
       StorageService.setString('user_uid', null);
+      Toast.info('Password Changed Successfully');
       setLoading(false);
       return true;
     }
+    Toast.info('Password  Unsuccessfully Changed');
     setLoading(false);
     return false;
   }

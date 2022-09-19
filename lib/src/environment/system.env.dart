@@ -1,3 +1,3 @@
-const serverUrl = 'http://192.168.0.207:8000';
-const clientId = 'dhms';
-const clientSecret = 'DhmsUaa@2022';
+const serverUrl = 'https://janju.herokuapp.com';
+const clientId = 'janju';
+const clientSecret = 'JanjuUaa@2022';

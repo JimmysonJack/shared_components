@@ -1,17 +1,12 @@
-// ignore_for_file: constant_identifier_names, depend_on_referenced_packages
 
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:file_picker_cross/file_picker_cross.dart';
-// import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
 import 'package:mobx/mobx.dart';
-import 'package:shared_component/src/utils/new-widgets-component/graphql_service.dart';
-import 'package:shared_component/src/utils/new-widgets-component/other_parameters.dart';
-
 import '../../../shared_component.dart' hide Store;
 
 part 'text-inputs.g.dart';
@@ -33,12 +28,11 @@ abstract class _TextInputBase with Store {
 
   // List<Map<String, dynamic>> _values = [];
 
-
   @observable
-   List<Map<String, dynamic>>? updateFields;
+  List<Map<String, dynamic>>? updateFields;
 
   @action
-  setUpdateFields(List<Map<String, dynamic>>? value){
+  setUpdateFields(List<Map<String, dynamic>>? value) {
     var list = updateFields;
     list = value;
     updateFields = list;
@@ -63,7 +57,7 @@ abstract class _TextInputBase with Store {
   @observable
   bool _switchState = false;
 
-  List<Map<String,dynamic>> _validationList = [];
+  List<Map<String, dynamic>> _validationList = [];
 
   @observable
   bool hasErrors = false;
@@ -79,31 +73,31 @@ abstract class _TextInputBase with Store {
       bool isPassword = false,
       bool isTextArea = false,
       int maxLines = 1,
-        bool fixed = false,
+      bool fixed = false,
       int minLines = 1,
+        String? inputType = 'String',
       bool readOnly = false,
       bool? validate = false,
       bool show = false,
       FieldInputType? fieldInputType}) {
-    checkForUpdate(key,label,fieldInputType,validate);
+    checkForUpdate(key, label, fieldInputType, validate);
 
     return Observer(builder: (context) {
       return SizedBox(
-        width: sizeSet(widthSize, context,fixed: fixed),
+        width: sizeSet(widthSize, context, fixed: fixed),
         child: TextFormField(
           inputFormatters: inputFormatter(fieldInputType),
           textInputAction: TextInputAction.next,
           onFieldSubmitted: (value) {},
           onChanged: (value) {
             if (fieldInputType == FieldInputType.Currency) {
-              _onUpdate(key, value.replaceAll(",", ""));
+              _onUpdate(key, value.replaceAll(",", ""),inputType);
             } else {
-              _onUpdate(key, value);
+              _onUpdate(key, value,inputType);
             }
           },
           validator: (value) {
-
-            validateErrors(key, label, fieldInputType, validate,value);
+            validateErrors(key, label, fieldInputType, validate, value);
             return generalValidator(value, label, fieldInputType, validate);
           },
           obscureText: _showPassword,
@@ -122,8 +116,10 @@ abstract class _TextInputBase with Store {
                   ? maxLines
                   : minLines,
           readOnly: readOnly,
-          initialValue: onInitialValue(updateFields,key),
-          autovalidateMode: onInitialValue(updateFields,key) == null ? AutovalidateMode.onUserInteraction : AutovalidateMode.always,
+          initialValue: onInitialValue(updateFields, key),
+          autovalidateMode: onInitialValue(updateFields, key) == null
+              ? AutovalidateMode.onUserInteraction
+              : AutovalidateMode.always,
           toolbarOptions: const ToolbarOptions(
               copy: true, cut: true, paste: true, selectAll: true),
           decoration: InputDecoration(
@@ -166,16 +162,17 @@ abstract class _TextInputBase with Store {
       CustomDisplayKey customDisplayKey = _customKey,
       String? queryFields,
       String? endPointName,
-        bool fixed = false,
+        String? inputType = 'String',
+      bool fixed = false,
       String? optionalResponseField,
       List<OtherParameters>? otherParameters,
       FieldInputType? fieldInputType}) {
-    checkForUpdate(key,label,fieldInputType,validate);
+    checkForUpdate(key, label, fieldInputType, validate);
 
     final size = MediaQuery.of(context).size;
     return Observer(builder: (context) {
       return SizedBox(
-        width: sizeSet(widthSize, context,fixed: fixed),
+        width: sizeSet(widthSize, context, fixed: fixed),
         child: DropdownSearch<Map<String, dynamic>>(
           enabled: !readOnly,
           clearButtonProps: const ClearButtonProps(
@@ -183,9 +180,12 @@ abstract class _TextInputBase with Store {
             isVisible: true,
             tooltip: 'Clear Field',
           ),
-          autoValidateMode: onInitialValue(updateFields,key) == null ? AutovalidateMode.onUserInteraction : AutovalidateMode.always,
+          autoValidateMode: onInitialValue(updateFields, key) == null
+              ? AutovalidateMode.onUserInteraction
+              : AutovalidateMode.always,
           validator: (value) {
-            validateErrors(key, label, fieldInputType, validate,value?[customDisplayKey.titleDisplayLabelKey]);
+            validateErrors(key, label, fieldInputType, validate,
+                value?[customDisplayKey.titleDisplayLabelKey]);
             return generalValidator(
                 value?[customDisplayKey.titleDisplayLabelKey],
                 label,
@@ -272,7 +272,7 @@ abstract class _TextInputBase with Store {
           asyncItems: (String filter) async {
             if (isPageable) {
               final results = await GraphQLService.queryPageable(
-                context: context,
+                  context: context,
                   endPointName: endPointName ?? '',
                   optionResponseFields: optionalResponseField,
                   queryParameters: otherParameters,
@@ -291,7 +291,7 @@ abstract class _TextInputBase with Store {
                   .toList();
             } else {
               final results = await GraphQLService.query(
-                context: context,
+                  context: context,
                   endPointName: endPointName ?? '',
                   optionResponseFields: optionalResponseField,
                   parameters: otherParameters,
@@ -308,8 +308,8 @@ abstract class _TextInputBase with Store {
           items: items ?? [],
           itemAsString: inFieldString ??
               (value) => "${value[customDisplayKey.titleDisplayLabelKey]}",
-          selectedItem: onInitialValue(updateFields,key),
-          onChanged: (data) => _onUpdate(key, data),
+          selectedItem: onInitialValue(updateFields, key),
+          onChanged: (data) => _onUpdate(key, data,inputType),
         ),
       );
     });
@@ -328,16 +328,17 @@ abstract class _TextInputBase with Store {
       CustomDisplayKey customDisplayKey = _customKey,
       String? queryFields,
       String? endPointName,
-        bool fixed = false,
+        String? inputType = 'String',
+      bool fixed = false,
       String? optionalResponseField,
       List<OtherParameters>? otherParameters,
       FieldInputType? fieldInputType}) {
-    checkForUpdate(key,label,fieldInputType,validate);
+    checkForUpdate(key, label, fieldInputType, validate);
 
     final size = MediaQuery.of(context).size;
     return Observer(builder: (context) {
       return SizedBox(
-        width: sizeSet(widthSize, context,fixed: fixed),
+        width: sizeSet(widthSize, context, fixed: fixed),
         child: DropdownSearch<Map<String, dynamic>>.multiSelection(
           enabled: !readOnly,
           clearButtonProps: const ClearButtonProps(
@@ -345,9 +346,11 @@ abstract class _TextInputBase with Store {
             isVisible: true,
             tooltip: 'Clear Field',
           ),
-          autoValidateMode: onInitialValue(updateFields,key) == null ? AutovalidateMode.onUserInteraction : AutovalidateMode.always,
+          autoValidateMode: onInitialValue(updateFields, key) == null
+              ? AutovalidateMode.onUserInteraction
+              : AutovalidateMode.always,
           validator: (value) {
-            validateErrors(key, label, fieldInputType, validate,value);
+            validateErrors(key, label, fieldInputType, validate, value);
             return generalValidator(value, label, fieldInputType, validate);
           },
           dropdownDecoratorProps: DropDownDecoratorProps(
@@ -429,7 +432,7 @@ abstract class _TextInputBase with Store {
           asyncItems: (String filter) async {
             if (isPageable) {
               final results = await GraphQLService.queryPageable(
-                context: context,
+                  context: context,
                   endPointName: endPointName ?? '',
                   optionResponseFields: optionalResponseField,
                   queryParameters: otherParameters,
@@ -448,7 +451,7 @@ abstract class _TextInputBase with Store {
                   .toList();
             } else {
               final results = await GraphQLService.query(
-                context: context,
+                  context: context,
                   endPointName: endPointName ?? '',
                   optionResponseFields: optionalResponseField,
                   parameters: otherParameters,
@@ -465,8 +468,8 @@ abstract class _TextInputBase with Store {
           items: items ?? [],
           itemAsString: inFieldString ??
               (value) => "${value[customDisplayKey.titleDisplayLabelKey]}",
-          selectedItems: onInitialValue(updateFields,key),
-          onChanged: (data) => _onUpdate(key, data),
+          selectedItems: onInitialValue(updateFields, key),
+          onChanged: (data) => _onUpdate(key, data,inputType),
         ),
       );
     });
@@ -480,22 +483,23 @@ abstract class _TextInputBase with Store {
     bool disable = false,
     bool isDateRange = false,
     bool validate = false,
+    String? inputType = 'String',
     bool fixed = false,
     WidthSize? widthSize,
     required String label,
     required String key,
   }) {
-    checkForUpdate(key,label,null,validate);
+    checkForUpdate(key, label, null, validate);
 
     return Observer(builder: (context) {
       return SizedBox(
-        width: sizeSet(widthSize, context,fixed: fixed),
+        width: sizeSet(widthSize, context, fixed: fixed),
         child: CustomDate(
           onSelected: (value) {
-            _onUpdate(key, value.toString());
+            _onUpdate(key, value.toString(),inputType);
           },
           validator: (value) {
-            validateErrors(key, label, null, validate,value);
+            validateErrors(key, label, null, validate, value);
             return generalValidator(
                 value, label, FieldInputType.Other, validate);
           },
@@ -509,7 +513,7 @@ abstract class _TextInputBase with Store {
           isDateRange: isDateRange,
           readyOnly: true,
           showDateIcon: true,
-          initialValue: onInitialValue(updateFields,key),
+          initialValue: onInitialValue(updateFields, key),
         ),
       );
     });
@@ -521,30 +525,31 @@ abstract class _TextInputBase with Store {
       required FieldInputType fieldInputType,
       FileTypeCross? fileType,
       bool? validate,
+        String? inputType = 'String',
       required String key,
-        bool fixed = false,
+      bool fixed = false,
       required BuildContext context}) {
-    checkForUpdate(key,label,fieldInputType,validate);
+    checkForUpdate(key, label, fieldInputType, validate);
 
     TextEditingController controller = TextEditingController();
     return Observer(builder: (context) {
       return SizedBox(
         width: sizeSet(widthSize, context, fixed: fixed),
         child: TextFormField(
-          initialValue: onInitialValue(updateFields,key),
+          initialValue: onInitialValue(updateFields, key),
           onTap: () async {
             FilePickerCross result = await FilePickerCross.importFromStorage(
               type: fileType ?? FileTypeCross.any,
             );
             controller.text = result.fileName ?? '';
             _onUpdate(
-                key, {'fileName': result.fileName, 'value': result.toBase64()});
+                key, {'fileName': result.fileName, 'value': result.toBase64()},inputType);
           },
           readOnly: true,
           controller: controller,
           onChanged: (value) {},
           validator: (value) {
-            validateErrors(key, label, fieldInputType, validate,value);
+            validateErrors(key, label, fieldInputType, validate, value);
             return generalValidator(value, label, fieldInputType, validate);
           },
           decoration: InputDecoration(
@@ -563,15 +568,18 @@ abstract class _TextInputBase with Store {
     WidthSize? widthSize,
     Function(bool?)? onChanged,
     bool fixed = false,
+    String? inputType = 'Boolean',
     required String label,
     required String key,
   }) {
-    checkForUpdate(key,label,null,false);
+    checkForUpdate(key, label, null, false);
 
-    _checkBoxState = onInitialValue(updateFields,key) ?? false;
+    _checkBoxState = onInitialValue(updateFields, key) ?? false;
     return Observer(builder: (context) {
       return SizedBox(
-        width: widthSize != null ? sizeSet(widthSize, context,fixed: fixed) : null,
+        width: widthSize != null
+            ? sizeSet(widthSize, context, fixed: fixed)
+            : null,
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -581,7 +589,7 @@ abstract class _TextInputBase with Store {
                 value: _checkBoxState,
                 onChanged: (value) {
                   setCheckBoxState(value);
-                  _onUpdate(key, value);
+                  _onUpdate(key, value,inputType);
                   if (onChanged != null) onChanged(value);
                 }),
             Text(
@@ -597,22 +605,25 @@ abstract class _TextInputBase with Store {
   Widget toggle({
     required BuildContext context,
     WidthSize? widthSize,
+    String? inputType = 'Boolean',
     bool fixed = false,
     Function(bool?)? onChanged,
     required String key,
   }) {
-    checkForUpdate(key,null,null,false);
+    checkForUpdate(key, null, null, false);
     final size = MediaQuery.of(context).size;
 
-    _switchState = onInitialValue(updateFields,key) ?? false;
+    _switchState = onInitialValue(updateFields, key) ?? false;
     return Observer(builder: (context) {
       return SizedBox(
-        width: widthSize != null ? sizeSet(widthSize, context,fixed: fixed) : null,
+        width: widthSize != null
+            ? sizeSet(widthSize, context, fixed: fixed)
+            : null,
         child: Switch(
             value: _switchState,
             onChanged: (value) {
               setSwitchState(value);
-              _onUpdate(key, value);
+              _onUpdate(key, value,inputType);
               if (onChanged != null) onChanged(value);
             }),
       );
@@ -623,36 +634,84 @@ abstract class _TextInputBase with Store {
       {required BuildContext context,
       WidthSize? widthSize,
       required String label,
-      required Function()?  onPressed,
-        bool fixed = false,
-        bool validate = true,
+      required Function()? onPressed,
+      bool fixed = false,
+      bool validate = true,
+        Color? backgroundColor,
       IconData? icon}) {
     if (icon == null) {
       return Observer(
-        builder: (context) {
-          return SizedBox(
-            width: widthSize != null ? sizeSet(widthSize, context,fixed: fixed) : null,
-            child: ElevatedButton(onPressed:validate ? updateState && updateFields != null ? null : !hasErrors ? null : onPressed : onPressed, child: Text(label)),
-          );
-        }
-      );
+        warnWhenNoObservables: false,
+          builder: (context) {
+        return SizedBox(
+          width: widthSize != null
+              ? sizeSet(widthSize, context, fixed: fixed)
+              : null,
+          child: ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                      (Set<MaterialState> states) {
+                    if (states.contains(MaterialState.pressed)) {
+                      return Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withOpacity(0.5);
+                    } else if (states.contains(MaterialState.disabled)) {
+                      return Theme.of(context).disabledColor;
+                    }
+                    return backgroundColor ?? Theme.of(context).primaryColor; // Use the component's default.
+                  },
+                ),
+              ),
+              onPressed:validate
+                  ? updateState && updateFields != null
+                  ? null
+                  : !hasErrors
+                  ? null
+                  : onPressed
+                  : onPressed,
+              child: Text(label)),
+        );
+      });
     }
     return Observer(
-      builder: (context) {
-        return SizedBox(
-          width: widthSize != null ? sizeSet(widthSize, context,fixed:fixed) : null,
-          child: ElevatedButton.icon(
-            onPressed: validate ? updateState && updateFields != null ? null : !hasErrors ? null : onPressed : onPressed,
-            label: Text(label),
-            icon: Icon(icon),
+        warnWhenNoObservables: false,
+        builder: (context) {
+      return SizedBox(
+        width: widthSize != null
+            ? sizeSet(widthSize, context, fixed: fixed)
+            : null,
+        child: ElevatedButton.icon(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                  (Set<MaterialState> states) {
+                if (states.contains(MaterialState.pressed)) {
+                  return Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withOpacity(0.5);
+                } else if (states.contains(MaterialState.disabled)) {
+                  return Theme.of(context).disabledColor;
+                }
+                return backgroundColor ?? Theme.of(context).primaryColor; // Use the component's default.
+              },
+            ),
           ),
-        );
-      }
-    );
+          onPressed: validate
+              ? updateState && updateFields != null
+              ? null
+              : !hasErrors
+              ? null
+              : onPressed
+              : onPressed,
+          label: Text(label),
+          icon: Icon(icon),
+        ),
+      );
+    });
   }
 
-  _onUpdate(String key, dynamic value) async {
-
+  _onUpdate(String key, dynamic value, String? inputType) async {
     String foundKey = 'noKey';
     for (var map in FieldValues.getInstance().instanceValues) {
       if (map.containsKey(key)) {
@@ -672,9 +731,9 @@ abstract class _TextInputBase with Store {
     } else {
       Map<String, dynamic> json = {
         key: value,
+        'inputType': inputType
       };
       FieldValues.getInstance().addValue(json);
-
     }
     notifierValue.value = value;
   }
@@ -716,8 +775,8 @@ abstract class _TextInputBase with Store {
     }
   }
 
-  checkForUpdate(key,validateName,fieldInputType,validate) {
-    validateErrors(key, validateName, fieldInputType, validate,null);
+  checkForUpdate(key, validateName, fieldInputType, validate) {
+    validateErrors(key, validateName, fieldInputType, validate, null);
     // if (updateFields != null || updateFields!.isNotEmpty) {
     //   FieldValues.getInstance().setValue(updateFields!);
     //   // assignInitialValue(key,validateName,fieldInputType,validate);
@@ -748,12 +807,12 @@ abstract class _TextInputBase with Store {
     return list;
   }
 
-  onInitialValue(List<Map<String,dynamic>>? dataList, String key){
+  onInitialValue(List<Map<String, dynamic>>? dataList, String key) {
     FieldValues.getInstance().setValue(dataList);
     dynamic dataValue;
-    if(dataList != null){
-      for(var data in dataList){
-        if(data.keys.first == key){
+    if (dataList != null) {
+      for (var data in dataList) {
+        if (data.keys.first == key) {
           dataValue = data.values.first;
         }
       }
@@ -773,9 +832,11 @@ abstract class _TextInputBase with Store {
   //   }
   // }
 
-  validateErrors(key,label,fieldInputType,validate,value){
-
-   _register(key: key, valid: generalValidator(value, label, fieldInputType, validate) == null);
+  validateErrors(key, label, fieldInputType, validate, value) {
+    _register(
+        key: key,
+        valid:
+            generalValidator(value, label, fieldInputType, validate) == null);
   }
 
   String? _validateServiceNumber(String? value) {
@@ -843,29 +904,23 @@ abstract class _TextInputBase with Store {
     return null;
   }
 
-  _register({required String key, required bool valid}){
+  _register({required String key, required bool valid}) {
     var listData = _validationList;
-    int index =listData.indexWhere((element) => element.containsKey(key));
-    if(listData.isNotEmpty){
+    int index = listData.indexWhere((element) => element.containsKey(key));
+    if (listData.isNotEmpty) {
       if (listData.any((element) => element.containsKey(key))) {
         listData[index].update(key, (value) => valid);
-      }  else{
-        listData.add({key:valid});
+      } else {
+        listData.add({key: valid});
       }
-    }else{
-      listData.add({key:valid});
+    } else {
+      listData.add({key: valid});
     }
     _validationList = listData;
     hasErrors = listData.every((element) => element.containsValue(true));
     hasError.value = !hasErrors;
-
   }
 }
-
-
-
-
-
 
 enum FieldInputType {
   UpperCase,
@@ -904,7 +959,7 @@ class CustomDisplayKey {
 
 class UpdateField {
   static UpdateField? _instance;
-  static  getInstance() {
+  static getInstance() {
     if (_instance == null) {
       return _instance = UpdateField();
     }
@@ -912,21 +967,20 @@ class UpdateField {
   }
 
   Box? box;
-   Future<Box> init() async {
-    return  await Hive.openBox('fieldsBox');
+  Future<Box> init() async {
+    return await Hive.openBox('fieldsBox');
   }
 }
 
 class Field {
   static TextInput? _instance;
-   static  List<Map<String,dynamic>> updateFieldList =[];
+  static List<Map<String, dynamic>> updateFieldList = [];
   static TextInput _use() {
     _instance ??= TextInput();
     return _instance!;
   }
 
   static TextInput get use => _use();
-
 }
 
 class FieldValues {
@@ -943,7 +997,7 @@ class FieldValues {
   }
 
   void setValue(List<Map<String, dynamic>>? value) {
-    _values = value ??=[];
+    _values = value ??= [];
     _storage = value;
   }
 
@@ -953,16 +1007,15 @@ class FieldValues {
 
   List<Map<String, dynamic>> get updateStorage => _storage;
 
-  updateValue(value,key,index) {
-    if(value is String && value.isEmpty){
+  updateValue(value, key, index) {
+    if (value is String && value.isEmpty) {
       _values.removeAt(index);
-    }else if(value == null){
+    } else if (value == null) {
       _values.removeAt(index);
-    }else{
+    } else {
       _values[index].update(key, (x) => value);
     }
   }
-
 }
 
 ValueNotifier<bool> hasError = ValueNotifier(true);

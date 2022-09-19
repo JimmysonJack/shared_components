@@ -94,7 +94,7 @@ class ToastView {
     }
     return Container(
       decoration: BoxDecoration(
-        color: strip ? Colors.transparent : bgColor,
+        color: strip ? Colors.white : bgColor,
         // borderRadius: BorderRadius.circular(0),
         border: strip
             ? Border(
