@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:google_ui/google_ui.dart';
 // import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_component/shared_component.dart';
 

@@ -27,4 +27,8 @@ class StorageService {
     prefs.setString(key, data);
     return data;
   }
+
+  static Future<String?> getToken(String key) async => await getString(key);
+
+  static Future<dynamic> getUser() async => await getJson('user');
 }

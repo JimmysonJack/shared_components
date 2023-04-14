@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_literals_to_create_immutables
+
 import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
 
@@ -45,153 +47,148 @@ class _TestingWidgetState extends State<TestingWidget> {
             //     child: FilePicker(onFileSelected: (value) {})),
 
             SizedBox(
-                child:   ElevatedButton(
+              child: ElevatedButton(
                   child: const Text('Save Data'),
-                  onPressed: (){
-                    PopupModel (
-                      endpointName: 'saveAgent',
+                  onPressed: () {
+                    PopupModel(
+                        endpointName: 'saveAgent',
                         queryFields: 'uid name',
-                        responseResults: (response, onLoad){
-
-                        },
+                        responseResults: (response, onLoad) {},
                         checkUnSavedData: true,
                         buildContext: context,
                         buttonLabel: 'Save Test',
                         iconButton: Icons.save_outlined,
                         title: 'Testing Model',
-                      formGroup: FormGroup(
-                        // updateFields:  [
-                        //   {
-                        //     'fullName': 'Juma Hassan Kimaro'
-                        //   },
-                        //   {
-                        //     'mobileNumber': '0753332777'
-                        //   },
-                        //   {
-                        //     'nationality': 'Tanzanian'
-                        //   },
-                        //   {
-                        //     'region': {'name':'Mwanza'}
-                        //   },
-                        // ],
-                        group: [
-                          Group(
-                            header: "Test's info",
-                              children: [
-                                Field.use.input(
-                                  context: context,
-                                  label: 'Full Name',
-                                  key: 'fullName',
-                                  fieldInputType: FieldInputType.FullName,
-                                  validate: true,
-                                  widthSize: WidthSize.col3,
-                                ),
-                                Field.use.input(
-                                  context: context,
-                                  label: 'Mobile Number',
-                                  key: 'mobileNumber',
-                                  fieldInputType: FieldInputType.MobileNumber,
-                                  validate: true,
-                                  widthSize: WidthSize.col3,
-                                ),
-                                Field.use.input(
-                                  context: context,
-                                  label: 'Citizenship',
-                                  key: 'nationality',
-                                  fieldInputType: FieldInputType.Other,
-                                  validate: true,
-                                  widthSize: WidthSize.col3,
-                                ),
-                                Field.use.select(
-                                  context: context,
-                                  label: 'Region',
-                                  items: [{'name':'Mwanza'},{'name':'Arusha'}],
-                                  key: 'region',
-                                  fieldInputType: FieldInputType.Other,
-                                  validate: true,
-                                  widthSize: WidthSize.col3,
-                                ),
-                              ]),
-                          // Group(
-                          //   header: "Another info",
-                          //     children: [
-                          //       Field.use.input(
-                          //         context: context,
-                          //         label: 'Full Name',
-                          //         key: 'fullName',
-                          //         fieldInputType: FieldInputType.FullName,
-                          //         validate: true,
-                          //         widthSize: WidthSize.col3,
-                          //       ),
-                          //       Field.use.input(
-                          //         context: context,
-                          //         label: 'Mobile Number',
-                          //         key: 'mobileNumber',
-                          //         fieldInputType: FieldInputType.MobileNumber,
-                          //         validate: true,
-                          //         widthSize: WidthSize.col3,
-                          //       ),
-                          //       Field.use.input(
-                          //         context: context,
-                          //         label: 'Citizenship',
-                          //         key: 'nationality',
-                          //         fieldInputType: FieldInputType.Other,
-                          //         validate: true,
-                          //         widthSize: WidthSize.col3,
-                          //       ),
-                          //       Field.use.select(
-                          //         context: context,
-                          //         label: 'Region',
-                          //         items: [{'name':'Mwanza'},{'name':'Arusha'}],
-                          //         key: 'region',
-                          //         fieldInputType: FieldInputType.Other,
-                          //         validate: true,
-                          //         widthSize: WidthSize.col3,
-                          //       ),
-                          //     ]),
-                          // Group(
-                          //   header: "Third info",
-                          //     children: [
-                          //       Field.use.input(
-                          //         context: context,
-                          //         label: 'Full Name',
-                          //         key: 'fullName',
-                          //         fieldInputType: FieldInputType.FullName,
-                          //         validate: true,
-                          //         widthSize: WidthSize.col3,
-                          //       ),
-                          //       Field.use.input(
-                          //         context: context,
-                          //         label: 'Mobile Number',
-                          //         key: 'mobileNumber',
-                          //         fieldInputType: FieldInputType.MobileNumber,
-                          //         validate: true,
-                          //         widthSize: WidthSize.col3,
-                          //       ),
-                          //       Field.use.input(
-                          //         context: context,
-                          //         label: 'Citizenship',
-                          //         key: 'nationality',
-                          //         fieldInputType: FieldInputType.Other,
-                          //         validate: true,
-                          //         widthSize: WidthSize.col3,
-                          //       ),
-                          //       Field.use.select(
-                          //         context: context,
-                          //         label: 'Region',
-                          //         items: [{'name':'Mwanza'},{'name':'Arusha'}],
-                          //         key: 'region',
-                          //         fieldInputType: FieldInputType.Other,
-                          //         validate: true,
-                          //         widthSize: WidthSize.col3,
-                          //       ),
-                          //     ]),
-                        ] ,
-                      )
-                    ).show();
-                  }
-
-                ),),
+                        formGroup: FormGroup(
+                          updateFields: [
+                            {'fullName': 'Juma Hassan Kimaro'},
+                            {'mobileNumber': '0753332777'},
+                            {'nationality': 'Tanzanian'},
+                            {
+                              'region': [
+                                {'name': 'Mwanza', 'uid': '87887g8g'}
+                              ]
+                            },
+                          ],
+                          group: [
+                            Group(header: "Test's info", children: [
+                              Field.use.input(
+                                context: context,
+                                label: 'Full Name',
+                                key: 'fullName',
+                                fieldInputType: FieldInputType.FullName,
+                                validate: true,
+                                widthSize: WidthSize.col3,
+                              ),
+                              Field.use.input(
+                                context: context,
+                                label: 'Mobile Number',
+                                key: 'mobileNumber',
+                                fieldInputType: FieldInputType.MobileNumber,
+                                validate: true,
+                                widthSize: WidthSize.col3,
+                              ),
+                              Field.use.input(
+                                context: context,
+                                label: 'Citizenship',
+                                key: 'nationality',
+                                fieldInputType: FieldInputType.Other,
+                                validate: true,
+                                widthSize: WidthSize.col3,
+                              ),
+                              Field.use.multiSelect(
+                                context: context,
+                                // customDisplayKey: 'name',
+                                label: 'Region',
+                                items: [
+                                  {'name': 'Mwanza', 'uid': '87887g8g'},
+                                  {'name': 'Arusha', 'uid': 'tfy6565f6'}
+                                ],
+                                key: 'region',
+                                isPageable: false,
+                                fieldInputType: FieldInputType.Other,
+                                validate: true,
+                                widthSize: WidthSize.col3,
+                              ),
+                            ]),
+                            // Group(
+                            //   header: "Another info",
+                            //     children: [
+                            //       Field.use.input(
+                            //         context: context,
+                            //         label: 'Full Name',
+                            //         key: 'fullName',
+                            //         fieldInputType: FieldInputType.FullName,
+                            //         validate: true,
+                            //         widthSize: WidthSize.col3,
+                            //       ),
+                            //       Field.use.input(
+                            //         context: context,
+                            //         label: 'Mobile Number',
+                            //         key: 'mobileNumber',
+                            //         fieldInputType: FieldInputType.MobileNumber,
+                            //         validate: true,
+                            //         widthSize: WidthSize.col3,
+                            //       ),
+                            //       Field.use.input(
+                            //         context: context,
+                            //         label: 'Citizenship',
+                            //         key: 'nationality',
+                            //         fieldInputType: FieldInputType.Other,
+                            //         validate: true,
+                            //         widthSize: WidthSize.col3,
+                            //       ),
+                            //       Field.use.select(
+                            //         context: context,
+                            //         label: 'Region',
+                            //         items: [{'name':'Mwanza'},{'name':'Arusha'}],
+                            //         key: 'region',
+                            //         fieldInputType: FieldInputType.Other,
+                            //         validate: true,
+                            //         widthSize: WidthSize.col3,
+                            //       ),
+                            //     ]),
+                            // Group(
+                            //   header: "Third info",
+                            //     children: [
+                            //       Field.use.input(
+                            //         context: context,
+                            //         label: 'Full Name',
+                            //         key: 'fullName',
+                            //         fieldInputType: FieldInputType.FullName,
+                            //         validate: true,
+                            //         widthSize: WidthSize.col3,
+                            //       ),
+                            //       Field.use.input(
+                            //         context: context,
+                            //         label: 'Mobile Number',
+                            //         key: 'mobileNumber',
+                            //         fieldInputType: FieldInputType.MobileNumber,
+                            //         validate: true,
+                            //         widthSize: WidthSize.col3,
+                            //       ),
+                            //       Field.use.input(
+                            //         context: context,
+                            //         label: 'Citizenship',
+                            //         key: 'nationality',
+                            //         fieldInputType: FieldInputType.Other,
+                            //         validate: true,
+                            //         widthSize: WidthSize.col3,
+                            //       ),
+                            //       Field.use.select(
+                            //         context: context,
+                            //         label: 'Region',
+                            //         items: [{'name':'Mwanza'},{'name':'Arusha'}],
+                            //         key: 'region',
+                            //         fieldInputType: FieldInputType.Other,
+                            //         validate: true,
+                            //         widthSize: WidthSize.col3,
+                            //       ),
+                            //     ]),
+                          ],
+                        )).show();
+                  }),
+            ),
           ],
         )
         // GElevatedButton(

@@ -53,11 +53,11 @@ mixin _$AuthServiceStore on _AuthServiceStoreBase, Store {
       AsyncAction('_AuthServiceStoreBase.loginUser', context: context);
 
   @override
-  Future<bool> loginUser(
+  Future<Checking> loginUser(BuildContext context,
       {required String username,
       required String password,
       bool showLoading = false}) {
-    return _$loginUserAsyncAction.run(() => super.loginUser(
+    return _$loginUserAsyncAction.run(() => super.loginUser(context,
         username: username, password: password, showLoading: showLoading));
   }
 
@@ -65,20 +65,20 @@ mixin _$AuthServiceStore on _AuthServiceStoreBase, Store {
       AsyncAction('_AuthServiceStoreBase.getUser', context: context);
 
   @override
-  Future<Checking> getUser() {
-    return _$getUserAsyncAction.run(() => super.getUser());
+  Future<Checking> getUser(BuildContext context) {
+    return _$getUserAsyncAction.run(() => super.getUser(context));
   }
 
   late final _$changePasswordAsyncAction =
       AsyncAction('_AuthServiceStoreBase.changePassword', context: context);
 
   @override
-  Future<bool> changePassword(
+  Future<bool> changePassword(BuildContext context,
       {required String uid,
       required String oldPassword,
       required String newPassword,
       required String confirmPassword}) {
-    return _$changePasswordAsyncAction.run(() => super.changePassword(
+    return _$changePasswordAsyncAction.run(() => super.changePassword(context,
         uid: uid,
         oldPassword: oldPassword,
         newPassword: newPassword,
@@ -89,10 +89,10 @@ mixin _$AuthServiceStore on _AuthServiceStoreBase, Store {
       AsyncAction('_AuthServiceStoreBase.logoutUser', context: context);
 
   @override
-  Future<bool> logoutUser(
+  Future<bool> logoutUser(BuildContext context,
       {required String accessToken, required String refreshToken}) {
-    return _$logoutUserAsyncAction.run(() =>
-        super.logoutUser(accessToken: accessToken, refreshToken: refreshToken));
+    return _$logoutUserAsyncAction.run(() => super.logoutUser(context,
+        accessToken: accessToken, refreshToken: refreshToken));
   }
 
   late final _$_AuthServiceStoreBaseActionController =
@@ -115,17 +115,6 @@ mixin _$AuthServiceStore on _AuthServiceStoreBase, Store {
         name: '_AuthServiceStoreBase.setLoading');
     try {
       return super.setLoading(value);
-    } finally {
-      _$_AuthServiceStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  dynamic getContext(BuildContext context) {
-    final _$actionInfo = _$_AuthServiceStoreBaseActionController.startAction(
-        name: '_AuthServiceStoreBase.getContext');
-    try {
-      return super.getContext(context);
     } finally {
       _$_AuthServiceStoreBaseActionController.endAction(_$actionInfo);
     }

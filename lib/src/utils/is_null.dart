@@ -1,4 +1,3 @@
-bool isInputNull(String? value){
+bool isInputNull(dynamic value) {
   return value == null;
 }
-

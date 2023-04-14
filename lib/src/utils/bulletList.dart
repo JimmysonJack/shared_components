@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_ui/google_ui.dart';
 
 class BulletList extends StatelessWidget {
   final List<String> strings;
 
-   const BulletList(Key key,this.strings): super(key: key);
+  const BulletList(Key key, this.strings) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +17,7 @@ class BulletList extends StatelessWidget {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // GDrawerListTile(title: title)
               const Text(
                 '\u2022',
                 style: TextStyle(

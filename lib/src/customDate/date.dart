@@ -62,14 +62,14 @@ class _CustomDateState extends State<CustomDate> {
   TextEditingController textController = TextEditingController();
   @override
   void initState() {
-    if(widget.initialValue != null) textController.text = widget.initialValue!;
+    if (widget.initialValue != null) textController.text = widget.initialValue!;
     _focus.addListener(() {
       setState(() {
         sourceFocused = _focus.hasFocus;
       });
       if (sourceFocused) {
         _overlayEntry = _createOverlay();
-        Overlay.of(context)!.insert(_overlayEntry);
+        Overlay.of(context).insert(_overlayEntry);
       } else {
         _overlayEntry.remove();
       }
@@ -123,15 +123,21 @@ class _CustomDateState extends State<CustomDate> {
                               onSubmit: (data) {
                                 if (widget.isDateRange) {
                                   if (_range.isEmpty) {
-                                    Toast.error(
-                                        'Date ${widget.isDateRange ? 'Range' : ''} is not Selected');
+                                    NotificationService.snackBarError(
+                                      context: context,
+                                      title:
+                                          'Date ${widget.isDateRange ? 'Range' : ''} is not Selected',
+                                    );
                                   } else {
                                     scopeNode.unfocus();
                                   }
                                 } else {
                                   if (_selectedDate.isEmpty) {
-                                    Toast.error(
-                                        'Date ${widget.isDateRange ? 'Range' : ''} is not Selected');
+                                    NotificationService.snackBarError(
+                                      context: context,
+                                      title:
+                                          'Date ${widget.isDateRange ? 'Range' : ''} is not Selected',
+                                    );
                                   } else {
                                     scopeNode.unfocus();
                                   }
@@ -168,7 +174,9 @@ class _CustomDateState extends State<CustomDate> {
       child: TextFormField(
         focusNode: _focus,
         controller: textController,
-        autovalidateMode: widget.initialValue == null ? AutovalidateMode.onUserInteraction : AutovalidateMode.always,
+        autovalidateMode: widget.initialValue == null
+            ? AutovalidateMode.onUserInteraction
+            : AutovalidateMode.always,
         // initialValue: widget.initialValue,
         decoration: InputDecoration(
             suffixIcon: const Icon(Icons.date_range),

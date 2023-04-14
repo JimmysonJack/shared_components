@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:google_ui/google_ui.dart';
 import 'package:shared_component/src/utils/table.dart';
 import '../../shared_component.dart';
 

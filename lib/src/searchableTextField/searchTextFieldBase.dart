@@ -256,7 +256,7 @@ class _SearchFieldState extends State<SearchField> {
             }
           }
           _overlayEntry = _createOverlay();
-          Overlay.of(context)!.insert(_overlayEntry);
+          Overlay.of(context).insert(_overlayEntry);
         } else {
           _overlayEntry.remove();
         }

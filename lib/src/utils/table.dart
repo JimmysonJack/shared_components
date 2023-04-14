@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
 
@@ -39,7 +38,8 @@ class TableCustom<T> extends StatefulWidget {
   _TableCustomState<T> createState() => _TableCustomState<T>();
 }
 
-class _TableCustomState<T> extends State<TableCustom<T>> with SingleTickerProviderStateMixin{
+class _TableCustomState<T> extends State<TableCustom<T>>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animationTween;
   int pressedIndex = -10;
@@ -55,8 +55,7 @@ class _TableCustomState<T> extends State<TableCustom<T>> with SingleTickerProvid
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _animationTween =
-        Tween(begin: 5.0, end: 1.0).animate(_animationController);
+    _animationTween = Tween(begin: 5.0, end: 1.0).animate(_animationController);
     _animationController.addListener(() {
       setState(() {});
     });
@@ -137,9 +136,10 @@ class _TableCustomState<T> extends State<TableCustom<T>> with SingleTickerProvid
                       style: const TextStyle(fontWeight: FontWeight.w400),
                     ),
                   ),
-                if(widget.headTitles.actionTitle == null &&
-                    widget.actionButton!.isEmpty ||
-                    !widget.deleteData) const SizedBox(width: 122)
+                if (widget.headTitles.actionTitle == null &&
+                        widget.actionButton!.isEmpty ||
+                    !widget.deleteData)
+                  const SizedBox(width: 122)
               ],
             ),
           ),
@@ -152,21 +152,24 @@ class _TableCustomState<T> extends State<TableCustom<T>> with SingleTickerProvid
               itemCount: widget.dataList.length,
               itemBuilder: (_, index) {
                 return InkWell(
-                  onTap: (){},
-                  onHover: (value){
+                  onTap: () {},
+                  onHover: (value) {
                     setState(() {
                       hoverIndex = index;
                       hover = !hover;
-                      if(!hover){
+                      if (!hover) {
                         _animationController.forward();
-                      }else{
+                      } else {
                         _animationController.reverse();
                       }
                     });
                   },
                   child: Card(
-                    elevation: hoverIndex == index ? _animationTween.value :1,
-                    color: widget.dataList.elementAt(index)?['hasError'] ?? false ? Theme.of(context).errorColor.withOpacity(0.5) : widget.color ?? Theme.of(context).primaryColor,
+                    elevation: hoverIndex == index ? _animationTween.value : 1,
+                    color:
+                        widget.dataList.elementAt(index)?['hasError'] ?? false
+                            ? Theme.of(context).errorColor.withOpacity(0.5)
+                            : widget.color ?? Theme.of(context).primaryColor,
                     child: ListTile(
                       dense: true,
                       title: Row(
@@ -186,19 +189,23 @@ class _TableCustomState<T> extends State<TableCustom<T>> with SingleTickerProvid
                                           .columnSize !=
                                       null
                                   ? Container(
-                                      width: widget.headTitles.heardTileItems?[i]
-                                          .columnSize,
+                                      width: widget.headTitles
+                                          .heardTileItems?[i].columnSize,
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 4),
-                                      alignment: widget.headTitles
-                                                  .heardTileItems?[i].alignment !=
+                                      alignment: widget
+                                                  .headTitles
+                                                  .heardTileItems?[i]
+                                                  .alignment !=
                                               null
                                           ? widget.headTitles.heardTileItems![i]
                                               .alignment
                                           : Alignment.centerLeft,
 
                                       ///SUB-OBJECT CAN BE ADDED HERE
-                                      child: widget.headTitles.heardTileItems?[i]
+                                      child: widget
+                                                  .headTitles
+                                                  .heardTileItems?[i]
                                                   .objectKeyField !=
                                               null
                                           ? Text(
@@ -208,17 +215,20 @@ class _TableCustomState<T> extends State<TableCustom<T>> with SingleTickerProvid
                                                           .titleKey] ==
                                                       null
                                                   ? '---'
-                                                  : widget.dataList[index][widget
+                                                  : widget
+                                                      .dataList[index][widget
                                                               .headTitles
                                                               .heardTileItems?[i]
                                                               .titleKey][
                                                           widget
                                                               .headTitles
-                                                              .heardTileItems?[i]
+                                                              .heardTileItems?[
+                                                                  i]
                                                               .objectKeyField]
                                                       .toString()
                                                       .replaceAll('_', ' ')
-                                                      .replaceAll('null', '---'),
+                                                      .replaceAll(
+                                                          'null', '---'),
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 2,
                                             )
@@ -238,13 +248,17 @@ class _TableCustomState<T> extends State<TableCustom<T>> with SingleTickerProvid
                                       child: Container(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 4),
-                                      alignment: widget.headTitles
-                                                  .heardTileItems?[i].alignment !=
+                                      alignment: widget
+                                                  .headTitles
+                                                  .heardTileItems?[i]
+                                                  .alignment !=
                                               null
                                           ? widget.headTitles.heardTileItems![i]
                                               .alignment
                                           : Alignment.centerLeft,
-                                      child: widget.headTitles.heardTileItems?[i]
+                                      child: widget
+                                                  .headTitles
+                                                  .heardTileItems?[i]
                                                   .objectKeyField !=
                                               null
                                           ? Text(
@@ -254,17 +268,20 @@ class _TableCustomState<T> extends State<TableCustom<T>> with SingleTickerProvid
                                                           .titleKey] ==
                                                       null
                                                   ? '---'
-                                                  : widget.dataList[index][widget
+                                                  : widget
+                                                      .dataList[index][widget
                                                               .headTitles
                                                               .heardTileItems?[i]
                                                               .titleKey][
                                                           widget
                                                               .headTitles
-                                                              .heardTileItems?[i]
+                                                              .heardTileItems?[
+                                                                  i]
                                                               .objectKeyField]
                                                       .toString()
                                                       .replaceAll('_', ' ')
-                                                      .replaceAll('null', '---'),
+                                                      .replaceAll(
+                                                          'null', '---'),
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 2,
                                             )
@@ -285,7 +302,8 @@ class _TableCustomState<T> extends State<TableCustom<T>> with SingleTickerProvid
                               width: 122,
                               height: 30,
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 0),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 0),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -298,7 +316,8 @@ class _TableCustomState<T> extends State<TableCustom<T>> with SingleTickerProvid
                                               child: SizedBox(
                                                 height: 25,
                                                 width: 25,
-                                                child: CircularProgressIndicator(
+                                                child:
+                                                    CircularProgressIndicator(
                                                   strokeWidth: 1,
                                                   color: Theme.of(context)
                                                       .primaryColor,
@@ -320,8 +339,10 @@ class _TableCustomState<T> extends State<TableCustom<T>> with SingleTickerProvid
                                                                   pressIndex]
                                                               .name),
                                                           onPressed: () {
-                                                            loadingIndex = index;
-                                                            widget.actionButton![
+                                                            loadingIndex =
+                                                                index;
+                                                            widget
+                                                                .actionButton![
                                                                     pressIndex]
                                                                 .onPressed(widget
                                                                         .dataList[
@@ -329,17 +350,18 @@ class _TableCustomState<T> extends State<TableCustom<T>> with SingleTickerProvid
                                                           })),
                                               // widthSize: 200,
                                               child: FloatingActionButton(
-                                                backgroundColor: Theme.of(context)
-                                                    .primaryColor
-                                                    .withOpacity(0.7),
+                                                backgroundColor:
+                                                    Theme.of(context)
+                                                        .primaryColor
+                                                        .withOpacity(0.7),
                                                 mini: true,
                                                 elevation: 10,
                                                 onPressed: null,
                                                 child: Icon(
                                                   Icons.more_vert_sharp,
                                                   size: 15,
-                                                  color:
-                                                      Theme.of(context).cardColor,
+                                                  color: Theme.of(context)
+                                                      .cardColor,
                                                 ),
                                               ),
                                             ),
@@ -408,23 +430,26 @@ class _TableCustomState<T> extends State<TableCustom<T>> with SingleTickerProvid
                       Container(
                         width: 10,
                       ),
-                     if(widget.onPageSize != null) DropdownButton(
-                          isDense: true,
-                          underline: Container(),
-                          value: widget.currentPageSize,
-                          items: const [
-                            DropdownMenuItem(value: 10, child: Text('10')),
-                            DropdownMenuItem(value: 20, child: Text('20')),
-                            DropdownMenuItem(value: 50, child: Text('50')),
-                            DropdownMenuItem(value: 100, child: Text('100')),
-                          ],
-                          onChanged: (value) {
-                            setState(() {
-                              // widget.currentPageSize = int.parse(value.toString());
-                             if(widget.onPageSize != null) widget.onPageSize!(value);
-                            });
-                          }),
-                      if(widget.onPageSize == null) Text(widget.currentPageSize.toString())
+                      if (widget.onPageSize != null)
+                        DropdownButton(
+                            isDense: true,
+                            underline: Container(),
+                            value: widget.currentPageSize,
+                            items: const [
+                              DropdownMenuItem(value: 10, child: Text('10')),
+                              DropdownMenuItem(value: 20, child: Text('20')),
+                              DropdownMenuItem(value: 50, child: Text('50')),
+                              DropdownMenuItem(value: 100, child: Text('100')),
+                            ],
+                            onChanged: (value) {
+                              setState(() {
+                                // widget.currentPageSize = int.parse(value.toString());
+                                if (widget.onPageSize != null)
+                                  widget.onPageSize!(value);
+                              });
+                            }),
+                      if (widget.onPageSize == null)
+                        Text(widget.currentPageSize.toString())
                     ],
                   ),
                 )),
@@ -444,10 +469,9 @@ class _TableCustomState<T> extends State<TableCustom<T>> with SingleTickerProvid
   }
 
   deleteConfirm(index) {
-    var size = MediaQuery.of(context).size;
     NotificationService.confirmWarn(
         context: context,
-        buttonColor: Theme.of(context).errorColor,
+        buttonColor: Theme.of(context).colorScheme.error,
         cancelBtnText: 'Cancel',
         confirmBtnText: 'Delete',
         title: 'Deleting Record...',
@@ -564,7 +588,7 @@ class _PaginatePageState extends State<PaginatePage> {
               mini: true,
               child: Text(
                 (1).toString(),
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
               onPressed: () {
                 setState(() {
@@ -584,7 +608,7 @@ class _PaginatePageState extends State<PaginatePage> {
                 Expanded(child: Container()),
                 Text(
                   '.....',
-                  style: Theme.of(context).textTheme.bodyText2,
+                  style: Theme.of(context).textTheme.bodyMedium,
                 )
               ],
             ),
@@ -598,7 +622,7 @@ class _PaginatePageState extends State<PaginatePage> {
               elevation: 7,
               mini: true,
               child: Text((widget.currentPage - 1).toString(),
-                  style: Theme.of(context).textTheme.caption),
+                  style: Theme.of(context).textTheme.bodySmall),
               onPressed: () {
                 widget.onNavigateToPage!(PaginatePage(
                   nextPage: widget.currentPage - 1,
@@ -618,7 +642,7 @@ class _PaginatePageState extends State<PaginatePage> {
             child: Text(
               (widget.currentPage).toString(),
               style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.caption!.fontSize,
+                  fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
                   color: Theme.of(context).cardColor),
             ),
             onPressed: () {}),
@@ -636,7 +660,7 @@ class _PaginatePageState extends State<PaginatePage> {
               mini: true,
               child: Text(
                 (widget.currentPage + 1).toString(),
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
               onPressed: () {
                 setState(() {
@@ -656,7 +680,7 @@ class _PaginatePageState extends State<PaginatePage> {
                 Expanded(child: Container()),
                 Text(
                   '.....',
-                  style: Theme.of(context).textTheme.bodyText2,
+                  style: Theme.of(context).textTheme.bodyMedium,
                 )
               ],
             ),
@@ -671,7 +695,7 @@ class _PaginatePageState extends State<PaginatePage> {
               mini: true,
               child: Text(
                 (widget.totalPages).toString(),
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
               onPressed: () {
                 setState(() {

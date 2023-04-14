@@ -6,10 +6,11 @@ import 'package:shared_component/shared_component.dart';
 typedef HoverCallBack = void Function(String);
 
 class Tile extends StatefulWidget {
-  Tile({Key? key, required this.url, required this.title, required this.icon}) : super(key: key);
-  String title;
-  String icon;
-  String url;
+  const Tile({Key? key, required this.url, required this.title, required this.icon}) : super(key: key);
+  final String title;
+  final String icon;
+ final  String url;
+
   @override
   _TileState createState() => _TileState();
 
@@ -50,7 +51,7 @@ class _TileState extends State<Tile> {
                       child: SvgPicture.asset(
                         'assets/images/svg/${widget.icon}.svg',
                         width: width,
-                        color: Theme.of(context).backgroundColor,
+                        color: Theme.of(context).colorScheme.background,
                         package: Tile.libraryName,
                       ),
                     ),
@@ -66,7 +67,7 @@ class _TileState extends State<Tile> {
                     child: Text(
                       widget.title,
                       style: TextStyle(
-                          fontSize: 20, color: Theme.of(context).backgroundColor),
+                          fontSize: 20, color: Theme.of(context).colorScheme.background),
                     ),
                   )
                 ],
