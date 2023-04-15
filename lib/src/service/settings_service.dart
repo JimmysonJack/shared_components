@@ -84,19 +84,17 @@ class SettingsService {
     }
   }
 
-  changePassword(
+  Future<Checking> changePassword(
     BuildContext context, {
     required String oldPassword,
     required String newPassword,
     required String confirmPassword,
   }) async {
     AuthServiceStore authService = AuthServiceStore();
-    if (await authService.changePassword(context,
+    return await authService.changePassword(context,
         uid: getUser()['uid'],
         oldPassword: oldPassword,
         newPassword: newPassword,
-        confirmPassword: confirmPassword)) {
-      Modular.to.pop();
-    }
+        confirmPassword: confirmPassword);
   }
 }

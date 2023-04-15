@@ -1,17 +1,19 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_modular/flutter_modular.dart';
 import 'package:shared_component/shared_component.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 
 class AuthGuard extends RouteGuard {
   Api api = Api();
   BuildContext? context;
   AuthGuard(this.context);
   @override
-  String? get redirectTo => '/login/';
+  String? get redirectTo => '/login';
 
   @override
   FutureOr<bool> canActivate(String path, ParallelRoute route) async {
+    console(
+        'In auth Guard-------$context ${NavigationService.navigatorKey.currentContext}');
     var newData = path.substring(1).split('/');
     if (newData.isNotEmpty) {
       if (['home', 'profile', 'help'].contains(newData.elementAt(0)) ||
@@ -20,7 +22,9 @@ class AuthGuard extends RouteGuard {
       }
     }
 
-    bool isValidated = await api.userToken(false, context!) != '';
+    bool isValidated = await api.userToken(
+            false, NavigationService.navigatorKey.currentContext) !=
+        '';
 
     return isValidated;
   }

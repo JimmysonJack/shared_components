@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:layout/layout.dart';
 import 'package:shared_component/shared_component.dart';
 
 RegExp regex = RegExp(
@@ -16,17 +17,22 @@ class LoginInputs extends StatelessWidget {
   final String navigateTo;
 
   final changeController = Get.put(LoginController());
+
   double height = 0;
+
   double width = 0;
 
   final FocusNode username_focusNode = FocusNode();
+
   final FocusNode password_focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
+    final padding =
+        context.layout.value(xs: 20.0, sm: 30, md: 40, lg: 50, xl: 60);
+    console(padding);
     adjustSize(context);
     return Container(
-        // height: height,
         width: width,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(7),
@@ -55,7 +61,8 @@ class LoginInputs extends StatelessWidget {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.symmetric(
+                  horizontal: 20, vertical: padding.toDouble()),
               decoration: BoxDecoration(
                   color: Theme.of(context).cardColor.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(7),
@@ -195,7 +202,8 @@ class LoginInputs extends StatelessWidget {
 
   Widget passwordIcon(bool show) {
     return GestureDetector(
-      onTap: changeController.changeVisibility,
+      onTapDown: (value) => changeController.changeVisibility(false),
+      onTapUp: (value) => changeController.changeVisibility(true),
       child: Icon(show ? Icons.visibility : Icons.visibility_off),
     );
   }
@@ -238,8 +246,8 @@ class LoginController extends GetxController {
         password.text.isNotEmpty;
   }
 
-  void changeVisibility() {
-    visibility.value = !visibility.value;
+  void changeVisibility(bool value) {
+    visibility.value = value;
   }
 
   void login(context, String navigateTo) async {

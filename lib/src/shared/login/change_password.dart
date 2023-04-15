@@ -21,6 +21,8 @@ class ChangePassword extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final padding =
+        context.layout.value(xs: 20.0, sm: 30, md: 40, lg: 50, xl: 60);
     adjustSize(context);
     return Container(
         // height: height,
@@ -52,7 +54,8 @@ class ChangePassword extends StatelessWidget {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.symmetric(
+                  horizontal: 20, vertical: padding.toDouble()),
               decoration: BoxDecoration(
                   color: Theme.of(context).cardColor.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(7),
@@ -220,9 +223,12 @@ class ChangePassword extends StatelessWidget {
 
   Widget passwordIcon(bool show, bool newPass) {
     return GestureDetector(
-      onTap: newPass
-          ? changeController.changeNewPassVisbility
-          : changeController.changeVisibility,
+      onTapUp: (value) => newPass
+          ? changeController.changeNewPassVisbility(true)
+          : changeController.changeVisibility(true),
+      onTapDown: (value) => newPass
+          ? changeController.changeNewPassVisbility(false)
+          : changeController.changeVisibility(false),
       child: Icon(show ? Icons.visibility : Icons.visibility_off),
     );
   }
@@ -255,7 +261,6 @@ class ChangePasswordController extends GetxController {
   final TextEditingController currentPassword = TextEditingController();
   final TextEditingController newPassword = TextEditingController();
   final TextEditingController verifyPassword = TextEditingController();
-  final loginController = Get.put(LoginController());
 
   final isButtonEnabled = false.obs;
   final visibility = true.obs;
@@ -267,21 +272,24 @@ class ChangePasswordController extends GetxController {
         verifyPassword.text == newPassword.text;
   }
 
-  void changeVisibility() {
-    visibility.value = !visibility.value;
+  void changeVisibility(bool value) {
+    visibility.value = value;
   }
 
-  void changeNewPassVisbility() {
-    newPassVisibility.value = !newPassVisibility.value;
+  void changeNewPassVisbility(bool value) {
+    newPassVisibility.value = value;
   }
 
   void changePassword(context) async {
+    final loginController = Get.put(LoginController());
     loading.value = true;
-
-    await Future.delayed(const Duration(seconds: 5), () {
-      loginController.isFirstLogin.value = false;
-    });
-
+    var res = await SettingsService().changePassword(context,
+        oldPassword: currentPassword.text,
+        newPassword: newPassword.text,
+        confirmPassword: verifyPassword.text);
     loading.value = false;
+    if (res == Checking.proceed) {
+      loginController.isFirstLogin.value = false;
+    }
   }
 }

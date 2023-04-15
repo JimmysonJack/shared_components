@@ -160,7 +160,7 @@ abstract class _AuthServiceStoreBase with Store {
   }
 
   @action
-  Future<bool> changePassword(BuildContext context,
+  Future<Checking> changePassword(BuildContext context,
       {required String uid,
       required String oldPassword,
       required String newPassword,
@@ -180,12 +180,12 @@ abstract class _AuthServiceStoreBase with Store {
       NotificationService.snackBarSuccess(
           context: context, title: 'Password Changed Successfully');
       setLoading(false);
-      return true;
+      return Checking.proceed;
     }
-    NotificationService.snackBarSuccess(
+    NotificationService.snackBarError(
         context: context, title: 'Password  Unsuccessfully Changed');
     setLoading(false);
-    return false;
+    return Checking.doNotProceed;
   }
 
   @action

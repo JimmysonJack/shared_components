@@ -61,3 +61,6 @@ export 'src/shared/login/background.dart';
 export 'package:dio/dio.dart';
 export 'package:google_ui/google_ui.dart';
 export 'package:flutter_dotenv/flutter_dotenv.dart';
+export 'package:layout/layout.dart';
+export 'src/init-main/init.app.dart';
+export 'package:flutter_modular/flutter_modular.dart';

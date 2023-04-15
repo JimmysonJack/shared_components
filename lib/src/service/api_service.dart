@@ -6,6 +6,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:shared_component/shared_component.dart';
+import 'package:get/get.dart';
 
 typedef DynamicFunction = void Function(dynamic);
 
@@ -13,7 +14,8 @@ class Api {
   final http = Dio();
   dynamic authService = {};
 
-  Future<String> userToken(bool login, BuildContext context) async {
+  Future<String> userToken(bool login, BuildContext? context) async {
+    userLogin(context);
     var jsonToken = await StorageService.getJson('user_token');
     if (jsonToken == null || jsonToken.isEmpty) {
       if (login) {
@@ -25,14 +27,15 @@ class Api {
       if (t.expiresAt != null && t.expiresAt!.isAfter(DateTime.now())) {
         return t.accessToken!;
       } else if (login) {
-        return await refreshToken(t, context);
+        return await refreshToken(t, context!);
       } else {
         return '';
       }
     }
   }
 
-  Future<String> userLogin(BuildContext context) async {
+  Future<String> userLogin(BuildContext? context) async {
+    var mediaQuery = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
     var principal = await StorageService.getJson('user');
     String? userName;
     String? userEmail;
@@ -45,122 +48,115 @@ class Api {
       await Future.delayed(const Duration(seconds: 5), () {
         ModalState.modal().modelIsOpened = false;
       });
-      showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return SizedBox(
-            width: MediaQuery.of(context).size.width / 3.5,
-            child: Observer(builder: (context) {
-              return SimpleDialog(
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                title: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        userName == null ? 'LOGIN' : 'Confirm Your Identity',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ),
-                    Text(
-                      userName ?? '',
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    TextFormField(
-                        decoration: InputDecoration(
-                          hintText: 'Password',
-                          fillColor: Theme.of(context).cardColor,
-                          filled: true,
-                        ),
-                        obscureText: true,
-                        onChanged: authService.setPass,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Password must be provided';
-                          }
-                          return null;
-                        })
-                  ],
+      Get.dialog(SizedBox(
+        width: mediaQuery.size.width / 3.5,
+        child: Observer(builder: (context) {
+          return SimpleDialog(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            title: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    userName == null ? 'LOGIN' : 'Confirm Your Identity',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                 ),
-                children: <Widget>[
-                  Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 23),
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width / 4,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
+                Text(
+                  userName ?? '',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                TextFormField(
+                    decoration: InputDecoration(
+                      hintText: 'Password',
+                      fillColor: Theme.of(context).cardColor,
+                      filled: true,
+                    ),
+                    obscureText: true,
+                    onChanged: authService.setPass,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Password must be provided';
+                      }
+                      return null;
+                    })
+              ],
+            ),
+            children: <Widget>[
+              Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 23),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width / 4,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (authService.loading)
-                                  IndicateProgress.linear(),
-                                Field.use.button(
-                                  widthSize: WidthSize.col12,
-                                  validate: false,
-                                  label: 'Confirm',
-                                  onPressed: authService.passwordHasError
+                            if (authService.loading) IndicateProgress.linear(),
+                            Field.use.button(
+                              widthSize: WidthSize.col12,
+                              validate: false,
+                              label: 'Confirm',
+                              onPressed: authService.passwordHasError
+                                  ? null
+                                  : authService.loading
                                       ? null
-                                      : authService.loading
-                                          ? null
-                                          : () async {
-                                              authService.setLoading(true);
-                                              if (await authService.loginUser(
-                                                  context,
-                                                  username: userEmail ??
-                                                      'root@janju.com',
-                                                  password: authService
-                                                      .passwordValue!)) {
-                                                authService.setLoading(false);
-                                                Modular.to.pop();
-                                              } else {
-                                                authService.setLoading(false);
-                                              }
-                                            },
-                                  context: context,
-                                ),
-                              ],
+                                      : () async {
+                                          authService.setLoading(true);
+                                          if (await authService.loginUser(
+                                              context,
+                                              username:
+                                                  userEmail ?? 'root@janju.com',
+                                              password:
+                                                  authService.passwordValue!)) {
+                                            authService.setLoading(false);
+                                            Modular.to.pop();
+                                          } else {
+                                            authService.setLoading(false);
+                                          }
+                                        },
+                              context: context,
                             ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            if (!authService.loading)
-                              Field.use.button(
-                                widthSize: WidthSize.col12,
-                                validate: false,
-                                label: 'Go To Start Over',
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.error,
-                                onPressed: () async {
-                                  var jsonToken = await StorageService.getJson(
-                                      'user_token');
-                                  if (jsonToken.isNotEmpty) {
-                                    Token t = Token.fromJson(jsonToken);
-                                    authService.logoutUser(context,
-                                        accessToken: t.accessToken!,
-                                        refreshToken: t.refreshToken!);
-                                  } else {
-                                    Modular.to.navigate('/login/');
-                                  }
-                                },
-                                context: context,
-                              )
                           ],
                         ),
-                      )),
-                ],
-              );
-            }),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        if (!authService.loading)
+                          Field.use.button(
+                            widthSize: WidthSize.col12,
+                            validate: false,
+                            label: 'Go To Start Over',
+                            backgroundColor:
+                                Theme.of(context).colorScheme.error,
+                            onPressed: () async {
+                              var jsonToken =
+                                  await StorageService.getJson('user_token');
+                              if (jsonToken.isNotEmpty) {
+                                Token t = Token.fromJson(jsonToken);
+                                authService.logoutUser(context,
+                                    accessToken: t.accessToken!,
+                                    refreshToken: t.refreshToken!);
+                              } else {
+                                Modular.to.navigate('/login/');
+                              }
+                            },
+                            context: context,
+                          )
+                      ],
+                    ),
+                  )),
+            ],
           );
-        },
-      );
+        }),
+      ));
     }
     return '';
   }
@@ -399,4 +395,8 @@ class ModalState {
     _instance ??= ModalState();
     return _instance!;
   }
+}
+
+class NavigationService {
+  static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 }

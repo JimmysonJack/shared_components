@@ -73,7 +73,7 @@ mixin _$AuthServiceStore on _AuthServiceStoreBase, Store {
       AsyncAction('_AuthServiceStoreBase.changePassword', context: context);
 
   @override
-  Future<bool> changePassword(BuildContext context,
+  Future<Checking> changePassword(BuildContext context,
       {required String uid,
       required String oldPassword,
       required String newPassword,
