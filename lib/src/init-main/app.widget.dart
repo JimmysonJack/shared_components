@@ -13,10 +13,12 @@ class AppWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Layout(
       child: GetMaterialApp(
+        initialRoute: '/',
+        debugShowCheckedModeBanner: false,
         navigatorKey: NavigationService.navigatorKey,
         home: MaterialApp.router(
-          title: appName,
           debugShowCheckedModeBanner: false,
+          title: appName,
           routeInformationParser: Modular.routeInformationParser,
           routerDelegate: Modular.routerDelegate,
           theme: ThemeData(

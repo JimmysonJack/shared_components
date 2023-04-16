@@ -4,7 +4,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:layout/layout.dart';
 import 'package:shared_component/shared_component.dart';
 
 RegExp regex = RegExp(

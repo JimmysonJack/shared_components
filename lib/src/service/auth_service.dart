@@ -5,16 +5,15 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
+// import 'package:shared_component/shared_component.dart';
+// import 'package:shared_component/shared_component.dart';
 import 'package:shared_component/src/service/storage_service.dart';
-import 'package:flutter_modular/flutter_modular.dart';
-import '../components/toast.dart';
 import '../environment/system.env.dart';
 import '../models/token.dart';
 import 'api_service.dart';
-import 'package:mobx/mobx.dart';
+import 'package:get/get.dart';
 
 import 'notification_service.dart';
-part 'auth_service.g.dart';
 
 enum Checking {
   proceed,
@@ -26,34 +25,28 @@ enum Checking {
   otpExpired
 }
 
-class AuthServiceStore extends _AuthServiceStoreBase with _$AuthServiceStore {}
+// class AuthServiceStore extends _AuthServiceStoreBase with _$AuthServiceStore {}
 
-abstract class _AuthServiceStoreBase with Store {
-  @observable
-  bool loading = false;
+class AuthServiceController extends GetxController {
+  Api api = Api();
+  final password = TextEditingController();
+  final loading = false.obs;
+  final isButtonEnabled = false.obs;
 
-  @observable
-  String? passwordValue;
-
-  @computed
-  bool get passwordHasError => passwordValue == null || passwordValue!.isEmpty;
-
-  @action
-  setPass(String value) {
-    passwordValue = value;
+  @override
+  void dispose() {
+    super.dispose();
+    password.dispose();
   }
 
-  @action
-  setLoading(bool value) => loading = value;
+  void verifyPassword(value) {
+    isButtonEnabled.value = password.text.isNotEmpty;
+  }
 
-  Api? api = Api();
-
-  @action
   Future<Checking> loginUser(BuildContext context,
       {required String username,
       required String password,
       bool showLoading = false}) async {
-    if (showLoading) setLoading(true);
     Map<String, String> credentials = {
       'grant_type': 'password',
       'username': username,
@@ -65,7 +58,7 @@ abstract class _AuthServiceStoreBase with Store {
       'Authorization':
           'Basic ${base64Encode(utf8.encode('${Environment.getInstance().getClientId()}:${Environment.getInstance().getClientSecret()}'))}'
     });
-    var res = await api?.request(context,
+    var res = await api.request(context,
         type: 'post',
         url: '/oauth/token',
         data: credentials,
@@ -74,7 +67,6 @@ abstract class _AuthServiceStoreBase with Store {
       if (res['access_token'] != null) {
         Token token = Token.fromJson(res as Map<String, dynamic>);
         StorageService.setJson('user_token', token.toJson());
-        setLoading(false);
         return Checking.proceed;
       } else if (res['error_description'] != null) {
         NotificationService.snackBarError(
@@ -82,10 +74,8 @@ abstract class _AuthServiceStoreBase with Store {
           title: res['error'],
           subTitle: res['error_description'],
         );
-        setLoading(false);
         return Checking.doNotProceed;
       }
-      setLoading(false);
       return Checking.doNotProceed;
     } else {
       if (res is String) {
@@ -95,22 +85,18 @@ abstract class _AuthServiceStoreBase with Store {
           subTitle: res,
         );
       }
-      setLoading(false);
       return Checking.doNotProceed;
     }
   }
 
-  @action
   Future<Checking> getUser(BuildContext context) async {
-    var res = await api?.get('/user', context);
+    var res = await api.get('/user', context);
     if (res != null) {
       if (res is String) {
         StorageService.setString('user_uid', res);
-        setLoading(false);
         return Checking.doNotProceed;
       } else if (res is Map && !res.keys.contains('checking')) {
         StorageService.setJson('user', res);
-        setLoading(false);
         if (res['principal']['firstLogin']) {
           return Checking.firstLogin;
         } else if (DateTime.parse(res['principal']['passwordExpiresAt'])
@@ -155,18 +141,15 @@ abstract class _AuthServiceStoreBase with Store {
       }
     }
 
-    setLoading(false);
     return Checking.stay;
   }
 
-  @action
   Future<Checking> changePassword(BuildContext context,
       {required String uid,
       required String oldPassword,
       required String newPassword,
       required String confirmPassword}) async {
-    setLoading(true);
-    var res = await api?.clientPost(
+    var res = await api.clientPost(
         '/user/changePassword',
         {
           'uid': uid,
@@ -179,16 +162,13 @@ abstract class _AuthServiceStoreBase with Store {
       StorageService.setString('user_uid', null);
       NotificationService.snackBarSuccess(
           context: context, title: 'Password Changed Successfully');
-      setLoading(false);
       return Checking.proceed;
     }
     NotificationService.snackBarError(
         context: context, title: 'Password  Unsuccessfully Changed');
-    setLoading(false);
     return Checking.doNotProceed;
   }
 
-  @action
   Future<bool> logoutUser(BuildContext context,
       {required String accessToken, required String refreshToken}) async {
     var jsonToken = await StorageService.getJson('user_token');
@@ -197,7 +177,7 @@ abstract class _AuthServiceStoreBase with Store {
       return true;
     }
     Token t = Token.fromJson(jsonToken);
-    var res = await api?.clientPost(
+    var res = await api.clientPost(
         '/oauth/token/revoke?access_token=${t.accessToken}&refresh_token=${t.refreshToken}',
         {},
         context);

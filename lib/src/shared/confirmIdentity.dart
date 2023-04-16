@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:get/get.dart';
 import 'package:google_ui/google_ui.dart';
 // import 'package:flutter_modular/flutter_modular.dart';
 import '../../shared_component.dart';
@@ -11,12 +12,12 @@ class ConfirmIdentity extends StatelessWidget {
   ConfirmIdentity({Key? key, this.userName, this.userEmail}) : super(key: key);
   final String? userName;
   final String? userEmail;
-  final AuthServiceStore authService = AuthServiceStore();
+  final authService = Get.put(AuthServiceController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Observer(builder: (context) {
+      body: GetX<AuthServiceController>(builder: (_) {
         return Column(
           children: [
             Container(
@@ -41,9 +42,9 @@ class ConfirmIdentity extends StatelessWidget {
                 ),
                 CustomTextField(
                     hintText: 'Password',
-                    controller: TextEditingController(),
+                    controller: _.password,
                     obscure: true,
-                    onChanged: authService.setPass,
+                    onChanged: _.verifyPassword,
                     validator: (value) {
                       if (value!.isEmpty) {
                         return 'Password must be provided';
@@ -58,26 +59,25 @@ class ConfirmIdentity extends StatelessWidget {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (authService.loading) IndicateProgress.linear(),
+                    if (_.loading.value) IndicateProgress.linear(),
                     SizedBox(
                       width: MediaQuery.of(context).size.width / 4,
                       child: GElevatedButton(
                         'Confirm',
-                        onPressed: authService.passwordHasError
+                        onPressed: _.isButtonEnabled.value
                             ? null
-                            : authService.loading
+                            : _.loading.value
                                 ? null
                                 : () async {
+                                    _.loading.value = true;
                                     if (await authService.loginUser(context,
                                             username: userEmail!,
                                             password:
-                                                authService.passwordValue!) ==
+                                                authService.password.text) ==
                                         Checking.proceed) {
-                                      authService.setLoading(false);
                                       Modular.to.pop();
-                                    } else {
-                                      authService.setLoading(false);
                                     }
+                                    _.loading.value = false;
                                   },
                       ),
                     ),
@@ -86,16 +86,15 @@ class ConfirmIdentity extends StatelessWidget {
                 const SizedBox(
                   height: 10,
                 ),
-                if (!authService.loading)
+                if (!_.loading.value)
                   SizedBox(
                     width: MediaQuery.of(context).size.width / 4,
                     child: GElevatedButton(
                       'Go To Start Over',
-                      color: Theme.of(context).errorColor,
+                      color: Theme.of(context).colorScheme.error,
                       onPressed: () {
-                        authService.setLoading(true);
-
-                        // Modular.to.navigate('/login/');
+                        // _.loading.value = true;
+                        Modular.to.navigate('/login');
                       },
                     ),
                   ),

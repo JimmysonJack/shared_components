@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:shared_component/shared_component.dart';
+import 'package:get/get.dart';
 import 'package:shared_component/src/service/auth_service.dart';
 import 'package:shared_component/src/service/storage_service.dart';
 
@@ -32,7 +32,7 @@ class SettingsService {
       required String password,
       String? navigateTo,
       required BuildContext context}) async {
-    AuthServiceStore authService = AuthServiceStore();
+    final authService = Get.put(AuthServiceController());
     if (await authService.loginUser(context,
             username: userName, password: password, showLoading: true) ==
         Checking.proceed) {
@@ -77,7 +77,7 @@ class SettingsService {
   }
 
   logout(String navigateTo, BuildContext context) async {
-    AuthServiceStore authService = AuthServiceStore();
+    final authService = Get.put(AuthServiceController());
     if (await authService.logoutUser(context,
         accessToken: 'accessToken', refreshToken: 'refreshToken')) {
       if (navigateTo.isNotEmpty) Modular.to.navigate(navigateTo);
@@ -90,7 +90,7 @@ class SettingsService {
     required String newPassword,
     required String confirmPassword,
   }) async {
-    AuthServiceStore authService = AuthServiceStore();
+    final authService = Get.put(AuthServiceController());
     return await authService.changePassword(context,
         uid: getUser()['uid'],
         oldPassword: oldPassword,

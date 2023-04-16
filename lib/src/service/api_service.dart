@@ -12,10 +12,9 @@ typedef DynamicFunction = void Function(dynamic);
 
 class Api {
   final http = Dio();
-  dynamic authService = {};
+  // final authService = Get.put(AuthServiceController());
 
   Future<String> userToken(bool login, BuildContext? context) async {
-    userLogin(context);
     var jsonToken = await StorageService.getJson('user_token');
     if (jsonToken == null || jsonToken.isEmpty) {
       if (login) {
@@ -35,7 +34,16 @@ class Api {
   }
 
   Future<String> userLogin(BuildContext? context) async {
+    AuthServiceController authServiceController = AuthServiceController();
+
     var mediaQuery = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
+
+    var width = (context ?? Get.context!).layout.value(
+        xs: mediaQuery.size.width * 0.8,
+        sm: mediaQuery.size.width * 0.4,
+        md: mediaQuery.size.width * 0.3,
+        lg: mediaQuery.size.width * 0.3,
+        xl: mediaQuery.size.width * 0.2);
     var principal = await StorageService.getJson('user');
     String? userName;
     String? userEmail;
@@ -48,115 +56,131 @@ class Api {
       await Future.delayed(const Duration(seconds: 5), () {
         ModalState.modal().modelIsOpened = false;
       });
-      Get.dialog(SizedBox(
-        width: mediaQuery.size.width / 3.5,
-        child: Observer(builder: (context) {
-          return SimpleDialog(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            title: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    userName == null ? 'LOGIN' : 'Confirm Your Identity',
-                    style: Theme.of(context).textTheme.titleMedium,
+
+      showDialog(
+          context: context!,
+          barrierDismissible: false,
+          builder: (context) {
+            return SizedBox(
+              width: width,
+              child: Obx(() {
+                console(width);
+                console(context.layout.breakpoint);
+                return SimpleDialog(
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  title: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          userName == null ? 'LOGIN' : 'Confirm Your Identity',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ),
+                      Text(
+                        userName ?? '',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                          controller: authServiceController.password,
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            fillColor: Theme.of(context).cardColor,
+                            filled: true,
+                          ),
+                          obscureText: true,
+                          onChanged: authServiceController.verifyPassword,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Password must be provided';
+                            }
+                            return null;
+                          })
+                    ],
                   ),
-                ),
-                Text(
-                  userName ?? '',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                    decoration: InputDecoration(
-                      hintText: 'Password',
-                      fillColor: Theme.of(context).cardColor,
-                      filled: true,
-                    ),
-                    obscureText: true,
-                    onChanged: authService.setPass,
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Password must be provided';
-                      }
-                      return null;
-                    })
-              ],
-            ),
-            children: <Widget>[
-              Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 23),
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width / 4,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (authService.loading) IndicateProgress.linear(),
-                            Field.use.button(
-                              widthSize: WidthSize.col12,
-                              validate: false,
-                              label: 'Confirm',
-                              onPressed: authService.passwordHasError
-                                  ? null
-                                  : authService.loading
-                                      ? null
-                                      : () async {
-                                          authService.setLoading(true);
-                                          if (await authService.loginUser(
-                                              context,
-                                              username:
-                                                  userEmail ?? 'root@janju.com',
-                                              password:
-                                                  authService.passwordValue!)) {
-                                            authService.setLoading(false);
-                                            Modular.to.pop();
-                                          } else {
-                                            authService.setLoading(false);
-                                          }
-                                        },
-                              context: context,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        if (!authService.loading)
-                          Field.use.button(
-                            widthSize: WidthSize.col12,
-                            validate: false,
-                            label: 'Go To Start Over',
-                            backgroundColor:
-                                Theme.of(context).colorScheme.error,
-                            onPressed: () async {
-                              var jsonToken =
-                                  await StorageService.getJson('user_token');
-                              if (jsonToken.isNotEmpty) {
-                                Token t = Token.fromJson(jsonToken);
-                                authService.logoutUser(context,
-                                    accessToken: t.accessToken!,
-                                    refreshToken: t.refreshToken!);
-                              } else {
-                                Modular.to.navigate('/login/');
-                              }
-                            },
-                            context: context,
-                          )
-                      ],
-                    ),
-                  )),
-            ],
-          );
-        }),
-      ));
+                  children: <Widget>[
+                    Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 23),
+                        child: SizedBox(
+                          width: width,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (authServiceController.loading.value)
+                                    IndicateProgress.linear(),
+                                  Field.use.button(
+                                    widthSize: WidthSize.col12,
+                                    validate: false,
+                                    label: 'Confirm',
+                                    onPressed: !authServiceController
+                                            .isButtonEnabled.value
+                                        ? null
+                                        : authServiceController.loading.value
+                                            ? null
+                                            : () async {
+                                                authServiceController
+                                                    .loading.value = true;
+                                                if (await authServiceController
+                                                        .loginUser(context,
+                                                            username: userEmail ??
+                                                                'john@max.com',
+                                                            password:
+                                                                authServiceController
+                                                                    .password
+                                                                    .text) ==
+                                                    Checking.proceed) {
+                                                  Modular.to.pop();
+                                                }
+                                                authServiceController
+                                                    .loading.value = false;
+                                              },
+                                    context: context,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              if (!authServiceController.loading.value)
+                                Field.use.button(
+                                  widthSize: WidthSize.col12,
+                                  validate: false,
+                                  label: 'Go To Start Over',
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.error,
+                                  onPressed: () async {
+                                    var jsonToken =
+                                        await StorageService.getJson(
+                                            'user_token');
+                                    if (jsonToken.isNotEmpty) {
+                                      Token t = Token.fromJson(jsonToken);
+                                      authServiceController.logoutUser(context,
+                                          accessToken: t.accessToken!,
+                                          refreshToken: t.refreshToken!);
+                                    } else {
+                                      // Modular.to.pop();
+                                      Modular.to.navigate('/login');
+                                    }
+                                  },
+                                  context: context,
+                                )
+                            ],
+                          ),
+                        )),
+                  ],
+                );
+              }),
+            );
+          });
     }
     return '';
   }

@@ -668,6 +668,8 @@ abstract class _TextInputBase with Store {
                   : null,
               child: ElevatedButton(
                   style: ButtonStyle(
+                    minimumSize:
+                        MaterialStateProperty.all<Size>(const Size(100, 50)),
                     backgroundColor: MaterialStateProperty.resolveWith<Color>(
                       (Set<MaterialState> states) {
                         if (states.contains(MaterialState.pressed)) {
