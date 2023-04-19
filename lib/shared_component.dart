@@ -1,8 +1,6 @@
 library shared_component;
 
 export 'src/components/button.dart';
-export 'src/components/tile.dart';
-export 'src/components/tiles_grid.dart';
 export 'src/components/time.dart';
 export 'src/components/toast.dart';
 export 'src/dialog/dialogService.dart';
@@ -13,7 +11,6 @@ export 'src/languages/en.dart';
 export 'src/languages/sw.dart';
 export 'src/languages/intl.dart';
 export 'src/models/notification.dart';
-export 'src/models/tile_model.dart';
 export 'src/models/token.dart';
 export 'src/models/user_model.dart';
 export 'src/popUpMenu/popUpMenu.dart';
@@ -57,6 +54,7 @@ export 'src/utils/dataTable.dart';
 export 'src/utils/console.dart';
 export 'src/utils/deferred.dart';
 export 'src/shared/login/login_page.dart';
+export 'src/shared/tile/tiles-search.dart';
 export 'src/shared/login/background.dart';
 export 'package:dio/dio.dart';
 export 'package:google_ui/google_ui.dart';

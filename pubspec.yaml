@@ -34,6 +34,7 @@ dependencies:
   file_picker_cross:
     path: "file_picker_cross-4.6.0"
   quickalert: ^1.0.0
+  shaky_animated_listview: ^0.0.5
 
 
 dependency_overrides:
@@ -43,6 +44,7 @@ dev_dependencies:
   mobx_codegen: ^2.1.1
   modular_test: ^2.0.0
   build_runner: ^2.3.3
+  json_serializable: ^6.6.1
 
   #ferry_generator: ^0.7.0
   flutter_test:

@@ -3,9 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:get/get.dart';
+import 'package:shared_component/shared_component.dart';
 import 'package:shared_component/src/service/auth_service.dart';
 import 'package:shared_component/src/service/storage_service.dart';
 
+import '../utils/size_config.dart';
 import 'notification_service.dart';
 
 class SettingsService {
@@ -96,5 +98,25 @@ class SettingsService {
         oldPassword: oldPassword,
         newPassword: newPassword,
         confirmPassword: confirmPassword);
+  }
+
+  Size sizeByScreenWidth(
+      {required double max,
+      required double min,
+      double? maxWidthScreenSize,
+      double? minWidthScreenSize}) {
+    double maxScreenSizeWidth = maxWidthScreenSize ?? 600;
+    double minScreenSizeWidth = minWidthScreenSize ?? 300;
+    var factor = SizeConfig.fullScreen.width >= maxScreenSizeWidth
+        ? 1
+        : SizeConfig.fullScreen.width <= minScreenSizeWidth
+            ? 0
+            : (SizeConfig.fullScreen.width - minScreenSizeWidth) /
+                (maxScreenSizeWidth - minScreenSizeWidth);
+    var width = min + (max - min) * factor;
+    var height = 0.5 * width;
+    console(
+        'min width is $minWidthScreenSize width is $width factor is $factor');
+    return Size(width, height);
   }
 }

@@ -4,6 +4,8 @@ class SizeConfig {
   static double screenWidth = 0;
   static double screenHeight = 0;
   static double defaultSize = 0;
+  static Size fullScreen =
+      MediaQueryData.fromWindow(WidgetsBinding.instance.window).size;
   static Orientation orientation = Orientation.portrait;
 
   void init(BuildContext context) {
