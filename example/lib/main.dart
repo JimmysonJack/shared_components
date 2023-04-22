@@ -1,23 +1,126 @@
-import 'package:example/login_page.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 // import 'package:google_ui/google_ui.dart';
 
-void main() async {
-  runApp(const MyApp());
-}
+import 'package:shared_component/shared_component.dart';
+// import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'loading_environment.dart';
+import 'package:get/get.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+void main() {
+  initApp(
+      appName: 'PWA',
+      loadEnvFile: () async {
+        // debugDisableShadows = true;
+        await loadingInvironment(
+            devEnvFile: ".env.development", prodEnvFile: ".env.production");
+      },
+      routes: [
+        ChildRoute(
+          Modular.initialRoute,
+          child: (context, args) => SideNavigation(
+            version: '2.0.3',
+            
+            sideMenuTile: [
+              SideMenuTile(
+                  title: 'Dashboard', icon: Icons.dashboard, permissions: []),
+              SideMenuTile(title: 'Users', icon: Icons.people, permissions: []),
+              SideMenuTile(title: 'Facility', icon: Icons.abc, permissions: []),
+            ],
+          ),
+          UserProfileItem(
+                        onLogout: () {},
+                        email: 'Jimmysonblack@gmail.com',
+                        userName: 'Jimmyson Jackson Mnunguri')
 
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Shared Component',
-      theme: ThemeData(primarySwatch: Colors.blue, primaryColor: Colors.black),
-      home: const Login(),
-    );
-  }
+                        [
+                      MenuItem<String>(
+                          title: 'Change Password',
+                          icon: Icons.logo_dev,
+                          value: 'password'),
+                      MenuItem<String>(
+                          title: 'Docker',
+                          icon: Icons.logo_dev,
+                          value: 'docker'),
+                    ]
+        ),
+        // ChildRoute('tiles',
+        //     child: (context, args) => TilesSearch(
+        //           showGradient: true,
+        //           // gradientColors: [Colors.grey, Colors.yellow],
+        //           titleColor: Colors.white,
+
+        //           // tileColor: Colors.brown,
+        //           tileFields: [
+        //             TileFields(
+        //                 icon: Icons.login,
+        //                 title: 'Logout',
+        //                 url: '/login',
+        //                 permissions: ['John']),
+        //             TileFields(
+        //                 icon: Icons.people,
+        //                 title: 'User Management',
+        //                 url: '/login',
+        //                 permissions: ['Mary']),
+        //             TileFields(
+        //                 icon: Icons.car_crash,
+        //                 title: 'Repair',
+        //                 url: '/login',
+        //                 permissions: ['David', 'Juma']),
+        //             TileFields(
+        //                 icon: Icons.timer_off,
+        //                 title: 'Taiwan',
+        //                 url: '/login',
+        //                 permissions: ['Mary']),
+        //             TileFields(
+        //                 icon: Icons.timer_off,
+        //                 title: 'Taiwan',
+        //                 url: '/login',
+        //                 permissions: ['Mary']),
+        //             TileFields(
+        //                 icon: Icons.timer_off,
+        //                 title: 'Taiwan',
+        //                 url: '/login',
+        //                 permissions: ['Mary']),
+        //             TileFields(
+        //                 icon: Icons.timer_off,
+        //                 title: 'Taiwan',
+        //                 url: '/login',
+        //                 permissions: ['Mary']),
+        //             TileFields(
+        //                 icon: Icons.timer_off,
+        //                 title: 'Taiwan',
+        //                 url: '/login',
+        //                 permissions: ['Mary']),
+        //             TileFields(
+        //                 icon: Icons.timer_off,
+        //                 title: 'Taiwan',
+        //                 url: '/login',
+        //                 permissions: []),
+        //             TileFields(
+        //                 icon: Icons.timer_off,
+        //                 title: 'Taiwan',
+        //                 url: '/login',
+        //                 permissions: []),
+        //             TileFields(
+        //                 icon: Icons.timer_off,
+        //                 title: 'Taiwan',
+        //                 url: '/login',
+        //                 permissions: []),
+        //             TileFields(
+        //                 icon: Icons.timer_off,
+        //                 title: 'Taiwan',
+        //                 url: '/login',
+        //                 permissions: []),
+        //           ],
+        //         )),
+
+        ChildRoute('/login',
+            child: (context, args) => Login(
+                  backgroundTheme: BackgroundTheme.techTheme,
+                  navigateTo: '',
+                ))
+      ]);
 }
 
 Map<int, Color> colorMap = {
@@ -32,3 +135,12 @@ Map<int, Color> colorMap = {
   800: const Color.fromRGBO(147, 205, 72, .9),
   900: const Color.fromRGBO(147, 205, 72, 1),
 };
+
+
+
+
+
+
+
+
+

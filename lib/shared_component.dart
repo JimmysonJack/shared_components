@@ -62,3 +62,4 @@ export 'package:flutter_dotenv/flutter_dotenv.dart';
 export 'package:layout/layout.dart';
 export 'src/init-main/init.app.dart';
 export 'package:flutter_modular/flutter_modular.dart';
+export 'package:flutter_side_menu/flutter_side_menu.dart';

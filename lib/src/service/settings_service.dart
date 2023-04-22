@@ -119,4 +119,17 @@ class SettingsService {
         'min width is $minWidthScreenSize width is $width factor is $factor');
     return Size(width, height);
   }
+
+  permissionCheck(List<String> searchList) async {
+    var user = await StorageService.getUser();
+    List<Map<String, dynamic>> userAuthorities =
+        List<Map<String, dynamic>>.from(user['principal']['authorities']);
+
+    bool found = searchList.isNotEmpty &&
+        searchList.every((searchElement) => userAuthorities
+            .where((element) => element["authority"] == searchElement)
+            .isNotEmpty);
+
+    return found;
+  }
 }

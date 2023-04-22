@@ -4,10 +4,11 @@ import 'package:get/get.dart';
 import 'package:layout/layout.dart';
 
 import '../service/api_service.dart';
+import '../themes/theme.dart';
 
 class AppWidget extends StatelessWidget {
   final String appName;
-  const AppWidget({super.key, required this.appName});
+  AppWidget({super.key, required this.appName});
 
   @override
   Widget build(BuildContext context) {
@@ -16,15 +17,13 @@ class AppWidget extends StatelessWidget {
         initialRoute: '/',
         debugShowCheckedModeBanner: false,
         navigatorKey: NavigationService.navigatorKey,
-        home: MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          title: appName,
-          routeInformationParser: Modular.routeInformationParser,
-          routerDelegate: Modular.routerDelegate,
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-        ),
+        home: Obx(() => MaterialApp.router(
+            debugShowCheckedModeBanner:
+                ThemeController.getInstance().isDarkTheme.value,
+            title: appName,
+            routeInformationParser: Modular.routeInformationParser,
+            routerDelegate: Modular.routerDelegate,
+            theme: ThemeController.getInstance().customTheme())),
       ),
     );
   }

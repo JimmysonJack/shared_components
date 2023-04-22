@@ -31,4 +31,15 @@ class StorageService {
   static Future<String?> getToken(String key) async => await getString(key);
 
   static Future<dynamic> getUser() async => await getJson('user');
+
+  static Future<bool> setDarkTheme(String key, bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool(key, value);
+    return value;
+  }
+
+  static Future<bool?> getDarkMode(String key) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(key);
+  }
 }

@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.5
+  # flutter_side_menu: ^0.3.1
   shared_component:
     path: "../"
 
@@ -24,6 +25,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
+  assets:
+    - .env.production
+    - .env.development
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

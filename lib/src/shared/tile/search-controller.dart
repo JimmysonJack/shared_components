@@ -41,7 +41,8 @@ class SearchTileController extends GetxController {
       Color? titleColor) {
     if (searching.value.isEmpty) {
       tileList.value = fields
-          .where((element) => permissionCheck(element.permissions))
+          .where((element) =>
+              SettingsService.use.permissionCheck(element.permissions))
           .map((e) => ContainerTile(
                 fields: e,
                 gradientColorsList: gradientColors,
@@ -61,7 +62,8 @@ class SearchTileController extends GetxController {
         .toList();
 
     tileList.value = newList
-        .where((element) => permissionCheck(element.permissions))
+        .where((element) =>
+            SettingsService.use.permissionCheck(element.permissions))
         .map((e) => ContainerTile(
               fields: e,
               gradientColorsList: gradientColors,
@@ -71,20 +73,5 @@ class SearchTileController extends GetxController {
               titalColor: titleColor,
             ))
         .toList();
-  }
-
-  permissionCheck(List<String> searchList) {
-    List<Map<String, dynamic>> list = [
-      {"name": "John", "age": 25},
-      {"name": "Mary", "age": 30},
-      {"name": "David", "age": 20},
-    ];
-
-    bool found = searchList.isNotEmpty &&
-        searchList.every((searchElement) => list
-            .where((element) => element["name"] == searchElement)
-            .isNotEmpty);
-
-    return found;
   }
 }
