@@ -17,13 +17,15 @@ class AppWidget extends StatelessWidget {
         initialRoute: '/',
         debugShowCheckedModeBanner: false,
         navigatorKey: NavigationService.navigatorKey,
-        home: Obx(() => MaterialApp.router(
-            debugShowCheckedModeBanner:
-                ThemeController.getInstance().isDarkTheme.value,
-            title: appName,
-            routeInformationParser: Modular.routeInformationParser,
-            routerDelegate: Modular.routerDelegate,
-            theme: ThemeController.getInstance().customTheme())),
+        home: Obx(() {
+          ThemeController.getInstance().isDarkTheme.value;
+          return MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              title: appName,
+              routeInformationParser: Modular.routeInformationParser,
+              routerDelegate: Modular.routerDelegate,
+              theme: ThemeController.getInstance().customTheme());
+        }),
       ),
     );
   }

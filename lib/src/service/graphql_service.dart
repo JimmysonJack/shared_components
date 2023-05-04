@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
 import 'package:graphql/client.dart';
 import 'package:shared_component/shared_component.dart';
 
@@ -104,6 +105,7 @@ class GraphQLService {
       {required String endPointName,
       required String responseFields,
       List<OtherParameters>? parameters,
+      FetchPolicy? fetchPolicy,
       required BuildContext context,
       String? optionResponseFields}) async {
     if (parameters != null) {
@@ -123,7 +125,7 @@ class GraphQLService {
 }
   '''),
       variables: {...?_otherParams},
-      fetchPolicy: FetchPolicy.cacheAndNetwork,
+      fetchPolicy: fetchPolicy ?? FetchPolicy.networkOnly,
     );
 
     final client = await graphClient(context);
@@ -180,14 +182,27 @@ class GraphQLService {
     return repositories ?? [];
   }
 
+  ///This [response]is used to return server response and loading state.
+  ///
+  /// This [endPointName] is used to pass graphql endpoint.
+  ///
+  ///  This [queryFields] is used to pass the response fields that you want to be returned.
+  ///
+  /// Is used to pass a custom [successMessage] that is being displayed when the request is success.
+  ///
+  /// [refetchData] is a boolean whisch helps us to decide if we want to refetch a dataTable after a completion of a request.
+  ///
+  /// [inputs] this param is used to pass Parameters of the [endPointName]
   static mutate(
       {required Function(Map<String, dynamic>?, bool)? response,
       required String endPointName,
       required String queryFields,
       String? successMessage,
+      bool refetchData = false,
       required List<InputParameter> inputs,
       required BuildContext context,
       String? optionResponseFields}) async {
+    DataTableController dataTableController = Get.put(DataTableController());
     Map<String, dynamic> otherParams = {};
     Map mapVariables = {};
     Map inputVariables = {};
@@ -225,7 +240,7 @@ class GraphQLService {
       operationName: endPointName,
       fetchPolicy: FetchPolicy.networkOnly,
       update: (GraphQLDataProxy? cache, QueryResult? result) {
-        if (result?.data != null) UpdateTable.change.setUpdateTable(true);
+        // if (result?.data != null) UpdateTable.change.setUpdateTable(true);
         // final queryRequest = QueryOptions(document: gql(GraphQLService.getService.endPoint ?? "")).asRequest;
         // final newResult = result?.data?[endPointName]['data'];
         // final  data = cache?.readQuery(queryRequest);
@@ -252,19 +267,18 @@ class GraphQLService {
         } else if (exception.runtimeType == HttpLinkServerException) {
           HttpLinkServerException serverException =
               exception as HttpLinkServerException;
-          var errorResponse =
-              serverException.parsedResponse!.response['message'].split(':');
-          if (errorResponse[0] == "Invalid access token") {
-            NotificationService.snackBarError(
-                context: context,
-                title: errorResponse[0],
-                subTitle: 'Logout and login again to refresh your token');
-          } else if (errorResponse[0] == 'Access token expired') {
-            NotificationService.snackBarError(
-                context: context, title: errorResponse[0]);
-          } else {
-            NotificationService.snackBarError(
-                context: context, title: 'Something is wrong');
+          if (serverException.parsedResponse!.response.keys
+              .contains('message')) {
+            var errorResponse =
+                serverException.parsedResponse!.response['message'].split(':');
+            _exceptionMessageHandler(errorResponse, context);
+          }
+          if (serverException.parsedResponse!.response.keys
+              .contains('error_description')) {
+            var errorResponse = serverException
+                .parsedResponse!.response['error_description']
+                .split(':');
+            _exceptionMessageHandler(errorResponse, context);
           }
         }
       } else {
@@ -276,6 +290,13 @@ class GraphQLService {
       }
     }
     if (response != null) {
+      dataTableController.onLoadMore.value = result.isLoading;
+      if (result.data?[endPointName] != null &&
+          !result.hasException &&
+          result.data?[endPointName]?['data'] != null &&
+          refetchData) {
+        RebuildToRefetch.instance().refetch();
+      }
       response(result.data?[endPointName], result.isLoading);
     }
 
@@ -294,6 +315,21 @@ class GraphQLService {
     }
 
     return result.data?[endPointName]['data'];
+  }
+
+  static _exceptionMessageHandler(List errorResponse, BuildContext context) {
+    if (errorResponse[0] == "Invalid access token") {
+      NotificationService.snackBarError(
+          context: context,
+          title: errorResponse[0],
+          subTitle: 'Logout and login again to refresh your token');
+    } else if (errorResponse[0] == 'Access token expired') {
+      NotificationService.snackBarError(
+          context: context, title: errorResponse[0]);
+    } else {
+      NotificationService.snackBarError(
+          context: context, title: 'Something is wrong');
+    }
   }
 }
 

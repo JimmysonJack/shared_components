@@ -21,6 +21,19 @@ class User {
   }
 }
 
+class Permissions {
+  static Permissions? _instance;
+  List<Map<String, dynamic>>? _authorities;
+  static Permissions instance() {
+    _instance ??= Permissions();
+    return _instance!;
+  }
+
+  setAuthorities(List<Map<String, dynamic>>? values) => _authorities = values;
+
+  List<Map<String, dynamic>>? getAuthorities() => _authorities;
+}
+
 // @JsonSerializable()
 class TileFields {
   IconData icon;

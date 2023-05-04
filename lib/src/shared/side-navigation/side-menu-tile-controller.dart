@@ -16,10 +16,11 @@ class SideMenuTileController extends GetxController {
     if (sideMenuTile.isEmpty) {
       return null;
     }
-    // SettingsService.use.permissionCheck(element.permissions)
+
     final selectedTile = sideMenuTile.elementAt(selectedIndex);
     return sideMenuTile
-        .where((element) => true)
+        .where((element) =>
+            SettingsService.use.permissionCheck(element.permissions))
         .map((e) => SideMenuItemDataTile(
               badgeStyle: BadgeStyle(
                   padding: const EdgeInsets.all(6),

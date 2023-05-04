@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:shared_component/shared_component.dart';
 
 import '../popUpMenu/custom_pop_up_menu.dart';
@@ -8,7 +9,6 @@ class TableCustom<T> extends StatefulWidget {
       {Key? key,
       this.loadingOnUpdateData = false,
       required this.currentPageSize,
-      this.loadOnMoreButton = false,
       this.color,
       required this.dataList,
       this.onCreate,
@@ -17,19 +17,16 @@ class TableCustom<T> extends StatefulWidget {
       this.deleteData = false,
       this.actionButton,
       this.paginatePage,
-      required this.onPageSize,
-      this.onDeleteLoader = false})
+      required this.onPageSize})
       : super(key: key);
   final List<dynamic> dataList;
   final void Function(dynamic)? onCreate;
-  final void Function(Map<String, dynamic> value)? onDelete;
-  final HeardTitle headTitles;
+  final void Function(Map<String, dynamic>)? onDelete;
+  final HeadTitle headTitles;
   final bool deleteData;
   final List<ActionButtonItem<T>>? actionButton;
   final PaginatePage? paginatePage;
   final void Function(dynamic)? onPageSize;
-  final bool onDeleteLoader;
-  final bool loadOnMoreButton;
   final Color? color;
   final int currentPageSize;
   final bool loadingOnUpdateData;
@@ -38,37 +35,34 @@ class TableCustom<T> extends StatefulWidget {
   _TableCustomState<T> createState() => _TableCustomState<T>();
 }
 
-class _TableCustomState<T> extends State<TableCustom<T>>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _animationTween;
+class _TableCustomState<T> extends State<TableCustom<T>> {
   int pressedIndex = -10;
   int loadingIndex = -0;
   bool hover = false;
   int hoverIndex = -1;
+  final dataTableController = Get.put(DataTableController());
+
   @override
   void initState() {
     widget.actionButton
         ?.removeWhere((element) => element.permissionGranted == false);
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _animationTween = Tween(begin: 5.0, end: 1.0).animate(_animationController);
-    _animationController.addListener(() {
-      setState(() {});
-    });
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (SizeConfig.fullScreen.width <= 820) {
+      return MobileDataTable(
+          dataList: widget.dataList,
+          headTitle: widget.headTitles,
+          onDelete: !widget.deleteData
+              ? null
+              : (data, index) async {
+                  return await deleteConfirm(index);
+                },
+          actionButton: widget.actionButton,
+          titleKey: 'name');
+    }
     return Column(
       children: [
         ///TITLE TILE
@@ -91,20 +85,20 @@ class _TableCustomState<T> extends State<TableCustom<T>>
                     ),
                   ),
                 ...List.generate(
-                    widget.headTitles.heardTileItems!.length,
-                    (x) => widget.headTitles.heardTileItems?[x].columnSize !=
+                    widget.headTitles.headTileItems!.length,
+                    (x) => widget.headTitles.headTileItems?[x].columnSize !=
                             null
                         ? Container(
                             width:
-                                widget.headTitles.heardTileItems?[x].columnSize,
+                                widget.headTitles.headTileItems?[x].columnSize,
                             padding: const EdgeInsets.symmetric(horizontal: 4),
-                            alignment: widget.headTitles.heardTileItems?[x]
+                            alignment: widget.headTitles.headTileItems?[x]
                                         .alignment !=
                                     null
-                                ? widget.headTitles.heardTileItems![x].alignment
+                                ? widget.headTitles.headTileItems![x].alignment
                                 : Alignment.centerLeft,
                             child: Text(
-                              widget.headTitles.heardTileItems![x].titleName!,
+                              widget.headTitles.headTileItems![x].titleName!,
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,
                             ),
@@ -112,13 +106,13 @@ class _TableCustomState<T> extends State<TableCustom<T>>
                         : Expanded(
                             child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 4),
-                            alignment: widget.headTitles.heardTileItems?[x]
+                            alignment: widget.headTitles.headTileItems?[x]
                                         .alignment !=
                                     null
-                                ? widget.headTitles.heardTileItems![x].alignment
+                                ? widget.headTitles.headTileItems![x].alignment
                                 : Alignment.centerLeft,
                             child: Text(
-                              widget.headTitles.heardTileItems![x].titleName!,
+                              widget.headTitles.headTileItems![x].titleName!,
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,
                             ),
@@ -136,10 +130,9 @@ class _TableCustomState<T> extends State<TableCustom<T>>
                       style: const TextStyle(fontWeight: FontWeight.w400),
                     ),
                   ),
-                if (widget.headTitles.actionTitle == null &&
-                        widget.actionButton!.isEmpty ||
-                    !widget.deleteData)
-                  const SizedBox(width: 122)
+                if (widget.headTitles.actionTitle == null ||
+                    widget.actionButton!.isEmpty && !widget.deleteData)
+                  const SizedBox(width: 0)
               ],
             ),
           ),
@@ -147,265 +140,245 @@ class _TableCustomState<T> extends State<TableCustom<T>>
         if (widget.loadingOnUpdateData) IndicateProgress.linear(),
         Expanded(
           child: ListView.builder(
-              controller: ScrollController(),
+              // controller: ScrollController(),
               shrinkWrap: true,
               itemCount: widget.dataList.length,
               itemBuilder: (_, index) {
-                return InkWell(
-                  onTap: () {},
-                  onHover: (value) {
-                    setState(() {
-                      hoverIndex = index;
-                      hover = !hover;
-                      if (!hover) {
-                        _animationController.forward();
-                      } else {
-                        _animationController.reverse();
-                      }
-                    });
-                  },
-                  child: Card(
-                    elevation: hoverIndex == index ? _animationTween.value : 1,
-                    color:
-                        widget.dataList.elementAt(index)?['hasError'] ?? false
-                            ? Theme.of(context).errorColor.withOpacity(0.5)
-                            : widget.color ?? Theme.of(context).primaryColor,
-                    child: ListTile(
-                      dense: true,
-                      title: Row(
-                        children: [
-                          if (widget.headTitles.serialNumberTitle != null)
-                            SizedBox(
-                              width: 50,
-                              child: Text(
-                                '${(index + 1) + ((widget.paginatePage!.currentPage - 1) * widget.paginatePage!.pageSize)}',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                              ),
+                return Card(
+                  // elevation:
+                  //     hoverIndex == index ? _animationTween.value : 1,
+                  color: widget.dataList.elementAt(index)?['hasError'] ?? false
+                      ? Theme.of(context).colorScheme.error.withOpacity(0.5)
+                      : widget.color ?? Theme.of(context).primaryColor,
+                  child: ListTile(
+                    onTap: () {},
+                    dense: true,
+                    title: Row(
+                      children: [
+                        if (widget.headTitles.serialNumberTitle != null)
+                          SizedBox(
+                            width: 50,
+                            child: Text(
+                              // '${(index + 1) + ((widget.paginatePage!.currentPage - 1) * widget.paginatePage!.pageSize)}',
+                              '${(index + 1)}',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
                             ),
-                          ...List.generate(
-                              widget.headTitles.heardTileItems!.length,
-                              (i) => widget.headTitles.heardTileItems?[i]
-                                          .columnSize !=
-                                      null
-                                  ? Container(
-                                      width: widget.headTitles
-                                          .heardTileItems?[i].columnSize,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 4),
-                                      alignment: widget
-                                                  .headTitles
-                                                  .heardTileItems?[i]
-                                                  .alignment !=
-                                              null
-                                          ? widget.headTitles.heardTileItems![i]
-                                              .alignment
-                                          : Alignment.centerLeft,
+                          ),
+                        ...List.generate(
+                            widget.headTitles.headTileItems!.length,
+                            (i) => widget.headTitles.headTileItems?[i]
+                                        .columnSize !=
+                                    null
+                                ? Container(
+                                    width: widget.headTitles.headTileItems?[i]
+                                        .columnSize,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 4),
+                                    alignment: widget.headTitles
+                                                .headTileItems?[i].alignment !=
+                                            null
+                                        ? widget.headTitles.headTileItems![i]
+                                            .alignment
+                                        : Alignment.centerLeft,
 
-                                      ///SUB-OBJECT CAN BE ADDED HERE
-                                      child: widget
-                                                  .headTitles
-                                                  .heardTileItems?[i]
-                                                  .objectKeyField !=
-                                              null
-                                          ? Text(
-                                              widget.dataList[index][widget
-                                                          .headTitles
-                                                          .heardTileItems?[i]
-                                                          .titleKey] ==
-                                                      null
-                                                  ? '---'
-                                                  : widget
-                                                      .dataList[index][widget
-                                                              .headTitles
-                                                              .heardTileItems?[i]
-                                                              .titleKey][
-                                                          widget
-                                                              .headTitles
-                                                              .heardTileItems?[
-                                                                  i]
-                                                              .objectKeyField]
-                                                      .toString()
-                                                      .replaceAll('_', ' ')
-                                                      .replaceAll(
-                                                          'null', '---'),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 2,
-                                            )
-                                          : Text(
-                                              widget.dataList[index][widget
-                                                      .headTitles
-                                                      .heardTileItems?[i]
-                                                      .titleKey]
-                                                  .toString()
-                                                  .replaceAll('_', ' ')
-                                                  .replaceAll('null', '---'),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 2,
+                                    ///SUB-OBJECT CAN BE ADDED HERE
+                                    child: widget.headTitles.headTileItems?[i]
+                                                .objectKeyField !=
+                                            null
+                                        ? Text(
+                                            widget.dataList[index][widget
+                                                        .headTitles
+                                                        .headTileItems?[i]
+                                                        .titleKey] ==
+                                                    null
+                                                ? '---'
+                                                : widget.dataList[index][widget
+                                                            .headTitles
+                                                            .headTileItems?[i]
+                                                            .titleKey][
+                                                        widget
+                                                            .headTitles
+                                                            .headTileItems?[i]
+                                                            .objectKeyField]
+                                                    .toString()
+                                                    .replaceAll('_', ' ')
+                                                    .replaceAll('null', '---'),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                          )
+                                        : Text(
+                                            widget.dataList[index][widget
+                                                    .headTitles
+                                                    .headTileItems?[i]
+                                                    .titleKey]
+                                                .toString()
+                                                .replaceAll('_', ' ')
+                                                .replaceAll('null', '---'),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                          ),
+                                  )
+                                : Expanded(
+                                    child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 4),
+                                    alignment: widget.headTitles
+                                                .headTileItems?[i].alignment !=
+                                            null
+                                        ? widget.headTitles.headTileItems![i]
+                                            .alignment
+                                        : Alignment.centerLeft,
+                                    child: widget.headTitles.headTileItems?[i]
+                                                .objectKeyField !=
+                                            null
+                                        ? Text(
+                                            widget.dataList[index][widget
+                                                        .headTitles
+                                                        .headTileItems?[i]
+                                                        .titleKey] ==
+                                                    null
+                                                ? '---'
+                                                : widget.dataList[index][widget
+                                                            .headTitles
+                                                            .headTileItems?[i]
+                                                            .titleKey][
+                                                        widget
+                                                            .headTitles
+                                                            .headTileItems?[i]
+                                                            .objectKeyField]
+                                                    .toString()
+                                                    .replaceAll('_', ' ')
+                                                    .replaceAll('null', '---'),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                          )
+                                        : Text(
+                                            widget.dataList[index][widget
+                                                    .headTitles
+                                                    .headTileItems?[i]
+                                                    .titleKey]
+                                                .toString()
+                                                .replaceAll('_', ' ')
+                                                .replaceAll('null', '---'),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                          ),
+                                  ))),
+                        if (widget.headTitles.actionTitle!.isNotEmpty &&
+                            widget.actionButton!.isNotEmpty)
+                          SizedBox(
+                            width: 122,
+                            height: 30,
+                            child: Row(
+                              mainAxisAlignment:
+                                  widget.actionButton!.isNotEmpty &&
+                                          widget.deleteData
+                                      ? MainAxisAlignment.spaceAround
+                                      : MainAxisAlignment.center,
+                              children: [
+                                if (widget.actionButton!.isNotEmpty)
+                                  Obx(() {
+                                    final bool loading =
+                                        dataTableController.onLoadMore.value;
+                                    return loading && loadingIndex == index
+                                        ? Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 5.0),
+                                            child: SizedBox(
+                                              height: 25,
+                                              width: 25,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 1.5,
+                                                backgroundColor: Colors.black12,
+                                                color: Theme.of(context)
+                                                    .primaryColor,
+                                              ),
                                             ),
-                                    )
-                                  : Expanded(
-                                      child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 4),
-                                      alignment: widget
-                                                  .headTitles
-                                                  .heardTileItems?[i]
-                                                  .alignment !=
-                                              null
-                                          ? widget.headTitles.heardTileItems![i]
-                                              .alignment
-                                          : Alignment.centerLeft,
-                                      child: widget
-                                                  .headTitles
-                                                  .heardTileItems?[i]
-                                                  .objectKeyField !=
-                                              null
-                                          ? Text(
-                                              widget.dataList[index][widget
-                                                          .headTitles
-                                                          .heardTileItems?[i]
-                                                          .titleKey] ==
-                                                      null
-                                                  ? '---'
-                                                  : widget
-                                                      .dataList[index][widget
-                                                              .headTitles
-                                                              .heardTileItems?[i]
-                                                              .titleKey][
-                                                          widget
-                                                              .headTitles
-                                                              .heardTileItems?[
-                                                                  i]
-                                                              .objectKeyField]
-                                                      .toString()
-                                                      .replaceAll('_', ' ')
-                                                      .replaceAll(
-                                                          'null', '---'),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 2,
-                                            )
-                                          : Text(
-                                              widget.dataList[index][widget
-                                                      .headTitles
-                                                      .heardTileItems?[i]
-                                                      .titleKey]
-                                                  .toString()
-                                                  .replaceAll('_', ' ')
-                                                  .replaceAll('null', '---'),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 2,
+                                          )
+                                        : QudsPopupButton(
+                                            tooltip: 'More',
+                                            items: List.generate(
+                                                widget.actionButton!.length,
+                                                (pressIndex) =>
+                                                    QudsPopupMenuItem(
+                                                        leading: Icon(widget
+                                                            .actionButton![
+                                                                pressIndex]
+                                                            .icon),
+                                                        title: Text(widget
+                                                            .actionButton![
+                                                                pressIndex]
+                                                            .name),
+                                                        onPressed: () {
+                                                          loadingIndex = index;
+                                                          widget.actionButton![
+                                                                  pressIndex]
+                                                              .onPressed(widget
+                                                                      .dataList[
+                                                                  index]);
+                                                        })),
+                                            // widthSize: 200,
+                                            child: FloatingActionButton(
+                                              backgroundColor: Theme.of(context)
+                                                  .primaryColor
+                                                  .withOpacity(0.7),
+                                              mini: true,
+                                              elevation: 10,
+                                              onPressed: null,
+                                              child: Icon(
+                                                Icons.more_vert_sharp,
+                                                size: 15,
+                                                color:
+                                                    Theme.of(context).cardColor,
+                                              ),
                                             ),
-                                    ))),
-                          if (widget.headTitles.actionTitle!.isNotEmpty)
-                            SizedBox(
-                              width: 122,
-                              height: 30,
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    if (widget.actionButton!.isNotEmpty)
-                                      widget.loadOnMoreButton &&
-                                              loadingIndex == index
-                                          ? Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10.0),
+                                          );
+                                  }),
+                                if (widget.actionButton!.isNotEmpty)
+                                  Container(
+                                    width: 5,
+                                  ),
+                                Obx(() {
+                                  final bool loading =
+                                      dataTableController.onDeleteLoad.value;
+                                  return widget.deleteData == true
+                                      ? loading && pressedIndex == index
+                                          ? const Padding(
+                                              padding:
+                                                  EdgeInsets.only(right: 5.0),
                                               child: SizedBox(
                                                 height: 25,
                                                 width: 25,
                                                 child:
                                                     CircularProgressIndicator(
-                                                  strokeWidth: 1,
-                                                  color: Theme.of(context)
-                                                      .primaryColor,
+                                                  strokeWidth: 1.5,
+                                                  backgroundColor:
+                                                      Colors.black12,
+                                                  color: Colors.red,
                                                 ),
                                               ),
                                             )
-                                          : QudsPopupButton(
-                                              tooltip: 'More',
-                                              items: List.generate(
-                                                  widget.actionButton!.length,
-                                                  (pressIndex) =>
-                                                      QudsPopupMenuItem(
-                                                          leading: Icon(widget
-                                                              .actionButton![
-                                                                  pressIndex]
-                                                              .icon),
-                                                          title: Text(widget
-                                                              .actionButton![
-                                                                  pressIndex]
-                                                              .name),
-                                                          onPressed: () {
-                                                            loadingIndex =
-                                                                index;
-                                                            widget
-                                                                .actionButton![
-                                                                    pressIndex]
-                                                                .onPressed(widget
-                                                                        .dataList[
-                                                                    index]);
-                                                          })),
-                                              // widthSize: 200,
-                                              child: FloatingActionButton(
-                                                backgroundColor:
-                                                    Theme.of(context)
-                                                        .primaryColor
-                                                        .withOpacity(0.7),
-                                                mini: true,
-                                                elevation: 10,
-                                                onPressed: null,
-                                                child: Icon(
-                                                  Icons.more_vert_sharp,
-                                                  size: 15,
-                                                  color: Theme.of(context)
-                                                      .cardColor,
-                                                ),
+                                          : FloatingActionButton(
+                                              elevation: 10,
+                                              mini: true,
+                                              backgroundColor: Colors.red,
+                                              tooltip: 'Delete',
+                                              child: const Icon(
+                                                Icons.delete_outline,
+                                                color: Colors.white,
+                                                size: 17,
                                               ),
-                                            ),
-                                    if (widget.actionButton!.isNotEmpty)
-                                      Container(
-                                        width: 5,
-                                      ),
-                                    widget.deleteData == true
-                                        ? widget.onDeleteLoader &&
-                                                pressedIndex == index
-                                            ? const Padding(
-                                                padding:
-                                                    EdgeInsets.only(left: 10.0),
-                                                child: SizedBox(
-                                                  height: 25,
-                                                  width: 25,
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    strokeWidth: 1,
-                                                    color: Colors.red,
-                                                  ),
-                                                ),
-                                              )
-                                            : FloatingActionButton(
-                                                elevation: 10,
-                                                mini: true,
-                                                backgroundColor: Colors.red,
-                                                tooltip: 'Delete',
-                                                child: const Icon(
-                                                  Icons.delete_outline,
-                                                  color: Colors.white,
-                                                  size: 17,
-                                                ),
-                                                onPressed: () {
-                                                  deleteConfirm(index);
-                                                },
-                                              )
-                                        : Container(),
-                                  ],
-                                ),
-                              ),
+                                              onPressed: () {
+                                                deleteConfirm(index);
+                                              },
+                                            )
+                                      : Container();
+                                })
+                              ],
                             ),
-                        ],
-                      ),
+                          ),
+                      ],
                     ),
                   ),
                 );
@@ -423,9 +396,15 @@ class _TableCustomState<T> extends State<TableCustom<T>>
                   height: 30,
                   child: Row(
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text('Page Size'),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: GText(
+                            widget.onPageSize == null
+                                ? 'Number Of Elements'
+                                : 'Page Size',
+                            color: ThemeController.getInstance().darkMode(
+                                darkColor: Colors.white30,
+                                lightColor: Colors.black38)),
                       ),
                       Container(
                         width: 10,
@@ -444,12 +423,18 @@ class _TableCustomState<T> extends State<TableCustom<T>>
                             onChanged: (value) {
                               setState(() {
                                 // widget.currentPageSize = int.parse(value.toString());
-                                if (widget.onPageSize != null)
+                                if (widget.onPageSize != null) {
                                   widget.onPageSize!(value);
+                                }
                               });
                             }),
                       if (widget.onPageSize == null)
-                        Text(widget.currentPageSize.toString())
+                        GText(
+                          widget.currentPageSize.toString(),
+                          color: ThemeController.getInstance().darkMode(
+                              darkColor: Colors.white30,
+                              lightColor: Colors.black38),
+                        )
                     ],
                   ),
                 )),
@@ -469,85 +454,24 @@ class _TableCustomState<T> extends State<TableCustom<T>>
   }
 
   deleteConfirm(index) {
-    NotificationService.confirmWarn(
-        context: context,
-        buttonColor: Theme.of(context).colorScheme.error,
-        cancelBtnText: 'Cancel',
-        confirmBtnText: 'Delete',
-        title: 'Deleting Record...',
-        content: 'Are You Sure?',
-        showCancelBtn: true,
-        onConfirmBtnTap: () {
-          pressedIndex = index;
-          widget.onDelete!(widget.dataList[index]);
-          Navigator.pop(context);
-        },
-        onCancelBtnTap: () {
-          Navigator.of(context).pop();
-        });
-    // showDialog(
-    //     barrierDismissible: false,
-    //     context: context,
-    //     builder: (context) {
-    //       return AlertDialog(
-    //         title: Column(
-    //           mainAxisSize: MainAxisSize.min,
-    //           children: [
-    //             SizedBox(
-    //                 height: size.height / 17,
-    //                 width: size.height / 17,
-    //                 child: SvgPicture.asset(
-    //                   'assets/wonder.svg',
-    //                   package: 'shared_component',
-    //                 )),
-    //             Center(
-    //                 child: Text(
-    //               'Deleting...',
-    //               style: Theme.of(context).textTheme.titleMedium,
-    //             )),
-    //             const SizedBox(
-    //               height: 10,
-    //             ),
-    //             Center(
-    //                 child: Text(
-    //               'Are you sure?',
-    //               style: Theme.of(context).textTheme.labelSmall,
-    //             )),
-    //           ],
-    //         ),
-    //         actions: [
-    //           Row(
-    //             mainAxisSize: MainAxisSize.max,
-    //             mainAxisAlignment: MainAxisAlignment.spaceAround,
-    //             children: [
-    //               TextButton(
-    //                   onPressed: () {
-    //                     pressedIndex = index;
-    //                     widget.onDelete!(widget.dataList[index]);
-    //                     Navigator.pop(context);
-    //                   },
-    //                   style: ButtonStyle(
-    //                       elevation: MaterialStateProperty.all<double>(0),
-    //                       overlayColor: MaterialStateProperty.all<Color>(
-    //                           Colors.transparent)),
-    //                   child: const Text(
-    //                     'Delete',
-    //                     style: TextStyle(color: Colors.red),
-    //                   )),
-    //               TextButton(
-    //                   onPressed: () {
-    //                     Navigator.of(context).pop();
-    //                   },
-    //                   style: ButtonStyle(
-    //                       elevation: MaterialStateProperty.all<double>(0),
-    //                       overlayColor: MaterialStateProperty.all<Color>(
-    //                           Colors.transparent)),
-    //                   child: const Text('Cancel')),
-    //             ],
-    //           )
-    //         ],
-    //       );
-    //     });
+    return NotificationService.confirmWarn(
+      context: Get.context!,
+      buttonColor: Theme.of(context).colorScheme.error,
+      cancelBtnText: 'Cancel',
+      confirmBtnText: 'Delete',
+      title: 'Deleting Record...',
+      content: 'Are You Sure?',
+      showCancelBtn: true,
+      onConfirmBtnTap: () {
+        pressedIndex = index;
+        widget.onDelete!(widget.dataList[index]);
+        Navigator.pop(Get.context!, true);
+      },
+      // onCancelBtnTap: () {
+      //   // Navigator.pop(context, true);
+      //   return true;
+      // }
+    );
   }
 }
 
@@ -709,22 +633,22 @@ class _PaginatePageState extends State<PaginatePage> {
   }
 }
 
-class HeardTitle {
+class HeadTitle {
   final String? serialNumberTitle;
   final String? actionTitle;
-  final List<HeardTitleItem>? heardTileItems;
+  final List<HeadTitleItem>? headTileItems;
 
-  HeardTitle({this.serialNumberTitle, this.actionTitle, this.heardTileItems});
+  HeadTitle({this.serialNumberTitle, this.actionTitle, this.headTileItems});
 }
 
-class HeardTitleItem {
+class HeadTitleItem {
   final String? titleKey;
   final String? titleName;
   final String? objectKeyField;
   final double? columnSize;
   final Alignment? alignment;
 
-  HeardTitleItem(
+  HeadTitleItem(
       {this.titleKey,
       this.titleName,
       this.objectKeyField,
@@ -764,4 +688,31 @@ class PagingValues {
   int getPageSize() => _pageSize ?? 10;
 
   setPageSize(value) => _pageSize = value;
+}
+
+class DataTableController extends GetxController {
+  final onDeleteLoad = false.obs;
+  final onLoadMore = false.obs;
+  final rebuild = false.obs;
+}
+
+class RebuildToRefetch {
+  static RebuildToRefetch? _instance;
+  bool _refetchState = false;
+  DataTableController controller = Get.put(DataTableController());
+
+  static RebuildToRefetch instance() {
+    _instance ??= RebuildToRefetch();
+    return _instance!;
+  }
+
+  bool changeRefetchState(bool value) => _refetchState = value;
+
+  bool getRefetchState() => _refetchState;
+
+  refetch() {
+    if (changeRefetchState(true)) {
+      controller.rebuild.value = !controller.rebuild.value;
+    }
+  }
 }

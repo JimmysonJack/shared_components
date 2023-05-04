@@ -12,6 +12,7 @@ import 'notification_service.dart';
 
 class SettingsService {
   static SettingsService use = SettingsService();
+
   List<Map<String, dynamic>> convertMapToList(data) {
     List<Map<String, dynamic>> dataList = [];
     if (data != null) {
@@ -120,13 +121,21 @@ class SettingsService {
     return Size(width, height);
   }
 
-  permissionCheck(List<String> searchList) async {
-    var user = await StorageService.getUser();
+  permissionCheck(List<String> searchList) {
+    var user = Permissions.instance().getAuthorities();
     List<Map<String, dynamic>> userAuthorities =
-        List<Map<String, dynamic>>.from(user['principal']['authorities']);
+        List<Map<String, dynamic>>.from(user ?? []);
+    if (userAuthorities.isEmpty) {
+      userAuthorities = [
+        {'authority': 'ACCESS_USER'},
+        {'authority': 'ACCESS_ROLE'},
+        {'authority': 'ACCESS_DASHBOARD'},
+        {'authority': 'ACCESS_FUND'}
+      ];
+    }
 
     bool found = searchList.isNotEmpty &&
-        searchList.every((searchElement) => userAuthorities
+        searchList.any((searchElement) => userAuthorities
             .where((element) => element["authority"] == searchElement)
             .isNotEmpty);
 

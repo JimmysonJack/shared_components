@@ -97,6 +97,8 @@ class AuthServiceController extends GetxController {
         return Checking.doNotProceed;
       } else if (res is Map && !res.keys.contains('checking')) {
         StorageService.setJson('user', res);
+        var permissions = res['principal']?['authorities'];
+        Permissions.instance().setAuthorities(permissions ?? []);
         if (res['principal']['firstLogin']) {
           return Checking.firstLogin;
         } else if (DateTime.parse(res['principal']['passwordExpiresAt'])

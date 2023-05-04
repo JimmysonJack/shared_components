@@ -6,7 +6,7 @@ class Button extends StatefulWidget {
       : super(key: key);
   String labelText;
   IconData? icon;
-  void Function() onPressed;
+  void Function()? onPressed;
   @override
   _ButtonState createState() => _ButtonState();
 }

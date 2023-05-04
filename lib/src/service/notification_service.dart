@@ -31,7 +31,7 @@ class NotificationService {
         false);
   }
 
-  static Future<bool> confirmWarn(
+  static Future confirmWarn(
       {required BuildContext context,
       String? cancelBtnText,
       String? confirmBtnText,
@@ -267,6 +267,7 @@ class NotificationService {
       Function()? onConfirmBtnTap}) async {
     return (await showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
         child: Container(

@@ -7,6 +7,8 @@ import '../top-app-bar/user-profile-item.dart';
 import 'side-menu-tile-controller.dart';
 import 'side-menu-tile.dart';
 
+enum AppBarPosition { top, side }
+
 class SideNavigation extends StatefulWidget {
   const SideNavigation(
       {super.key,
@@ -15,10 +17,12 @@ class SideNavigation extends StatefulWidget {
       required this.body,
       required this.sideMenuTile,
       this.version,
+      this.appBarPosition = AppBarPosition.side,
       this.selectedColor,
       this.useBorderRadius = false});
   final String? version;
   final Color? selectedColor;
+  final AppBarPosition appBarPosition;
   final bool useBorderRadius;
   final bool useAppBar;
   final Widget body;
@@ -60,6 +64,20 @@ class _SideNavigationState extends State<SideNavigation>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: widget.appBarPosition == AppBarPosition.top &&
+              widget.useAppBar &&
+              widget.topAppBarDetails != null
+          ? PreferredSize(
+              preferredSize: Size.fromHeight(60),
+              child: TopAppBar(
+                onSettings: () {},
+                title: widget.topAppBarDetails!.title ?? '',
+                userDetails: widget.topAppBarDetails!.userProfileDetails,
+                onTap: widget.topAppBarDetails!.onTap,
+                menuItems: widget.topAppBarDetails!.menuItems,
+                body: widget.body,
+              ))
+          : null,
       body: Row(
         children: [
           SideMenu(
@@ -76,15 +94,18 @@ class _SideNavigationState extends State<SideNavigation>
                   useBorderRadius: widget.useBorderRadius,
                   onTap: (index) => selectedIndex = index)),
           Expanded(
-            child: widget.useAppBar && widget.topAppBarDetails != null
+            child: widget.useAppBar &&
+                    widget.topAppBarDetails != null &&
+                    widget.appBarPosition == AppBarPosition.side
                 ? TopAppBar(
                     onSettings: () {},
+                    title: widget.topAppBarDetails!.title ?? '',
                     userDetails: widget.topAppBarDetails!.userProfileDetails,
                     onTap: widget.topAppBarDetails!.onTap,
                     menuItems: widget.topAppBarDetails!.menuItems,
                     body: widget.body,
                   )
-                : widget.body,
+                : Center(child: widget.body),
           ),
         ],
       ),
@@ -150,8 +171,10 @@ class TopAppBarDetails {
   final UserProfileItem userProfileDetails;
   final Function(String) onTap;
   final List<MenuItem> menuItems;
+  final String? title;
   TopAppBarDetails(
-      {required this.userProfileDetails,
+      {this.title,
+      required this.userProfileDetails,
       required this.menuItems,
       required this.onTap});
 }

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 // import 'package:google_ui/google_ui.dart';
 
@@ -19,31 +18,38 @@ void main() {
         ChildRoute(
           Modular.initialRoute,
           child: (context, args) => SideNavigation(
+            appBarPosition: AppBarPosition.side,
             version: '2.0.3',
-            
+            topAppBarDetails: TopAppBarDetails(
+                title: 'Top Bar',
+                menuItems: [
+                  MenuItem<String>(
+                      title: 'Change Password',
+                      icon: Icons.logo_dev,
+                      value: 'password'),
+                  MenuItem<String>(
+                      title: 'Profile', icon: Icons.details, value: 'profile'),
+                ],
+                onTap: (value) {},
+                userProfileDetails: UserProfileItem(
+                    onLogout: () {},
+                    email: 'Jimmysonblack@gmail.com',
+                    userName: 'Jimmyson Jackson Mnunguri')),
             sideMenuTile: [
               SideMenuTile(
-                  title: 'Dashboard', icon: Icons.dashboard, permissions: []),
-              SideMenuTile(title: 'Users', icon: Icons.people, permissions: []),
+                  title: 'Dashboard',
+                  icon: Icons.dashboard,
+                  permissions: ['ACCESS_USER']),
+              SideMenuTile(
+                  title: 'Users',
+                  icon: Icons.people,
+                  permissions: ['ACCESS_ROLE', 'ACCESS']),
               SideMenuTile(title: 'Facility', icon: Icons.abc, permissions: []),
             ],
+            body: const UsersWidget(),
           ),
-          UserProfileItem(
-                        onLogout: () {},
-                        email: 'Jimmysonblack@gmail.com',
-                        userName: 'Jimmyson Jackson Mnunguri')
-
-                        [
-                      MenuItem<String>(
-                          title: 'Change Password',
-                          icon: Icons.logo_dev,
-                          value: 'password'),
-                      MenuItem<String>(
-                          title: 'Docker',
-                          icon: Icons.logo_dev,
-                          value: 'docker'),
-                    ]
         ),
+
         // ChildRoute('tiles',
         //     child: (context, args) => TilesSearch(
         //           showGradient: true,
@@ -136,11 +142,88 @@ Map<int, Color> colorMap = {
   900: const Color.fromRGBO(147, 205, 72, 1),
 };
 
+class UsersWidget extends StatelessWidget {
+  const UsersWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const PermissionSettings(
+      endPointName: 'savePermissions',
+      titleKey: 'titleKey',
+    );
+
+    // ListDataTable(
+    //   endPointName: 'getUsers',
+    //   queryFields: "name uid",
+    //   mapFunction: (item) => {'userName': item['name']},
+    //   deleteEndPointName: 'deleteUser',
+    //   deleteUidFieldName: 'userUid',
+    //   actionButtons: [
+    //     ActionButtonItem(
+    //         icon: Icons.perm_data_setting_sharp,
+    //         name: 'Set Permission',
+    //         onPressed: (value) {
+    //           RebuildToRefetch.instance().refetch();
+    //           console(value);
+    //         })
+    //   ],
+    //   tableAddButton:
+    //       TableAddButton(onPressed: () {}, buttonName: 'Create User'),
+    //   topActivityButtons: [
+    //     TopActivityButton(
+    //         onTap: () {},
+    //         // buttonName: 'Create User',
+    //         iconData: Icons.create,
+    //         toolTip: 'For creating user'),
+    //     TopActivityButton(
+    //         onTap: () {},
+    //         buttonName: 'Create User',
+    //         // iconData: Icons.create,
+    //         toolTip: 'For creating user'),
+    //     TopActivityButton(
+    //         onTap: () {},
+    //         buttonName: 'Create Role',
+    //         // iconData: Icons.create,
+    //         toolTip: 'For creating user'),
+    //   ],
+    //   headColumns: [
+    //     HeadTitleItem(
+    //       titleKey: 'userName',
+    //       titleName: 'User Name',
+    //     ),
+    //     HeadTitleItem(
+    //         titleKey: 'uid',
+    //         titleName: 'Key',
+    //         alignment: Alignment.centerRight),
+    //   ],
+    // );
+  }
+}
 
 
-
-
-
-
+    // const ExpansionTileCard(
+    //   initialElevation: 1,
+    //   title: Text('Card title'),
+    //   subtitle: Text('Subtitle'),
+    //   leading: Icon(Icons.data_thresholding_sharp),
+    //   children: [
+    //     Divider(
+    //       height: 1,
+    //       thickness: 1,
+    //     ),
+    //     ListTile(
+    //       title: Text('Title'),
+    //       subtitle: Text('Subtitle'),
+    //     ),
+    //     ListTile(
+    //       title: Text('Title1'),
+    //       subtitle: Text('Subtitle1'),
+    //     ),
+    //     ListTile(
+    //       title: Text('Title2'),
+    //       subtitle: Text('Subtitle2'),
+    //     ),
+    //   ],
+    // );
 
 
