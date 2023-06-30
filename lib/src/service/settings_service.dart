@@ -1,14 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:flutter_modular/flutter_modular.dart';
 import 'package:get/get.dart';
 import 'package:shared_component/shared_component.dart';
-import 'package:shared_component/src/service/auth_service.dart';
-import 'package:shared_component/src/service/storage_service.dart';
 
-import '../utils/size_config.dart';
-import 'notification_service.dart';
 
 class SettingsService {
   static SettingsService use = SettingsService();
@@ -33,13 +28,19 @@ class SettingsService {
   Future<Checking> login(
       {required String userName,
       required String password,
+      String? url,
       String? navigateTo,
       required BuildContext context}) async {
     final authService = Get.put(AuthServiceController());
+    console('its being called');
     if (await authService.loginUser(context,
-            username: userName, password: password, showLoading: true) ==
+            username: userName,
+            password: password,
+            url: url,
+            showLoading: true) ==
         Checking.proceed) {
-      Checking userState = await authService.getUser(context);
+      console('has returned true.....');
+      Checking userState = await authService.getUser(context, url);
       if (userState == Checking.proceed) {
         if (navigateTo != null) Modular.to.navigate(navigateTo);
         return userState;
@@ -140,5 +141,17 @@ class SettingsService {
             .isNotEmpty);
 
     return found;
+  }
+
+  bool isEmptyOrNull(dynamic data) {
+    if (data == null) {
+      return true;
+    }
+
+    if (data is List || data is String || data is Map) {
+      return data.isEmpty;
+    }
+
+    return false;
   }
 }

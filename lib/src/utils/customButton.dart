@@ -36,8 +36,8 @@ class CustomButton extends StatelessWidget {
         child: Text(
           buttonName,
           style: TextStyle(
-              fontSize: fontSize == null ? 17 : fontSize,
-              fontWeight: fontWeight == null ? FontWeight.normal : fontWeight),
+              fontSize: fontSize ?? 17,
+              fontWeight: fontWeight ?? FontWeight.normal),
         ));
   }
 }

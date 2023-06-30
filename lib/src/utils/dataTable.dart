@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:google_ui/google_ui.dart';
-import 'package:shared_component/src/utils/table.dart';
 import '../../shared_component.dart';
 
 class DataSourceTable<T> extends StatefulWidget {
@@ -121,8 +119,9 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
                                     // filled: true
                                   ),
                                   onFieldSubmitted: (value) {
-                                    if (widget.onSearch != null)
+                                    if (widget.onSearch != null) {
                                       widget.onSearch!(value);
+                                    }
                                   },
                                   onChanged: (value) {
                                     setState(() {});

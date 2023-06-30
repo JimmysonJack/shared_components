@@ -9,6 +9,7 @@ import 'login_inputs.dart';
 RegExp regex = RegExp(
     r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
 
+// ignore: must_be_immutable
 class ChangePassword extends StatelessWidget {
   ChangePassword({super.key});
 
@@ -184,11 +185,11 @@ class ChangePassword extends StatelessWidget {
                                   color: Theme.of(context).cardColor,
                                   borderRadius: BorderRadius.circular(7)),
                               width: width,
-                              child: Column(
+                              child: const Column(
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
+                                children: [
                                   LinearProgress(),
                                   GText(
                                     'Changing Password...',

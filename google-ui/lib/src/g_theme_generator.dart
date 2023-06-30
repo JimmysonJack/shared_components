@@ -33,65 +33,65 @@ class GThemeGenerator {
   );
 
   static const _textTheme = TextTheme(
-    headline1: TextStyle(
+    displayLarge: TextStyle(
       fontSize: 93,
       fontWeight: FontWeight.w300,
       letterSpacing: -1.5,
     ),
-    headline2: TextStyle(
+    displayMedium: TextStyle(
       fontSize: 58,
       fontWeight: FontWeight.w300,
       letterSpacing: -0.5,
     ),
-    headline3: TextStyle(
+    displaySmall: TextStyle(
       fontSize: 46,
       fontWeight: FontWeight.w400,
     ),
-    headline4: TextStyle(
+    headlineMedium: TextStyle(
       fontSize: 33,
       fontWeight: FontWeight.w400,
       letterSpacing: 0.25,
     ),
-    headline5: TextStyle(
+    headlineSmall: TextStyle(
       fontSize: 23,
       fontWeight: FontWeight.w400,
     ),
-    headline6: TextStyle(
+    titleLarge: TextStyle(
       fontSize: 19,
       fontWeight: FontWeight.w500,
       letterSpacing: 0.15,
     ),
-    subtitle1: TextStyle(
+    titleMedium: TextStyle(
       fontSize: 15,
       fontWeight: FontWeight.w400,
       letterSpacing: 0.15,
     ),
-    subtitle2: TextStyle(
+    titleSmall: TextStyle(
       fontSize: 13,
       fontWeight: FontWeight.w500,
       letterSpacing: 0.1,
     ),
-    bodyText1: TextStyle(
+    bodyLarge: TextStyle(
       fontSize: 15,
       fontWeight: FontWeight.w400,
       letterSpacing: 0.5,
     ),
-    bodyText2: TextStyle(
+    bodyMedium: TextStyle(
       fontSize: 13,
       fontWeight: FontWeight.w400,
       letterSpacing: 0.25,
     ),
-    button: TextStyle(
+    labelLarge: TextStyle(
       fontSize: 13,
       fontWeight: FontWeight.w500,
       letterSpacing: 1.25,
     ),
-    caption: TextStyle(
+    bodySmall: TextStyle(
       fontSize: 12,
       fontWeight: FontWeight.w400,
       letterSpacing: 0.4,
     ),
-    overline: TextStyle(
+    labelSmall: TextStyle(
       fontSize: 10,
       fontWeight: FontWeight.w400,
       letterSpacing: 1.5,
@@ -115,7 +115,6 @@ class GThemeGenerator {
       colorScheme: colorScheme,
       primaryColor: colorScheme.primary,
       indicatorColor: colorScheme.primary,
-      toggleableActiveColor: colorScheme.primary,
       scaffoldBackgroundColor: colorScheme.background,
       popupMenuTheme: PopupMenuThemeData(color: colorScheme.surface),
       dialogBackgroundColor: colorScheme.surface,
@@ -133,7 +132,7 @@ class GThemeGenerator {
         ),
       ),
       appBarTheme: AppBarTheme(
-        titleTextStyle: _textTheme.headline6?.copyWith(
+        titleTextStyle: _textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.normal,
           color: colorScheme.onSurface,
         ),
@@ -150,10 +149,10 @@ class GThemeGenerator {
         type: BottomNavigationBarType.fixed,
         backgroundColor: colorScheme.surface,
         unselectedItemColor: colorScheme.onSurface.withOpacity(.75),
-        selectedLabelStyle: _textTheme.bodyText2?.copyWith(
+        selectedLabelStyle: _textTheme.bodyMedium?.copyWith(
           fontWeight: FontWeight.w500,
         ),
-        unselectedLabelStyle: _textTheme.bodyText2?.copyWith(
+        unselectedLabelStyle: _textTheme.bodyMedium?.copyWith(
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -197,7 +196,30 @@ class GThemeGenerator {
       ),
       outlinedButtonTheme: const OutlinedButtonThemeData(
         style: ButtonStyle(tapTargetSize: MaterialTapTargetSize.padded),
-      ),
+      ), checkboxTheme: CheckboxThemeData(
+ fillColor: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
+ if (states.contains(MaterialState.disabled)) { return null; }
+ if (states.contains(MaterialState.selected)) { return colorScheme.primary; }
+ return null;
+ }),
+ ), radioTheme: RadioThemeData(
+ fillColor: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
+ if (states.contains(MaterialState.disabled)) { return null; }
+ if (states.contains(MaterialState.selected)) { return colorScheme.primary; }
+ return null;
+ }),
+ ), switchTheme: SwitchThemeData(
+ thumbColor: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
+ if (states.contains(MaterialState.disabled)) { return null; }
+ if (states.contains(MaterialState.selected)) { return colorScheme.primary; }
+ return null;
+ }),
+ trackColor: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
+ if (states.contains(MaterialState.disabled)) { return null; }
+ if (states.contains(MaterialState.selected)) { return colorScheme.primary; }
+ return null;
+ }),
+ ),
     );
   }
 }

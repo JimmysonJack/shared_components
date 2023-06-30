@@ -27,8 +27,6 @@ class AnimatedCardTile extends StatefulWidget {
 class _AnimatedCardTileState extends State<AnimatedCardTile> {
   int selectedIndex = -1;
 
-  bool _isExpanded = false;
-
   @override
   Widget build(BuildContext context) {
     return ListView.builder(

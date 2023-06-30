@@ -8,7 +8,6 @@ import 'package:shared_component/shared_component.dart';
 import '../utils/new-widgets-component/base_fields.dart';
 
 class GraphQLService {
-  static Map<String, dynamic>? _otherParams;
   static GraphQLService? _instance;
   static GraphQLService _getInstance() {
     _instance ??= GraphQLService();
@@ -19,38 +18,54 @@ class GraphQLService {
   String? endPoint;
   String? endPointName;
 
-  static Future<List<Map<String, dynamic>>> queryPageable(
-      {required String endPointName,
-      required String responseFields,
-      List<OtherParameters>? queryParameters,
-      PageableParams pageableParams = const PageableParams(),
-      required BuildContext context,
-      String? optionResponseFields}) async {
-    if (queryParameters != null) {
-      for (var element in queryParameters) {
-        _otherParams?.addAll({element.keyName: element.keyValue});
+  static Future<List<Map<String, dynamic>>> queryPageable({
+    required String endPointName,
+    required String responseFields,
+    Function(PageableResponse?, bool)? response,
+    List<OtherParameters>? parameters,
+    PageableParams pageableParams = const PageableParams(),
+    FetchPolicy? fetchPolicy,
+    required BuildContext context,
+  }) async {
+    Map<String, dynamic> otherParams = {};
+
+    Map mapVariables = {};
+    Map inputVariables = {};
+    String? inputVariable = '';
+    String? mapVariable = '';
+
+    if (parameters != null) {
+      for (var element in parameters) {
+        mapVariables.addAll({'\$${element.keyName}': element.keyType});
+        inputVariables.addAll({element.keyName: '\$${element.keyName}'});
+        otherParams.addAll({element.keyName: element.keyValue});
       }
+      mapVariable =
+          mapVariables.toString().replaceAll('{', '').replaceAll('}', '');
+      inputVariable =
+          inputVariables.toString().replaceAll('{', '').replaceAll('}', '');
     }
-    final QueryOptions options = QueryOptions(
-      document: gql('''
-  query $endPointName{
-    $endPointName{
+    var endpoint = '''
+  query $endPointName($pageableFields $mapVariable){
+    $endPointName($pageableValue  $inputVariable){
         $pageableBaseFields
         data{
-            ${optionResponseFields ?? responseFields}
+           $responseFields
         }
     }
 }
-  '''),
-      variables: {...pageableParams.toJson(), ...?_otherParams},
-      fetchPolicy: FetchPolicy.cacheAndNetwork,
+  ''';
+    // GraphQLService.getService.endPoint = _endpoint;
+    // GraphQLService.getService.endPointName = endPointName;
+    final QueryOptions options = QueryOptions(
+      document: gql(endpoint),
+      variables: {'pageableParam': pageableParams.toJson(), ...otherParams},
+      fetchPolicy: fetchPolicy ?? FetchPolicy.networkOnly,
     );
 
     final client = await graphClient(context);
 
     final QueryResult result = await client.value.query(options);
-
-    if (result.hasException) {}
 
     if (result.isLoading) {}
     List<Map<String, dynamic>>? repositories = result.data?[endPointName]
@@ -58,6 +73,13 @@ class GraphQLService {
         .map((e) => e)
         .cast<Map<String, dynamic>>()
         .toList();
+
+    if (response != null) {
+      var data = result.data == null
+          ? null
+          : PageableResponse.fromJson(result.data![endPointName]);
+      response(data, result.isLoading);
+    }
 
     if (result.data?[endPointName]?['status'] == false) {
       NotificationService.snackBarError(
@@ -77,13 +99,26 @@ class GraphQLService {
       } else if (exception.runtimeType == HttpLinkServerException) {
         HttpLinkServerException serverException =
             exception as HttpLinkServerException;
-        var errorResponse =
-            serverException.parsedResponse!.response['message'].split(':');
-        if (errorResponse[0] == "Invalid access token") {
-          NotificationService.snackBarError(
-            context: context,
-            title: errorResponse[0],
-          );
+        if (serverException.parsedResponse!.response.keys.contains('message')) {
+          var errorResponse =
+              serverException.parsedResponse!.response['message'].split(':');
+          if (errorResponse[0] == "Invalid access token") {
+            NotificationService.snackBarError(
+              context: context,
+              title: errorResponse[0],
+            );
+          }
+        } else if (serverException.parsedResponse!.response.keys
+            .contains('error_description')) {
+          var errorResponse = serverException
+              .parsedResponse!.response['error_description']
+              .split(':');
+          if (errorResponse[0] == "Invalid access token") {
+            NotificationService.snackBarError(
+              context: context,
+              title: errorResponse[0],
+            );
+          }
         } else {
           NotificationService.snackBarError(
             context: context,
@@ -108,13 +143,31 @@ class GraphQLService {
       FetchPolicy? fetchPolicy,
       required BuildContext context,
       String? optionResponseFields}) async {
+    Map<String, dynamic>? otherParams = {};
+    Map values = {};
+    Map variables = {};
     if (parameters != null) {
       for (var element in parameters) {
-        _otherParams?.addAll({element.keyName: element.keyValue});
+        variables.addAll({'\$${element.keyName}': element.keyType});
+        values.addAll({element.keyName: '\$${element.keyName}'});
+        otherParams.addAll({element.keyName: element.keyValue});
       }
     }
-    final QueryOptions options = QueryOptions(
-      document: gql('''
+    var graphVariables =
+        variables.toString().replaceAll('{', '').replaceAll('}', '');
+    var graphValues = values.toString().replaceAll('{', '').replaceAll('}', '');
+    var withParams = '''
+  query $endPointName($graphVariables){
+    $endPointName($graphValues){
+        $baseResponseFields
+        data{
+            ${optionResponseFields ?? responseFields}
+        }
+    }
+}
+  ''';
+
+    var withoutParams = '''
   query $endPointName{
     $endPointName{
         $baseResponseFields
@@ -123,8 +176,10 @@ class GraphQLService {
         }
     }
 }
-  '''),
-      variables: {...?_otherParams},
+  ''';
+    final QueryOptions options = QueryOptions(
+      document: gql(parameters != null ? withParams : withoutParams),
+      variables: {...otherParams},
       fetchPolicy: fetchPolicy ?? FetchPolicy.networkOnly,
     );
 
@@ -206,8 +261,8 @@ class GraphQLService {
     Map<String, dynamic> otherParams = {};
     Map mapVariables = {};
     Map inputVariables = {};
-    String? input_Variable;
-    String? map_Variable;
+    String? inputVariable;
+    String? mapVariable;
     if (inputs.isNotEmpty) {
       for (var element in inputs) {
         mapVariables.addAll({'\$${element.fieldName}': element.inputType});
@@ -219,16 +274,16 @@ class GraphQLService {
           otherParams.addAll({element.fieldName: element.fieldValue});
         }
       }
-      map_Variable =
+      mapVariable =
           mapVariables.toString().replaceAll('{', '').replaceAll('}', '');
-      input_Variable =
+      inputVariable =
           inputVariables.toString().replaceAll('{', '').replaceAll('}', '');
     }
 
     final MutationOptions options = MutationOptions(
       document: gql('''
-  mutation $endPointName($map_Variable){
-    $endPointName($input_Variable){
+  mutation $endPointName($mapVariable){
+    $endPointName($inputVariable){
         $baseResponseFields
         data{
             ${optionResponseFields ?? queryFields}
@@ -405,13 +460,55 @@ class PageableParams {
   final int page;
   final String? searchKey;
 
-  const PageableParams({this.size = 20, this.page = 1, this.searchKey});
+  const PageableParams({this.size = 20, this.page = 0, this.searchKey});
 
   Map<String, dynamic> toJson() {
     return {
       'size': size,
       'page': page,
-      'searchKey': searchKey,
+      'searchParam': searchKey,
+    };
+  }
+}
+
+class PageableResponse {
+  final int currentPage;
+  final List<Map<String, dynamic>> data;
+  final String message;
+  final int numberOfElements;
+  final int pages;
+  final int size;
+  final bool status;
+
+  PageableResponse(
+      {required this.currentPage,
+      required this.data,
+      required this.message,
+      required this.numberOfElements,
+      required this.pages,
+      required this.size,
+      required this.status});
+
+  factory PageableResponse.fromJson(Map<String, dynamic> map) {
+    return PageableResponse(
+        currentPage: map['currentPage'] as int,
+        data: List<Map<String, dynamic>>.from(map['data'] as List),
+        message: map['message'] as String,
+        numberOfElements: map['numberOfElements'] as int,
+        pages: map['pages'] as int,
+        size: map['size'] as int,
+        status: map['status'] as bool);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'currentPage': currentPage,
+      'data': data,
+      'message': message,
+      'numberOfElements': numberOfElements,
+      'pages': pages,
+      'size': size,
+      'status': status
     };
   }
 }

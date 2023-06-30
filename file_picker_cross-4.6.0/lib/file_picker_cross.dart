@@ -56,7 +56,7 @@ class FilePickerCross {
       Uint8List? _bytes = file[_path];
 
       if (_bytes == null) {
-        throw (NullThrownError());
+        throw (Null);
       }
       return FilePickerCross(_bytes,
           path: _path, fileExtension: fileExtension, type: type);
@@ -78,7 +78,7 @@ class FilePickerCross {
       );
 
       if (files.isEmpty) {
-        throw (NullThrownError());
+        throw (Null);
       }
 
       List<FilePickerCross> filePickers = [];
@@ -133,7 +133,7 @@ class FilePickerCross {
     final Uint8List? file = await internalFileByPath(path: path);
 
     if (file == null) {
-      throw (NullThrownError());
+      throw (Null);
     }
 
     return FilePickerCross(file, path: path);
@@ -237,7 +237,7 @@ class FilePickerCross {
 }
 
 /// Supported file types
-enum FileTypeCross { image, video, audio, any, custom,pdf, csv }
+enum FileTypeCross { image, video, audio, any, custom, pdf, csv }
 
 /// represents the storage quota of the [FilePickerCross]
 class FileQuotaCross {

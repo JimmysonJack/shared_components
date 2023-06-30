@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_ui/google_ui.dart';
 import 'package:shared_component/shared_component.dart';
 
-import '../../themes/theme.dart';
-import '../../utils/table.dart';
 import 'permission-controler.dart';
 import 'dart:math';
 

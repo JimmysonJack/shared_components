@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
 
-import '../top-app-bar/menu-item.dart';
-import '../top-app-bar/top-app-bar.dart';
-import '../top-app-bar/user-profile-item.dart';
 import 'side-menu-tile-controller.dart';
-import 'side-menu-tile.dart';
 
 enum AppBarPosition { top, side }
 
@@ -68,7 +64,7 @@ class _SideNavigationState extends State<SideNavigation>
               widget.useAppBar &&
               widget.topAppBarDetails != null
           ? PreferredSize(
-              preferredSize: Size.fromHeight(60),
+              preferredSize: const Size.fromHeight(60),
               child: TopAppBar(
                 onSettings: () {},
                 title: widget.topAppBarDetails!.title ?? '',

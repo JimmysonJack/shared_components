@@ -67,46 +67,46 @@ class GText extends StatelessWidget {
   TextStyle _textStyle(BuildContext context) {
     switch (variant) {
       case GTextVariant.headline1:
-        return Theme.of(context).textTheme.headline1!;
+        return Theme.of(context).textTheme.displayLarge!;
 
       case GTextVariant.headline2:
-        return Theme.of(context).textTheme.headline2!;
+        return Theme.of(context).textTheme.displayMedium!;
 
       case GTextVariant.headline3:
-        return Theme.of(context).textTheme.headline3!;
+        return Theme.of(context).textTheme.displaySmall!;
 
       case GTextVariant.headline4:
-        return Theme.of(context).textTheme.headline4!;
+        return Theme.of(context).textTheme.headlineMedium!;
 
       case GTextVariant.headline5:
-        return Theme.of(context).textTheme.headline5!;
+        return Theme.of(context).textTheme.headlineSmall!;
 
       case GTextVariant.headline6:
-        return Theme.of(context).textTheme.headline6!;
+        return Theme.of(context).textTheme.titleLarge!;
 
       case GTextVariant.subtitle1:
-        return Theme.of(context).textTheme.subtitle1!;
+        return Theme.of(context).textTheme.titleMedium!;
 
       case GTextVariant.subtitle2:
-        return Theme.of(context).textTheme.subtitle2!;
+        return Theme.of(context).textTheme.titleSmall!;
 
       case GTextVariant.bodyText1:
-        return Theme.of(context).textTheme.bodyText1!;
+        return Theme.of(context).textTheme.bodyLarge!;
 
       case GTextVariant.bodyText2:
-        return Theme.of(context).textTheme.bodyText2!;
+        return Theme.of(context).textTheme.bodyMedium!;
 
       case GTextVariant.button:
-        return Theme.of(context).textTheme.button!;
+        return Theme.of(context).textTheme.labelLarge!;
 
       case GTextVariant.caption:
-        return Theme.of(context).textTheme.caption!;
+        return Theme.of(context).textTheme.bodySmall!;
 
       case GTextVariant.overline:
-        return Theme.of(context).textTheme.overline!;
+        return Theme.of(context).textTheme.labelSmall!;
 
       default:
-        return Theme.of(context).textTheme.bodyText1!;
+        return Theme.of(context).textTheme.bodyLarge!;
     }
   }
 

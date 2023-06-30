@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_component/shared_component.dart';
@@ -14,7 +16,7 @@ class PermissionBody extends StatefulWidget {
     this.selectedPermissions,
     required this.dataInstance,
     this.controller,
-  }) {}
+  });
   bool initialSelectedValue;
   List<Map<String, dynamic>> dataList;
   final int Function() selectedTileIndex;

@@ -169,12 +169,12 @@ class _GTextFormFieldState extends State<GTextFormField> {
           suffixIcon: widget.passwordField
               ? _buildTogglePasswordButton()
               : widget.suffixIcon,
-          hintStyle: theme.textTheme.bodyText1?.copyWith(
+          hintStyle: theme.textTheme.bodyLarge?.copyWith(
             color: _textColor.withOpacity(.5),
             decorationColor: _textColor.withOpacity(.5),
           ),
         ),
-        style: theme.textTheme.bodyText1?.copyWith(
+        style: theme.textTheme.bodyLarge?.copyWith(
           color: _textColor,
           decorationColor: _textColor,
         ),

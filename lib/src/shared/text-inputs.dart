@@ -58,7 +58,8 @@ abstract class _TextInputBase with Store {
   @observable
   bool _switchState = false;
 
-  List<Map<String, dynamic>> _validationList = [];
+  final Map<String, bool> _validationMap = {};
+  // List<Map<String, dynamic>> _validationList = [];
 
   @observable
   bool hasErrors = false;
@@ -278,8 +279,7 @@ abstract class _TextInputBase with Store {
               final results = await GraphQLService.queryPageable(
                   context: context,
                   endPointName: endPointName ?? '',
-                  optionResponseFields: optionalResponseField,
-                  queryParameters: otherParameters,
+                  parameters: otherParameters,
                   pageableParams: PageableParams(
                     searchKey: filter,
                     size: 20,
@@ -338,7 +338,6 @@ abstract class _TextInputBase with Store {
       String? endPointName,
       String? inputType = 'String',
       bool fixed = false,
-      String? optionalResponseField,
       List<OtherParameters>? otherParameters,
       FieldInputType? fieldInputType}) {
     checkForUpdate(key, label, fieldInputType, validate);
@@ -448,8 +447,7 @@ abstract class _TextInputBase with Store {
                   final results = await GraphQLService.queryPageable(
                       context: context,
                       endPointName: endPointName ?? '',
-                      optionResponseFields: optionalResponseField,
-                      queryParameters: otherParameters,
+                      parameters: otherParameters,
                       pageableParams: PageableParams(
                         searchKey: filter,
                         size: 20,
@@ -468,7 +466,6 @@ abstract class _TextInputBase with Store {
                     final results = await GraphQLService.query(
                         context: context,
                         endPointName: endPointName,
-                        optionResponseFields: optionalResponseField,
                         parameters: otherParameters,
                         responseFields: queryFields ?? '');
                     return results
@@ -663,13 +660,12 @@ abstract class _TextInputBase with Store {
           warnWhenNoObservables: false,
           builder: (context) {
             return SizedBox(
+              height: 40,
               width: widthSize != null
                   ? sizeSet(widthSize, context, fixed: fixed)
                   : null,
               child: ElevatedButton(
                   style: ButtonStyle(
-                    minimumSize:
-                        MaterialStateProperty.all<Size>(const Size(100, 50)),
                     backgroundColor: MaterialStateProperty.resolveWith<Color>(
                       (Set<MaterialState> states) {
                         if (states.contains(MaterialState.pressed)) {
@@ -689,7 +685,7 @@ abstract class _TextInputBase with Store {
                   onPressed: validate
                       ? updateState && updateFields != null
                           ? null
-                          : !hasErrors
+                          : hasErrors
                               ? null
                               : onPressed
                       : onPressed,
@@ -725,7 +721,7 @@ abstract class _TextInputBase with Store {
               onPressed: validate
                   ? updateState && updateFields != null
                       ? null
-                      : !hasErrors
+                      : hasErrors
                           ? null
                           : onPressed
                   : onPressed,
@@ -737,25 +733,18 @@ abstract class _TextInputBase with Store {
   }
 
   _onUpdate(String key, dynamic value, String? inputType) async {
-    String foundKey = 'noKey';
-    for (var map in FieldValues.getInstance().instanceValues) {
-      if (map.containsKey(key)) {
-        if (map.keys.elementAt(0) == key) {
-          foundKey = key;
-          break;
-        }
-      }
-    }
+    final instanceValues = FieldValues.getInstance().instanceValues;
+    final instanceMap = {for (var map in instanceValues) map.keys.first: map};
+    String foundKey = instanceMap.containsKey(key) ? key : 'noKey';
     late int valueIndex;
-    if ('noKey' != foundKey) {
-      valueIndex = FieldValues.getInstance()
-          .instanceValues
+    if ('noKey' == foundKey) {
+      Map<String, dynamic> json = {key: value, 'inputType': inputType};
+      FieldValues.getInstance().addValue(json);
+    } else {
+      valueIndex = instanceValues
           .indexWhere((rawValue) => rawValue.keys.first == foundKey);
 
       FieldValues.getInstance().updateValue(value, foundKey, valueIndex);
-    } else {
-      Map<String, dynamic> json = {key: value, 'inputType': inputType};
-      FieldValues.getInstance().addValue(json);
     }
     notifierValue.value = value;
   }
@@ -831,16 +820,9 @@ abstract class _TextInputBase with Store {
 
   onInitialValue(List<Map<String, dynamic>>? dataList, String key) {
     FieldValues.getInstance().setValue(dataList);
-    dynamic dataValue;
-    if (dataList != null) {
-      for (var data in dataList) {
-        if (data.keys.first == key) {
-          dataValue = data.values.first;
-        }
-      }
-    }
-
-    return dataValue;
+    final dataMap = dataList?.firstWhere((data) => data.keys.first == key,
+        orElse: () => <String, dynamic>{});
+    return dataMap?.values.first;
   }
 
   // assignInitialValue(key,validateName,fieldInputType,validate) async {
@@ -927,20 +909,9 @@ abstract class _TextInputBase with Store {
   }
 
   _register({required String key, required bool valid}) {
-    var listData = _validationList;
-    int index = listData.indexWhere((element) => element.containsKey(key));
-    if (listData.isNotEmpty) {
-      if (listData.any((element) => element.containsKey(key))) {
-        listData[index].update(key, (value) => valid);
-      } else {
-        listData.add({key: valid});
-      }
-    } else {
-      listData.add({key: valid});
-    }
-    _validationList = listData;
-    hasErrors = listData.every((element) => element.containsValue(true));
-    hasError.value = !hasErrors;
+    _validationMap[key] = valid;
+    hasErrors = _validationMap.values.any((value) => !value);
+    hasError.value = hasErrors;
   }
 }
 
@@ -1002,6 +973,10 @@ class Field {
     return _instance!;
   }
 
+  static clearFields() {
+    _instance = null;
+  }
+
   static TextInput get use => _use();
 }
 
@@ -1029,14 +1004,12 @@ class FieldValues {
 
   List<Map<String, dynamic>> get updateStorage => _storage;
 
-  updateValue(value, key, index) {
-    if (value is String && value.isEmpty) {
+  updateValue(dynamic value, String key, int index) {
+    if (value is String && value.isEmpty || value == null) {
       _values.removeAt(index);
-    } else if (value == null) {
-      _values.removeAt(index);
-    } else {
-      _values[index].update(key, (x) => value);
+      return;
     }
+    _values[index].update(key, (x) => value);
   }
 }
 

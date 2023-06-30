@@ -38,7 +38,7 @@ class _FilePickerState extends State<FilePicker> {
           builder: (context, size) {
             return Row(
               children: [
-                Container(
+                SizedBox(
                   width: size.biggest.width / 2.4,
                   height: size.biggest.height,
                   child: CustomButton(
@@ -55,7 +55,7 @@ class _FilePickerState extends State<FilePicker> {
                     fileName ?? '',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontStyle: FontStyle.italic),
+                    style: const TextStyle(fontStyle: FontStyle.italic),
                   ),
                 ))
               ],

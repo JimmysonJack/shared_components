@@ -9,14 +9,14 @@ import 'permission-tile.dart';
 class PermissionSettings extends StatefulWidget {
   const PermissionSettings({
     Key? key,
-    // required this.dataList,
-    required this.titleKey,
     required this.endPointName,
+    required this.roleUid,
+    this.roleUidFieldName,
   }) : super(key: key);
 
-  // final List<dynamic> dataList;
-  final String titleKey;
   final String endPointName;
+  final String roleUid;
+  final String? roleUidFieldName;
 
   @override
   _PermissionSettingsState createState() => _PermissionSettingsState();
@@ -32,24 +32,28 @@ class _PermissionSettingsState extends State<PermissionSettings> {
 
   @override
   void initState() {
-    permissionController.createPermissionMatrix();
+    permissionController.createPermissionMatrix(context, widget.roleUid);
     super.initState();
   }
 
   @override
   void dispose() {
-    switchController!.dispose();
-    changeDetectController!.dispose();
+    if (switchController != null) {
+      switchController!.dispose();
+    }
+    if (changeDetectController != null) {
+      changeDetectController!.dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return permissionController.permissionList.isEmpty
-        ? IndicateProgress.circular()
+    return Obx(() => permissionController.loadingOnGetPermissions.value
+        ? IndicateProgress.cardLinear('Loading Permissions')
         : ListView.builder(
             shrinkWrap: true,
-            itemCount: permissionController.permissionList.value.length,
+            itemCount: permissionController.permissionList.length,
             itemBuilder: (BuildContext context, int index) {
               switchController = SwitchController(SwitchState.nothing);
               changeDetectController = ChangeDetectController(false);
@@ -58,8 +62,8 @@ class _PermissionSettingsState extends State<PermissionSettings> {
               return PermissionTile(
                 changeController: changeDetectController,
                 controller: switchController,
-                activeElement: permissionController
-                    .permissionList.value[index]['permission']
+                activeElement: permissionController.permissionList[index]
+                        ['permissions']
                     .where((element) => element['isAllowed'] == true)
                     .length,
                 onSetPermission: () {
@@ -76,17 +80,19 @@ class _PermissionSettingsState extends State<PermissionSettings> {
                             fieldName: 'uid',
                             inputType: 'String',
                             fieldValue:
-                                selectedPermissions.selectedPermissionUids)
+                                selectedPermissions.selectedPermissionUids),
+                        InputParameter(
+                            fieldName: 'roleUid',
+                            inputType: 'String',
+                            fieldValue: widget.roleUid),
                       ],
                       context: context);
                 },
                 onExpansion: () {
                   permissionController.selectedPermission.value =
-                      permissionController.permissionList.value[index]
-                          ['permission'];
-
-                  return permissionController.permissionList.value[index]
-                      ['toggle'];
+                      List<dynamic>.from(permissionController
+                          .permissionList[index]['permissions']);
+                  return permissionController.permissionList[index]['toggle'];
                 },
                 // selectedData: widget.dataList[index],
                 bodyWidget: PermissionBody(
@@ -94,16 +100,16 @@ class _PermissionSettingsState extends State<PermissionSettings> {
                   changeController: changeDetectController,
                   dataInstance: dataInstance,
                   controller: switchController,
-                  dataList: permissionController.permissionList.value[index]
-                      ['permission'],
+                  dataList: List<Map<String, dynamic>>.from(permissionController
+                      .permissionList[index]['permissions']),
                   selectedTileIndex: () => index,
                 ),
-                titleValue: permissionController.permissionList.value[index]
+                titleValue: permissionController.permissionList[index]
                         ['groupName'] ??
                     'is Empty',
                 // titleValue: widget.dataList[index][widget.titleKey],
               );
             },
-          );
+          ));
   }
 }

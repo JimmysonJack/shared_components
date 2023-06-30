@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.5
-  # flutter_side_menu: ^0.3.1
+  # context_menus: ^1.0.2
   shared_component:
     path: "../"
 

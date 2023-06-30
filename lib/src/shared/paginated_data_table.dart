@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get/get.dart';
-import 'package:google_ui/google_ui.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:shared_component/shared_component.dart';
 
 import '../utils/new-widgets-component/base_fields.dart';
-import 'list_data_table.dart';
 
 class PageableDataTable extends StatefulWidget {
   const PageableDataTable({
@@ -105,7 +103,6 @@ class _PageableDataTableState extends State<PageableDataTable> {
                 child: Text('Waiting'),
               );
             }
-            console('...............${snapshot.hasData}');
             if (snapshot.hasError) {
               return GErrorMessage(
                 icon: const Icon(Icons.error_sharp),
@@ -129,8 +126,8 @@ class _PageableDataTableState extends State<PageableDataTable> {
                             'size': _initialSize,
                             'page': 0,
                             'searchParam': _searchKeyValue ?? '',
-                            ...otherParams ?? {}
-                          }
+                          },
+                          ...otherParams ?? {}
                         },
                         fetchPolicy: FetchPolicy.networkOnly,
                         cacheRereadPolicy: CacheRereadPolicy.mergeOptimistic,

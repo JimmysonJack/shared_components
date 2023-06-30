@@ -2,9 +2,7 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_modular/flutter_modular.dart';
 
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:shared_component/shared_component.dart';
 import 'package:get/get.dart';
 
@@ -36,7 +34,7 @@ class Api {
   Future<String> userLogin(BuildContext? context) async {
     AuthServiceController authServiceController = AuthServiceController();
 
-    var mediaQuery = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
+    var mediaQuery = MediaQueryData.fromView(WidgetsBinding.instance.window);
 
     var width = (context ?? Get.context!).layout.value(
         xs: mediaQuery.size.width * 0.8,

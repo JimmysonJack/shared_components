@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../shared_component.dart';
-import 'user-profile-item.dart';
 
 class UserProfilePopupMenuItem<T> extends PopupMenuItem<T> {
   final UserProfileItem userProfileItem;

@@ -22,12 +22,13 @@ enum SuggestionAction {
   unfocus,
 }
 
+// ignore: must_be_immutable
 class SearchField<T> extends StatefulWidget {
   /// Data source to perform search.
- List<Map<String,dynamic>>? suggestions;
+  List<Map<String, dynamic>>? suggestions;
 
   /// Callback to return the selected suggestion.
-  final Function(Map<String,dynamic>?) onTap;
+  final Function(Map<String, dynamic>?) onTap;
 
   /// Hint for the [SearchField].
   final String? hint;
@@ -39,7 +40,7 @@ class SearchField<T> extends StatefulWidget {
   /// must be present in [suggestions].
   ///
   /// When not specified, [hint] is shown instead of `initialValue`.
-  final Map<String,dynamic>? initialValue;
+  final Map<String, dynamic>? initialValue;
 
   /// Specifies [TextStyle] for search input.
   final TextStyle? searchStyle;
@@ -167,17 +168,17 @@ class SearchField<T> extends StatefulWidget {
   final bool isNetworkData;
   final bool enabled;
 
-  final bool isChipInputs ;
+  final bool isChipInputs;
 
   final String? updateEntry;
 
-  final List<Map<String,dynamic>> chipList;
+  final List<Map<String, dynamic>> chipList;
 
   final Future<List<Map<String, dynamic>>> Function(String) findFn;
 
   SearchField({
     Key? key,
-     this.suggestions,
+    this.suggestions,
     required this.chipList,
     this.updateEntry,
     this.isChipInputs = false,
@@ -206,16 +207,15 @@ class SearchField<T> extends StatefulWidget {
     this.enabled = true,
     this.objectTitleKey,
     this.subObjectTitleKey,
-  })  :
-        super(key: key);
+  }) : super(key: key);
 
   @override
   _SearchFieldState createState() => _SearchFieldState();
 }
 
 class _SearchFieldState extends State<SearchField> {
-  final StreamController<List<Map<String,dynamic>>?> sourceStream =
-  StreamController<List<Map<String,dynamic>>?>.broadcast();
+  final StreamController<List<Map<String, dynamic>>?> sourceStream =
+      StreamController<List<Map<String, dynamic>>?>.broadcast();
   final FocusNode _focus = FocusNode();
 
   bool sourceFocused = false;
@@ -229,29 +229,27 @@ class _SearchFieldState extends State<SearchField> {
   }
 
   void initialize() {
-
     widget.controller?.text = widget.updateEntry ?? '';
     _focus.addListener(() {
       setState(() {
-        Future.delayed(Duration.zero,()async{
-          if(widget.isNetworkData){
+        Future.delayed(Duration.zero, () async {
+          if (widget.isNetworkData) {
             sourceStream.sink.add(await widget.findFn(widget.controller!.text));
-          } else{
+          } else {
             widget.suggestions = await widget.findFn(widget.controller!.text);
             sourceStream.sink.add(widget.suggestions);
           }
-
         });
 
         sourceFocused = _focus.hasFocus;
-
       });
       if (widget.hasOverlay) {
         if (sourceFocused) {
           if (widget.initialValue == null) {
             if (widget.suggestionState == SuggestionState.enabled) {
               Future.delayed(const Duration(milliseconds: 100), () {
-                if(widget.suggestions != []) sourceStream.sink.add(widget.suggestions);
+                if (widget.suggestions != [])
+                  sourceStream.sink.add(widget.suggestions);
               });
             }
           }
@@ -264,7 +262,8 @@ class _SearchFieldState extends State<SearchField> {
         if (widget.initialValue == null) {
           if (widget.suggestionState == SuggestionState.enabled) {
             Future.delayed(const Duration(milliseconds: 100), () {
-              if(widget.suggestions != []) sourceStream.sink.add(widget.suggestions);
+              if (widget.suggestions != [])
+                sourceStream.sink.add(widget.suggestions);
             });
           }
         }
@@ -311,18 +310,19 @@ class _SearchFieldState extends State<SearchField> {
 
   Widget _suggestionsBuilder({Size? size}) {
     final onSurfaceColor = Theme.of(context).colorScheme.onSurface;
-    return StreamBuilder<List<Map<String,dynamic>?>?>(
+    return StreamBuilder<List<Map<String, dynamic>?>?>(
       stream: sourceStream.stream,
-      builder: (BuildContext context, AsyncSnapshot<List<Map<String,dynamic>?>?> snapshot) {
-        if(snapshot.connectionState == ConnectionState.waiting){
+      builder: (BuildContext context,
+          AsyncSnapshot<List<Map<String, dynamic>?>?> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return Material(
             color: Colors.white,
             elevation: 3,
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 20),
+                padding: const EdgeInsets.symmetric(vertical: 20),
                 child: const Center(
                     child: SizedBox(
-                      height: 20,
+                        height: 20,
                         width: 20,
                         child: CircularProgressIndicator(
                           color: Colors.black,
@@ -330,14 +330,19 @@ class _SearchFieldState extends State<SearchField> {
                           backgroundColor: Colors.black12,
                         )))),
           );
-        }else if (snapshot.data == null || snapshot.data!.isEmpty || !sourceFocused) {
+        } else if (snapshot.data == null ||
+            snapshot.data!.isEmpty ||
+            !sourceFocused) {
           return Material(
             color: Colors.white,
             elevation: 3,
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: Center(
-                child: Text('No records found!',style: Theme.of(context).textTheme.caption,),
+                child: Text(
+                  'No records found!',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
               ),
             ),
           );
@@ -363,9 +368,9 @@ class _SearchFieldState extends State<SearchField> {
                       spreadRadius: 2.0, // extend the shadow
                       offset: widget.hasOverlay
                           ? const Offset(
-                        2.0,
-                        5.0,
-                      )
+                              2.0,
+                              5.0,
+                            )
                           : const Offset(1.0, 0.5),
                     ),
                   ],
@@ -386,7 +391,9 @@ class _SearchFieldState extends State<SearchField> {
                     //   widget.chipList.add({key:value});
                     //   return MapEntry(key, value);
                     // });
-                    sourceController!.text = widget.isChipInputs ? '' :snapshot.data![index]?[widget.titleKey]!;
+                    sourceController!.text = widget.isChipInputs
+                        ? ''
+                        : snapshot.data![index]?[widget.titleKey]!;
                     sourceController!.selection = TextSelection.fromPosition(
                       TextPosition(
                         offset: sourceController!.text.length,
@@ -405,10 +412,8 @@ class _SearchFieldState extends State<SearchField> {
 
                     // hide the suggestions
                     sourceStream.sink.add(null);
-                    if (widget.onTap != null) {
-                      widget.onTap(snapshot.data![index]);
-                      widget.validator(widget.updateEntry);
-                    }
+                    widget.onTap(snapshot.data![index]);
+                    widget.validator(widget.updateEntry);
                   },
                   child: Container(
                     height: size.height,
@@ -418,18 +423,41 @@ class _SearchFieldState extends State<SearchField> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(widget.objectTitleKey != null ? snapshot.data![index]![widget.titleKey][widget.objectTitleKey]: snapshot.data![index]?[widget.titleKey],style: TextStyle(
-                          color: Theme.of(context).textTheme.subtitle2!.color,
-                          fontSize: 12,
-                          fontWeight: Theme.of(context).textTheme.subtitle2!.fontWeight,
-                          fontStyle: Theme.of(context).textTheme.subtitle2!.fontStyle
-                        ),overflow: TextOverflow.ellipsis,maxLines: 1,),
-                        widget.subTitleKey == null ? Container():Text(widget.subObjectTitleKey != null ? snapshot.data![index]![widget.subTitleKey][widget.subObjectTitleKey]:snapshot.data![index]?[widget.subTitleKey],style: Theme.of(context).textTheme.caption,overflow: TextOverflow.ellipsis,maxLines: 1),
+                        Text(
+                          widget.objectTitleKey != null
+                              ? snapshot.data![index]![widget.titleKey]
+                                  [widget.objectTitleKey]
+                              : snapshot.data![index]?[widget.titleKey],
+                          style: TextStyle(
+                              color:
+                                  Theme.of(context).textTheme.titleSmall!.color,
+                              fontSize: 12,
+                              fontWeight: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall!
+                                  .fontWeight,
+                              fontStyle: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall!
+                                  .fontStyle),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                        widget.subTitleKey == null
+                            ? Container()
+                            : Text(
+                                widget.subObjectTitleKey != null
+                                    ? snapshot.data![index]![widget.subTitleKey]
+                                        [widget.subObjectTitleKey]
+                                    : snapshot.data![index]
+                                        ?[widget.subTitleKey],
+                                style: Theme.of(context).textTheme.bodySmall,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1),
                       ],
                     ),
                   ),
                 ),
-
               ),
             ),
           );
@@ -461,38 +489,39 @@ class _SearchFieldState extends State<SearchField> {
     final offset = renderBox.localToGlobal(Offset.zero);
     return OverlayEntry(
         builder: (context) => GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: (){
-            FocusScopeNode scopeNode = FocusScope.of(context);
-            if(sourceFocused){
-              widget.controller?.clear();
-              sourceController?.clear();
-            }
-
-            if(scopeNode.hasFocus) scopeNode.unfocus();
-            },
-          child: StreamBuilder<List<Map<String,dynamic>?>?>(
-              stream: sourceStream.stream,
-              builder:
-                  (BuildContext context, AsyncSnapshot<List<Map<String,dynamic>?>?> snapshot) {
-                late var count = widget.maxSuggestionsInViewPort;
-                if (snapshot.data != null) {
-                  count = snapshot.data!.length;
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                FocusScopeNode scopeNode = FocusScope.of(context);
+                if (sourceFocused) {
+                  widget.controller?.clear();
+                  sourceController?.clear();
                 }
-                return Stack(
-                  children: [
-                    Positioned(
-                      left: offset.dx,
-                      width: size.width,
-                      child: CompositedTransformFollower(
-                          offset: getYOffset(offset, count),
-                          link: _layerLink,
-                          child: Material(child: _suggestionsBuilder(size:size))),
-                    ),
-                  ],
-                );
-              }),
-        ));
+
+                if (scopeNode.hasFocus) scopeNode.unfocus();
+              },
+              child: StreamBuilder<List<Map<String, dynamic>?>?>(
+                  stream: sourceStream.stream,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Map<String, dynamic>?>?> snapshot) {
+                    late var count = widget.maxSuggestionsInViewPort;
+                    if (snapshot.data != null) {
+                      count = snapshot.data!.length;
+                    }
+                    return Stack(
+                      children: [
+                        Positioned(
+                          left: offset.dx,
+                          width: size.width,
+                          child: CompositedTransformFollower(
+                              offset: getYOffset(offset, count),
+                              link: _layerLink,
+                              child: Material(
+                                  child: _suggestionsBuilder(size: size))),
+                        ),
+                      ],
+                    );
+                  }),
+            ));
   }
 
   final LayerLink _layerLink = LayerLink();
@@ -500,7 +529,7 @@ class _SearchFieldState extends State<SearchField> {
   bool isUp = false;
   @override
   Widget build(BuildContext context) {
-    if(widget.suggestions != []) {
+    if (widget.suggestions != []) {
       if (widget.suggestions!.length > widget.maxSuggestionsInViewPort) {
         height = widget.itemHeight * widget.maxSuggestionsInViewPort;
       } else {
@@ -513,34 +542,43 @@ class _SearchFieldState extends State<SearchField> {
         CompositedTransformTarget(
           link: _layerLink,
           child: Container(
-            padding: EdgeInsets.only(top:widget.isChipInputs && widget.chipList.isNotEmpty ? 4 : 0),
-            color: widget.isChipInputs && widget.chipList.isNotEmpty ? Theme.of(context).cardColor : Colors.transparent,
+            padding: EdgeInsets.only(
+                top: widget.isChipInputs && widget.chipList.isNotEmpty ? 4 : 0),
+            color: widget.isChipInputs && widget.chipList.isNotEmpty
+                ? Theme.of(context).cardColor
+                : Colors.transparent,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if(widget.isChipInputs && widget.chipList.isNotEmpty) Padding(
-                  padding: const EdgeInsets.only(left: 10.0,right: 10),
-                  child: SizedBox(
-                    child: Wrap(
-                      runSpacing: 5,
-                      spacing: 5,
-                      children: List.generate(widget.chipList.length, (index) => Chip(
-                        deleteButtonTooltipMessage: 'Remove',
-                        deleteIcon: const Icon(Icons.clear),
-                        onDeleted: (){
-                          setState(() {
-                            widget.chipList.removeWhere((element) {
-                              widget.validator(widget.chipList.elementAt(index)['uid']);
-                              return element == widget.chipList.elementAt(index);
-                            });
-                          });
-                        },
-                        label: Text(widget.chipList.elementAt(index)[widget.titleKey]),
-                      )),
+                if (widget.isChipInputs && widget.chipList.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10.0, right: 10),
+                    child: SizedBox(
+                      child: Wrap(
+                        runSpacing: 5,
+                        spacing: 5,
+                        children: List.generate(
+                            widget.chipList.length,
+                            (index) => Chip(
+                                  deleteButtonTooltipMessage: 'Remove',
+                                  deleteIcon: const Icon(Icons.clear),
+                                  onDeleted: () {
+                                    setState(() {
+                                      widget.chipList.removeWhere((element) {
+                                        widget.validator(widget.chipList
+                                            .elementAt(index)['uid']);
+                                        return element ==
+                                            widget.chipList.elementAt(index);
+                                      });
+                                    });
+                                  },
+                                  label: Text(widget.chipList
+                                      .elementAt(index)[widget.titleKey]),
+                                )),
+                      ),
                     ),
                   ),
-                ),
                 TextFormField(
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   enabled: widget.enabled,
@@ -552,7 +590,8 @@ class _SearchFieldState extends State<SearchField> {
                         sourceFocused = true;
                       });
                       Future.delayed(const Duration(milliseconds: 100), () {
-                        if(widget.suggestions != []) sourceStream.sink.add(widget.suggestions);
+                        if (widget.suggestions != [])
+                          sourceStream.sink.add(widget.suggestions);
                       });
                     }
                   },
@@ -568,54 +607,62 @@ class _SearchFieldState extends State<SearchField> {
                       suffixIcon: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          widget.controller!.text.isNotEmpty ? InkWell(
-                              hoverColor: Colors.transparent,
-                              onTap: (){
-                                widget.onTap({});
-                                widget.controller?.clear();
-                                sourceController?.clear();
-                                widget.validator(widget.updateEntry);
-                              },
-                              child: Icon(CupertinoIcons.clear_circled_solid,color: Theme.of(context).disabledColor,)
-                          ):Container(),
-                          Container(width: 5,),
+                          widget.controller!.text.isNotEmpty
+                              ? InkWell(
+                                  hoverColor: Colors.transparent,
+                                  onTap: () {
+                                    widget.onTap({});
+                                    widget.controller?.clear();
+                                    sourceController?.clear();
+                                    widget.validator(widget.updateEntry);
+                                  },
+                                  child: Icon(
+                                    CupertinoIcons.clear_circled_solid,
+                                    color: Theme.of(context).disabledColor,
+                                  ))
+                              : Container(),
+                          Container(
+                            width: 5,
+                          ),
                           const Icon(Icons.arrow_drop_down)
                         ],
-                      )
-                  ),
-                  onChanged: (item) async{
+                      )),
+                  onChanged: (item) async {
                     setState(() {});
-                    final searchResult = <Map<String,dynamic>>[];
-                    if(widget.isNetworkData){
+                    final searchResult = <Map<String, dynamic>>[];
+                    if (widget.isNetworkData) {
                       var obtainedData = await widget.findFn(item);
                       sourceStream.sink.add(obtainedData);
                       widget.onChange(item);
-                    }else{
+                    } else {
                       if (item.isEmpty) {
-                        if(widget.suggestions != []){
+                        if (widget.suggestions != []) {
                           sourceStream.sink.add(widget.suggestions);
                         }
-                        return ;
+                        return;
                       }
-                      if(widget.suggestions != []){
+                      if (widget.suggestions != []) {
                         for (final suggestion in widget.suggestions!) {
-                          if(widget.objectTitleKey == null){
-                            if (suggestion[widget.titleKey].toLowerCase().contains(item.toLowerCase())) {
+                          if (widget.objectTitleKey == null) {
+                            if (suggestion[widget.titleKey]
+                                .toLowerCase()
+                                .contains(item.toLowerCase())) {
                               searchResult.add(suggestion);
                             }
-                          }else{
-                            if (suggestion[widget.titleKey][widget.objectTitleKey].toLowerCase().contains(item.toLowerCase())) {
+                          } else {
+                            if (suggestion[widget.titleKey]
+                                    [widget.objectTitleKey]
+                                .toLowerCase()
+                                .contains(item.toLowerCase())) {
                               searchResult.add(suggestion);
                             }
                           }
-
                         }
                       }
 
                       sourceStream.sink.add(searchResult);
                       widget.onChange(item);
                     }
-
                   },
                 ),
               ],

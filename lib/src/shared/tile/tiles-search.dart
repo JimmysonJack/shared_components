@@ -18,7 +18,7 @@ class TilesSearch extends StatefulWidget {
   final Color? titleColor;
   final Color? tileColor;
   final bool? showGradient;
-  TilesSearch(
+  const TilesSearch(
       {super.key,
       required this.tileFields,
       this.gradientColors,

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class WidgetsGroup{
@@ -20,7 +19,7 @@ class WidgetsGroup{
           Container(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.only(bottom: (size.height /2) * 0.03),
-              child: Text(header ?? '',style: TextStyle(color: Theme.of(context).hintColor,fontSize: Theme.of(context).textTheme.caption!.fontSize),)),
+              child: Text(header ?? '',style: TextStyle(color: Theme.of(context).hintColor,fontSize: Theme.of(context).textTheme.bodySmall!.fontSize),)),
 
           LayoutBuilder(
             builder:(context, buildSize) {

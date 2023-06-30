@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
 // import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'loading_environment.dart';
-import 'package:get/get.dart';
 
 void main() {
   initApp(
@@ -15,40 +14,52 @@ void main() {
             devEnvFile: ".env.development", prodEnvFile: ".env.production");
       },
       routes: [
-        ChildRoute(
-          Modular.initialRoute,
-          child: (context, args) => SideNavigation(
-            appBarPosition: AppBarPosition.side,
-            version: '2.0.3',
-            topAppBarDetails: TopAppBarDetails(
-                title: 'Top Bar',
-                menuItems: [
-                  MenuItem<String>(
-                      title: 'Change Password',
-                      icon: Icons.logo_dev,
-                      value: 'password'),
-                  MenuItem<String>(
-                      title: 'Profile', icon: Icons.details, value: 'profile'),
-                ],
-                onTap: (value) {},
-                userProfileDetails: UserProfileItem(
-                    onLogout: () {},
-                    email: 'Jimmysonblack@gmail.com',
-                    userName: 'Jimmyson Jackson Mnunguri')),
-            sideMenuTile: [
-              SideMenuTile(
-                  title: 'Dashboard',
-                  icon: Icons.dashboard,
-                  permissions: ['ACCESS_USER']),
-              SideMenuTile(
-                  title: 'Users',
-                  icon: Icons.people,
-                  permissions: ['ACCESS_ROLE', 'ACCESS']),
-              SideMenuTile(title: 'Facility', icon: Icons.abc, permissions: []),
-            ],
-            body: const UsersWidget(),
-          ),
-        ),
+        ChildRoute('/landing',
+            child: (context, args) => SideNavigation(
+                  appBarPosition: AppBarPosition.side,
+                  version: '2.0.3',
+                  topAppBarDetails: TopAppBarDetails(
+                      title: 'Top Bar',
+                      menuItems: [
+                        MenuItem<String>(
+                            title: 'Change Password',
+                            icon: Icons.logo_dev,
+                            value: 'password'),
+                        MenuItem<String>(
+                            title: 'Profile',
+                            icon: Icons.details,
+                            value: 'profile'),
+                      ],
+                      onTap: (value) {},
+                      userProfileDetails: UserProfileItem(
+                          onLogout: () {
+                            SettingsService.use
+                                .logout(Modular.initialRoute, context);
+                          },
+                          email: 'Jimmysonblack@gmail.com',
+                          userName: 'Jimmyson Jackson Mnunguri')),
+                  sideMenuTile: [
+                    SideMenuTile(
+                        title: 'Dashboard',
+                        icon: Icons.dashboard,
+                        permissions: ['ACCESS_BILLS']),
+                    SideMenuTile(
+                        title: 'Users',
+                        icon: Icons.people,
+                        permissions: ['ACCESS_ROLE', 'ACCESS']),
+                    SideMenuTile(
+                        title: 'Facility', icon: Icons.abc, permissions: []),
+                  ],
+                  body: const UserManager(),
+                ),
+            guards: [AuthGuard(null)]),
+
+        ChildRoute('/login',
+            child: (context, args) => Login(
+                navigateTo: 'landing',
+                backgroundTheme: BackgroundTheme.techTheme)),
+
+        RedirectRoute(Modular.initialRoute, to: 'login')
 
         // ChildRoute('tiles',
         //     child: (context, args) => TilesSearch(
@@ -121,11 +132,11 @@ void main() {
         //           ],
         //         )),
 
-        ChildRoute('/login',
-            child: (context, args) => Login(
-                  backgroundTheme: BackgroundTheme.techTheme,
-                  navigateTo: '',
-                ))
+        // ChildRoute('/login',
+        //     child: (context, args) => Login(
+        //           backgroundTheme: BackgroundTheme.techTheme,
+        //           navigateTo: '',
+        //         ))
       ]);
 }
 
@@ -147,83 +158,125 @@ class UsersWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const PermissionSettings(
-      endPointName: 'savePermissions',
-      titleKey: 'titleKey',
+    return PageableDataTable(
+      endPointName: 'getUsers',
+      queryFields: "name email uid",
+      // mapFunction: (item) => {'userName': item['name']},
+      deleteEndPointName: 'deleteUser',
+      deleteUidFieldName: 'userUid',
+      actionButtons: [
+        ActionButtonItem(
+            icon: Icons.edit_document,
+            name: 'Edit User',
+            onPressed: (value) {
+              saveAndUpdateUser(context, value);
+            })
+      ],
+      tableAddButton: TableAddButton(
+          onPressed: () {
+            saveAndUpdateUser(context, null);
+          },
+          buttonName: 'Create User'),
+      topActivityButtons: [
+        TopActivityButton(
+            onTap: () {
+              saveAndUpdateUser(context, null);
+            },
+            buttonName: 'Create User',
+            // iconData: Icons.create,
+            toolTip: 'Adding new User'),
+      ],
+      headColumns: [
+        HeadTitleItem(
+          titleKey: 'name',
+          titleName: 'User Name',
+        ),
+        HeadTitleItem(
+          titleKey: 'email',
+          titleName: 'Email Address',
+        ),
+      ],
     );
+  }
 
-    // ListDataTable(
-    //   endPointName: 'getUsers',
-    //   queryFields: "name uid",
-    //   mapFunction: (item) => {'userName': item['name']},
-    //   deleteEndPointName: 'deleteUser',
-    //   deleteUidFieldName: 'userUid',
-    //   actionButtons: [
-    //     ActionButtonItem(
-    //         icon: Icons.perm_data_setting_sharp,
-    //         name: 'Set Permission',
-    //         onPressed: (value) {
-    //           RebuildToRefetch.instance().refetch();
-    //           console(value);
-    //         })
-    //   ],
-    //   tableAddButton:
-    //       TableAddButton(onPressed: () {}, buttonName: 'Create User'),
-    //   topActivityButtons: [
-    //     TopActivityButton(
-    //         onTap: () {},
-    //         // buttonName: 'Create User',
-    //         iconData: Icons.create,
-    //         toolTip: 'For creating user'),
-    //     TopActivityButton(
-    //         onTap: () {},
-    //         buttonName: 'Create User',
-    //         // iconData: Icons.create,
-    //         toolTip: 'For creating user'),
-    //     TopActivityButton(
-    //         onTap: () {},
-    //         buttonName: 'Create Role',
-    //         // iconData: Icons.create,
-    //         toolTip: 'For creating user'),
-    //   ],
-    //   headColumns: [
-    //     HeadTitleItem(
-    //       titleKey: 'userName',
-    //       titleName: 'User Name',
-    //     ),
-    //     HeadTitleItem(
-    //         titleKey: 'uid',
-    //         titleName: 'Key',
-    //         alignment: Alignment.centerRight),
-    //   ],
-    // );
+  saveAndUpdateUser(context, data) {
+    PopupModel(
+        buildContext: context,
+        buttonLabel: 'Save User',
+        checkUnSavedData: true,
+        endpointName: 'saveUser',
+        title: 'Create User',
+        queryFields: 'uid',
+        formGroup: FormGroup(
+          updateFields: data,
+          group: [
+            Group(children: [
+              Field.use.input(
+                context: context,
+                label: 'Fullname',
+                key: 'fullName',
+                validate: true,
+                // fieldInputType: FieldInputType
+              ),
+              Field.use.input(
+                  context: context,
+                  label: 'Description',
+                  key: 'description',
+                  validate: true,
+                  fieldInputType: FieldInputType.FullName),
+              Field.use.input(
+                  context: context,
+                  label: 'Imail',
+                  key: 'email',
+                  validate: true,
+                  fieldInputType: FieldInputType.EmailAddress),
+            ])
+          ],
+        )).show();
+  }
+
+  setRoles(context, data) {
+    PopupModel(
+        buildContext: context,
+        title: 'Set Permission to ${data['name']}',
+        formGroup: const FormGroup(
+          group: [
+            Group(children: [
+              PermissionSettings(
+                endPointName: 'savePermissions',
+                roleUid: '',
+              )
+            ])
+          ],
+        )).show();
   }
 }
 
 
-    // const ExpansionTileCard(
-    //   initialElevation: 1,
-    //   title: Text('Card title'),
-    //   subtitle: Text('Subtitle'),
-    //   leading: Icon(Icons.data_thresholding_sharp),
-    //   children: [
-    //     Divider(
-    //       height: 1,
-    //       thickness: 1,
-    //     ),
-    //     ListTile(
-    //       title: Text('Title'),
-    //       subtitle: Text('Subtitle'),
-    //     ),
-    //     ListTile(
-    //       title: Text('Title1'),
-    //       subtitle: Text('Subtitle1'),
-    //     ),
-    //     ListTile(
-    //       title: Text('Title2'),
-    //       subtitle: Text('Subtitle2'),
-    //     ),
-    //   ],
-    // );
+// const ExpansionTileCard(
+//   initialElevation: 1,
+//   title: Text('Card title'),
+//   subtitle: Text('Subtitle'),
+//   leading: Icon(Icons.data_thresholding_sharp),
+//   children: [
+//     Divider(
+//       height: 1,
+//       thickness: 1,
+//     ),
+//     ListTile(
+//       title: Text('Title'),
+//       subtitle: Text('Subtitle'),
+//     ),
+//     ListTile(
+//       title: Text('Title1'),
+//       subtitle: Text('Subtitle1'),
+//     ),
+//     ListTile(
+//       title: Text('Title2'),
+//       subtitle: Text('Subtitle2'),
+//     ),
+//   ],
+// );
+
 
 

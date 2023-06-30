@@ -43,7 +43,7 @@ class _MyAppState extends State<MyApp> {
           children: <Widget>[
             Text(
               'Last files',
-              style: Theme.of(context).textTheme.headline5,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
             (lastFiles == null)
                 ? const Center(
@@ -77,7 +77,7 @@ class _MyAppState extends State<MyApp> {
                   ),
             Text(
               'File system details',
-              style: Theme.of(context).textTheme.headline5,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
             Text('Quota: ${(quota.quota / 1e6).round()} MB'),
             Text(
@@ -85,7 +85,7 @@ class _MyAppState extends State<MyApp> {
             Text('Percentage: ${quota.relative.roundToDouble()}'),
             Text(
               'File details',
-              style: Theme.of(context).textTheme.headline5,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
             Text(
                 'File path: ${filePickerCross?.path ?? 'unknown'} (Might cause issues on web)\n'),

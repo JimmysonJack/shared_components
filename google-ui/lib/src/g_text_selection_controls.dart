@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 /// Change [selectionHandleColor] for [TextFormField].
 /// Note [selectionHandleColor] only changed on first build.

@@ -1,9 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get/get.dart';
 import 'package:google_ui/google_ui.dart';
-import 'package:graphql/client.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:shared_component/src/components/toast.dart';
 import 'package:shared_component/src/service/graphql_service.dart';
@@ -15,13 +13,12 @@ import 'package:shared_component/src/utils/new-widgets-component/other_parameter
 import 'package:shared_component/src/utils/new-widgets-component/update_table.dart';
 import 'package:shared_component/src/utils/table.dart';
 
-import '../utils/console.dart';
 import '../utils/new-widgets-component/base_fields.dart';
 import 'paginated_data_table.dart';
 
 class ListDataTable extends StatefulWidget {
-  ListDataTable({
-    Key? key,
+  const ListDataTable({
+    super.key,
     this.deleteUidFieldName,
     required this.endPointName,
     required this.queryFields,

@@ -44,14 +44,13 @@ class _QudsAutoAnimatedSizeSize extends State<QudsAutoAnimatedSize>
   Widget build(BuildContext context) {
     return AnimatedSize(
         alignment: widget.alignment,
+        curve: Curves.fastLinearToSlowEaseIn,
+        duration: widget.duration,
         child: showChild
             ? widget.child
             : const SizedBox(
           width: 1,
           height: 1,
-        ),
-        curve: Curves.fastLinearToSlowEaseIn,
-        duration: widget.duration,
-        vsync: this);
+        ));
   }
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -20,6 +22,7 @@ class PopupModel extends _PopupModelBase with _$PopupModel {
       super.queryFields,
       super.inputType,
       super.endpointName,
+      super.refetchData,
       super.inputObjectFieldName,
       super.onButtonPressed});
 }
@@ -38,12 +41,15 @@ abstract class _PopupModelBase with Store {
       this.inputType,
       this.inputObjectFieldName,
       this.iconButton,
+      this.refetchData = true,
       this.checkUnSavedData = true,
       this.modelWidth});
   final BuildContext buildContext;
 
   ///[modelWidth] is used to set a model width, maximum is 1.0
   final double? modelWidth;
+
+  final bool refetchData;
 
   ///[title] is for providing your dialog model with name
   final String title;
@@ -75,7 +81,7 @@ abstract class _PopupModelBase with Store {
   ///This will provide inputs tha endpoint needs
   final List<InputParameter>? inputs;
 
-  /// If endpoint input field is an object, this will be used to give that field name
+  /// If endpoint input field is an object, this will be used to give that field names
   final String? inputObjectFieldName;
 
   ///This provides inputs type
@@ -200,6 +206,7 @@ abstract class _PopupModelBase with Store {
                               padding: const EdgeInsets.only(
                                   bottom: 10.0, right: 10),
                               child: Field.use.button(
+                                  widthSize: WidthSize.col1,
                                   context: context,
                                   icon: iconButton,
                                   label: buttonLabel!,
@@ -212,11 +219,17 @@ abstract class _PopupModelBase with Store {
                                           if (onButtonPressed == null) {
                                             GraphQLService.mutate(
                                                 context: context,
+                                                refetchData: refetchData,
                                                 response: (result, load) {
                                                   loading = load;
                                                   if (responseResults != null) {
                                                     responseResults!(
                                                         result, load);
+
+                                                    if (result?['status']) {
+                                                      Navigator.pop(context);
+                                                    }
+                                                  } else {
                                                     if (result?['status']) {
                                                       Navigator.pop(context);
                                                     }

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
-import 'package:flutter_modular/flutter_modular.dart';
 
 class AuthGuard extends RouteGuard {
   Api api = Api();

@@ -2,18 +2,12 @@
 
 import 'dart:convert';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
 // import 'package:shared_component/shared_component.dart';
 // import 'package:shared_component/shared_component.dart';
-import 'package:shared_component/src/service/storage_service.dart';
-import '../environment/system.env.dart';
-import '../models/token.dart';
-import 'api_service.dart';
 import 'package:get/get.dart';
 
-import 'notification_service.dart';
 
 enum Checking {
   proceed,
@@ -46,6 +40,7 @@ class AuthServiceController extends GetxController {
   Future<Checking> loginUser(BuildContext context,
       {required String username,
       required String password,
+      String? url,
       bool showLoading = false}) async {
     Map<String, String> credentials = {
       'grant_type': 'password',
@@ -60,7 +55,7 @@ class AuthServiceController extends GetxController {
     });
     var res = await api.request(context,
         type: 'post',
-        url: '/oauth/token',
+        url: url ?? '/oauth/token',
         data: credentials,
         options: requestOptions);
     if (res != null && res is Map && !res.keys.contains('checking')) {
@@ -89,8 +84,10 @@ class AuthServiceController extends GetxController {
     }
   }
 
-  Future<Checking> getUser(BuildContext context) async {
-    var res = await api.get('/user', context);
+  Future<Checking> getUser(BuildContext context, String? url) async {
+    console('in user get');
+    var res = await api.get(
+        url != null ? url.replaceAll('oauth/token', 'user') : '/user', context);
     if (res != null) {
       if (res is String) {
         StorageService.setString('user_uid', res);
@@ -98,11 +95,13 @@ class AuthServiceController extends GetxController {
       } else if (res is Map && !res.keys.contains('checking')) {
         StorageService.setJson('user', res);
         var permissions = res['principal']?['authorities'];
-        Permissions.instance().setAuthorities(permissions ?? []);
-        if (res['principal']['firstLogin']) {
+        Permissions.instance()
+            .setAuthorities(List<Map<String, dynamic>>.from(permissions ?? []));
+        if (res['principal']['firstLogin'] == true) {
           return Checking.firstLogin;
-        } else if (DateTime.parse(res['principal']['passwordExpiresAt'])
-            .isBefore(DateTime.now())) {
+        } else if (res['principal']['passwordExpiresAt'] != null &&
+            DateTime.parse(res['principal']['passwordExpiresAt'])
+                .isBefore(DateTime.now())) {
           return Checking.passwordExpired;
         }
 

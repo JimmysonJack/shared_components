@@ -29,7 +29,7 @@ class DialogManager extends StatelessWidget {
         ),
         automaticallyImplyLeading: formValidator.hasErrors ? false : false,
         backgroundColor: Theme.of(context).primaryColor,
-        title: Text(title.toUpperCase(),style: Theme.of(context).textTheme.button,),
+        title: Text(title.toUpperCase(),style: Theme.of(context).textTheme.labelLarge,),
         actions:  [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),

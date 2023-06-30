@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_component/src/shared/side-navigation/side-menu-tile.dart';
 
 import '../../../shared_component.dart';
 

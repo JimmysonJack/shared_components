@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 class Time extends StatefulWidget {
-  Time();
+  const Time({super.key});
 
   @override
   _TimeState createState() => _TimeState();

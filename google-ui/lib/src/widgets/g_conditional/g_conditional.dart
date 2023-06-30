@@ -6,7 +6,7 @@ class GConditional extends StatelessWidget {
     Key? key,
     required this.condition,
     required this.onTrue,
-    required this.onFalse, child,
+    required this.onFalse,
   }) : super(key: key);
 
   /// A condition to display widget [onTrue] or [onFalse].

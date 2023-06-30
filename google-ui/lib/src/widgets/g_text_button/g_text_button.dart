@@ -28,7 +28,7 @@ class GTextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final buttonStyle = TextButton.styleFrom(
-      primary: color ?? colorBuilder?.call(Theme.of(context).colorScheme),
+      foregroundColor: color ?? colorBuilder?.call(Theme.of(context).colorScheme),
     );
 
     return icon == null

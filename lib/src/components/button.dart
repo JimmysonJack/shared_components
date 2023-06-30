@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class Button extends StatefulWidget {
-  Button(
+  const Button(
       {Key? key, this.icon, required this.labelText, required this.onPressed})
       : super(key: key);
-  String labelText;
-  IconData? icon;
-  void Function()? onPressed;
+  final String labelText;
+  final IconData? icon;
+  final void Function()? onPressed;
   @override
   _ButtonState createState() => _ButtonState();
 }
@@ -24,15 +24,15 @@ class _ButtonState extends State<Button> {
           label: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(widget.labelText,
-                style: Theme.of(context).textTheme.button),
+                style: Theme.of(context).textTheme.labelLarge),
           ));
     }
     return ElevatedButton(
         onPressed: widget.onPressed,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child:
-              Text(widget.labelText, style: Theme.of(context).textTheme.button),
+          child: Text(widget.labelText,
+              style: Theme.of(context).textTheme.labelLarge),
         ));
   }
 }

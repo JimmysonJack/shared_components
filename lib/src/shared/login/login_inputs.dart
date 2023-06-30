@@ -11,6 +11,7 @@ RegExp regex = RegExp(
 
 RegExp emailRegExp = RegExp(r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$');
 
+// ignore: must_be_immutable
 class LoginInputs extends StatelessWidget {
   LoginInputs({super.key, required this.navigateTo});
   final String navigateTo;
@@ -162,11 +163,11 @@ class LoginInputs extends StatelessWidget {
                                   color: Theme.of(context).cardColor,
                                   borderRadius: BorderRadius.circular(7)),
                               width: width,
-                              child: Column(
+                              child: const Column(
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
+                                children: [
                                   LinearProgress(),
                                   GText(
                                     'Authenticating...',

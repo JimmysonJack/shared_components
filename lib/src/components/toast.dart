@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 typedef StringCallback = void Function(String);
@@ -11,19 +10,19 @@ class Toast {
     _context = context;
   }
 
-  static void info(String title, {String? subTitle,bool? strip}) {
+  static void info(String title, {String? subTitle, bool? strip}) {
     ToastViewContainer.show(
-        ToastViewContainer.INFO, title, _context!, subTitle,strip);
+        ToastViewContainer.INFO, title, _context!, subTitle, strip);
   }
 
-  static void warn(String title, {String? subTitle,bool? strip}) {
+  static void warn(String title, {String? subTitle, bool? strip}) {
     ToastViewContainer.show(
-        ToastViewContainer.WARN, title, _context!, subTitle,strip);
+        ToastViewContainer.WARN, title, _context!, subTitle, strip);
   }
 
-  static void error(String title, {String? subTitle,bool? strip}) {
+  static void error(String title, {String? subTitle, bool? strip}) {
     ToastViewContainer.show(
-        ToastViewContainer.ERROR, title, _context!, subTitle,strip);
+        ToastViewContainer.ERROR, title, _context!, subTitle, strip);
   }
 }
 
@@ -43,13 +42,19 @@ class ToastViewContainer {
   static OverlayState? overlayState;
   static OverlayEntry? overlayEntry;
   static List<ToastWidgetHolder> widgets = [];
-  static Future<void> show(
-      int type, String message, BuildContext context, String? content, bool? strip) async {
+  static Future<void> show(int type, String message, BuildContext context,
+      String? content, bool? strip) async {
     String id = Random.secure().nextDouble().toString();
     widgets.add(ToastWidgetHolder(
         id: id,
-        widget: ToastView.createView(type, message, dismiss, id, context,
-            content, strip))); // pos, ToastView.createView(type, message, dismiss, pos)});
+        widget: ToastView.createView(
+            type,
+            message,
+            dismiss,
+            id,
+            context,
+            content,
+            strip))); // pos, ToastView.createView(type, message, dismiss, pos)});
     overlayState ??= Overlay.of(context);
     addEntry();
     await Future.delayed(const Duration(seconds: 6));
@@ -126,7 +131,7 @@ class ToastView {
             children: [
               Icon(
                 bgIcon,
-                color: strip ? bgColor: Theme.of(context).cardColor,
+                color: strip ? bgColor : Theme.of(context).cardColor,
               ),
               const SizedBox(
                 width: 10,
@@ -138,13 +143,19 @@ class ToastView {
                   Text(message,
                       softWrap: true,
                       style: TextStyle(
-                          fontSize: 16, color: strip ? Theme.of(context).hintColor : Theme.of(context).cardColor)),
+                          fontSize: 16,
+                          color: strip
+                              ? Theme.of(context).hintColor
+                              : Theme.of(context).cardColor)),
                   // if(content != null) const SizedBox(height: 10,),
                   if (content != null)
                     Text(content,
                         softWrap: true,
                         style: TextStyle(
-                            fontSize: 12, color: strip ? Theme.of(context).hintColor : Theme.of(context).cardColor)),
+                            fontSize: 12,
+                            color: strip
+                                ? Theme.of(context).hintColor
+                                : Theme.of(context).cardColor)),
                 ],
               ),
             ],

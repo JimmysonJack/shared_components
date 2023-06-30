@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_ui/google_ui.dart';
 
 class BulletList extends StatelessWidget {
   final List<String> strings;

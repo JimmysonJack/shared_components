@@ -36,9 +36,7 @@ class GElevatedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final buttonStyle = ElevatedButton.styleFrom(
-      primary: color ?? colorBuilder?.call(Theme.of(context).colorScheme),
-      onPrimary:
-          labelColor ?? labelColorBuilder?.call(Theme.of(context).colorScheme),
+      foregroundColor: labelColor ?? labelColorBuilder?.call(Theme.of(context).colorScheme), backgroundColor: color ?? colorBuilder?.call(Theme.of(context).colorScheme),
     );
 
     return icon == null

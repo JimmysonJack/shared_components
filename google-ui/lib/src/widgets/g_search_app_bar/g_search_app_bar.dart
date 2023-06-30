@@ -157,12 +157,12 @@ class _GSearchAppBarState extends State<GSearchAppBar> {
                   errorBorder: InputBorder.none,
                   disabledBorder: InputBorder.none,
                   hintText: widget.hintText,
-                  hintStyle: theme.textTheme.bodyText1?.copyWith(
+                  hintStyle: theme.textTheme.bodyLarge?.copyWith(
                     color: _foregroundColor?.withOpacity(.5),
                     decorationColor: _foregroundColor?.withOpacity(.5),
                   ),
                 ),
-                style: theme.textTheme.bodyText1?.copyWith(
+                style: theme.textTheme.bodyLarge?.copyWith(
                   color: _foregroundColor,
                   decorationColor: _foregroundColor,
                 ),

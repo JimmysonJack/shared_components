@@ -72,3 +72,4 @@ export 'src/shared/top-app-bar/theme-changer-popup-menu-item.dart';
 export 'src/shared/top-app-bar/user-profile-popup-menu-item.dart';
 export 'src/shared/animated-expansion-tile/mobile-data-table.dart';
 export 'src/shared/permissions-widget/permission-set.dart';
+export 'src/shared/user-management/users-manager.dart';

@@ -70,8 +70,8 @@ class _QudsPopupButtonState extends State<QudsPopupButton> {
         autofocus: widget.autofocus,
         canRequestFocus: true,
         mouseCursor: widget.mouseCursor,
-        child: widget.child,
         radius: widget.radius,
+        child: widget.child,
       ),
     );
 

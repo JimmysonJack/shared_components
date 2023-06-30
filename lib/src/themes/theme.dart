@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_component/shared_component.dart';
 
-import 'default.dart';
 
 class ThemeController extends GetxController {
   static ThemeController? _instance;

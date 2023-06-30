@@ -60,16 +60,16 @@ class _TestingWidgetState extends State<TestingWidget> {
                         iconButton: Icons.save_outlined,
                         title: 'Testing Model',
                         formGroup: FormGroup(
-                          updateFields: [
-                            {'fullName': 'Juma Hassan Kimaro'},
-                            {'mobileNumber': '0753332777'},
-                            {'nationality': 'Tanzanian'},
-                            {
-                              'region': [
-                                {'name': 'Mwanza', 'uid': '87887g8g'}
-                              ]
-                            },
-                          ],
+                          // updateFields: [
+                          //   {'fullName': 'Juma Hassan Kimaro'},
+                          //   {'mobileNumber': '0753332777'},
+                          //   {'nationality': 'Tanzanian'},
+                          //   {
+                          //     'region': [
+                          //       {'name': 'Mwanza', 'uid': '87887g8g'}
+                          //     ]
+                          //   },
+                          // ],
                           group: [
                             Group(header: "Test's info", children: [
                               Field.use.input(
