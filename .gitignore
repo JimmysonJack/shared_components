@@ -31,10 +31,7 @@ build/
 .flutter-plugins
 .flutter-plugins-dependencies
 pubspec.lock
-<<<<<<< HEAD
 # /flutter_side_menu-0.3.1/example/windows/flutter/ephemeral/flutter_windows.dll.pdb
 # flutter_side_menu-0.3.1/example/windows/flutter/ephemeral/flutter_windows.dll.pdb
 # .\flutter_side_menu-0.3.1\example\windows\flutter\ephemeral\flutter_windows.dll.pdb
 # flutter_side_menu-0.3.1\example\windows\flutter\ephemeral\flutter_windows.dll.pdb
-=======
->>>>>>> 9944470bbf750340fd12f74b4fc8ea59e5c6c94c
