@@ -33,14 +33,14 @@ Shared_Component is a comprehensive collection of reusable components, classes, 
 
 ## Installation
 
-To install Shared_Component package, follow the steps below:
+To install `Shared_Component` package, follow the steps below:
 1. Download Shared_Component from git Repository and then place it any whare you want. We are only doing it because its not yet published.
 2. Add the package to your Flutter project's `pubspec.yaml` file, in the path put an address where you placed Shared_component package.
 
 ```yaml
  dependencies:
-            Shared_Component:
-                path: "<<PACKAGE_ADDRESS>>shared_component"
+    Shared_Component:
+        path: "<<PACKAGE_ADDRESS>>/shared_component"
 ```
 
 3. Run the `flutter pub get` command to fetch the package and its dependencies.
@@ -48,7 +48,96 @@ To install Shared_Component package, follow the steps below:
 
 ## Getting Started
 
-The Getting Started guide provides a step-by-step walkthrough on how to integrate the Package Name package into your Flutter project. It covers the basic setup, import instructions, and demonstrates how to use the core functionalities to kick-start your development process.
+**Configuration Stapes**
+- By using `Shared_Component` package you dont have to call a `runAp()` to initialize your App, its already taken care of. What you have to do is to call a `initApp()` fuction inside the `main()`, and it will handle the rest.
+-  `Shared_Component` is using `flutter_module` to manage routing and manage module architecture in the project. Its also using `GetX` for dependence injection and state management.
+
+    ```dart
+    void main() async{
+        ///This line ensures that Flutter is properly initialized before running the app
+         WidgetsFlutterBinding.ensureInitialized();
+
+         ///initializes the app with some configuration
+        initApp(
+            appName: 'Shared Components',
+            loadEnvFile: () async {
+
+                ///Loading Inviroment files from the root of the project
+                await loadingInvironment(
+                    devEnvFile: ".env.development", prodEnvFile: ".env.production");
+            },
+            routes: [
+                ChildRoute('/landing',
+                    child: (context, args) => SideNavigation(
+                        appBarPosition: AppBarPosition.side,
+                        version: '2.0.3',
+                        topAppBarDetails: TopAppBarDetails(
+                            title: 'Top Bar',
+                            menuItems: [
+                                MenuItem<String>(
+                                    title: 'Change Password',
+                                    icon: Icons.logo_dev,
+                                    value: 'password'),
+                                MenuItem<String>(
+                                    title: 'Profile',
+                                    icon: Icons.details,
+                                    value: 'profile'),
+                            ],
+                            onTap: (value) {},
+                            userProfileDetails: UserProfileItem(
+                                onLogout: () {
+                                    SettingsService.use
+                                        .logout(Modular.initialRoute, context);
+                                },
+                                email: 'Jimmysonblack@gmail.com',
+                                userName: 'Jimmyson Jackson Mnunguri')),
+                        sideMenuTile: [
+                            SideMenuTile(
+                                title: 'Dashboard',
+                                icon: Icons.dashboard,
+                                permissions: ['ACCESS_BILLS']),
+                            SideMenuTile(
+                                title: 'Users',
+                                icon: Icons.people,
+                                permissions: ['ACCESS_ROLE', 'ACCESS']),
+                            SideMenuTile(
+                                title: 'Facility', icon: Icons.abc, permissions: []),
+                        ],
+                        body: const UserManager(),
+                        ),
+                    guards: [AuthGuard()]),
+
+                ChildRoute('/login',
+                    child: (context, args) => Login(
+                        navigateTo: 'landing',
+                        backgroundTheme: BackgroundTheme.techTheme)),
+
+                RedirectRoute(Modular.initialRoute, to: 'login')
+            ]);
+
+    }
+    ```
+
+    ```dart
+        import 'package:flutter/foundation.dart';
+        import 'package:shared_component/shared_component.dart';
+
+        loadingInvironment(
+            {required String devEnvFile, required String prodEnvFile}) async {
+        String fileName = kReleaseMode ? prodEnvFile : devEnvFile;
+        await dotenv.load(fileName: fileName);
+        Environment.getInstance().setClientId(dotenv.env['CLIENT_ID']!);
+        Environment.getInstance().setClientSecret(dotenv.env['CLIENT_SECRET']!);
+        Environment.getInstance().setServerUrl(dotenv.env['SERVER_URL']!);
+        }
+    ```
+    Thsis Method loads Production invernment when the app is running on production inveronment, and it will load the dev inveronment if the in development invronment
+
+- **Note:** Avoid using `Get.context` to get `context` globally, instead use NavigationService.
+```dart
+    NavigationService.navigatorKey.currentContext!
+```
+    This will enable you to get current `context` globally.
 
 ## Documentation Structure
 
