@@ -507,6 +507,8 @@ abstract class _TextInputBase with Store {
                 validate ?? false, label, inputType),
             onChanged: (data) {
               validateErrors(key, label, fieldInputType, validate, data);
+              data.map((e) =>
+                  {...e, 'inputValueField': customDisplayKey.inputValueField});
               _onUpdate(key, data, inputType);
             }),
       );
