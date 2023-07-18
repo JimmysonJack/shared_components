@@ -110,6 +110,7 @@ Shared_Component is a comprehensive collection of reusable components, classes, 
       ],
     );
 ```
+### PopupModel Widget
 - **PopupModel Widget:** The `PopupModel` widget is a flexible and reusable component in Flutter that allows the display of a popup or dialog to collect user input or show information. It is particularly useful for creating and updating data records with a form-like interface. The widget is highly customizable, supporting dynamic titles, input validation, and data prefilling for update operations.
 
 **Parameters:**
@@ -173,9 +174,11 @@ Shared_Component is a comprehensive collection of reusable components, classes, 
 The actual functionality of the PopupModel widget may depend on specific implementations and usage in your application. Ensure that you have the required dependencies and data endpoints set up correctly to make the widget work as intended. The form fields inside the FormGroup may also have their own custom validation logic and functionality based on the FieldInputType.
 
 
+### Field Widget and Form Handling
 - **Field Widget and Form Handling:** The `Field` widget is a versatile form handling component in Flutter that enables developers to collect and manage user input efficiently. It offers various input field options, such as text inputs, dropdown menus, date pickers, multi-selects, attachments, checkboxes, and switches. The Field widget supports two main approaches for implementation: the static method approach (`Field.use`) and the instance-based approach (`Field` class instance). Both approaches provide effective form handling capabilities and data management.
 
 **Static Method Approach (Field.use):**
+
 In the static method approach, developers can use the Field.use static method to directly create and implement form fields with various input types.
 
 - **Field.use.input:**
