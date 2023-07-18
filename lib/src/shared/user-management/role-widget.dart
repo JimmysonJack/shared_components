@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_component/shared_component.dart';
 
 import '../../utils/table.dart';
 import '../form-group.dart';
@@ -75,6 +76,8 @@ class RoleWidget extends StatelessWidget {
           group: [
             Group(children: [
               Field.use.input(
+                inputType: 'String',
+                widthSize: WidthSize.col12,
                 context: context,
                 label: 'Role',
                 key: 'name',
