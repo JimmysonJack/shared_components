@@ -177,11 +177,11 @@ The actual functionality of the PopupModel widget may depend on specific impleme
 ### Field Widget and Form Handling
 - **Field Widget and Form Handling:** The `Field` widget is a versatile form handling component in Flutter that enables developers to collect and manage user input efficiently. It offers various input field options, such as text inputs, dropdown menus, date pickers, multi-selects, attachments, checkboxes, and switches. The Field widget supports two main approaches for implementation: the static method approach (`Field.use`) and the instance-based approach (`Field` class instance). Both approaches provide effective form handling capabilities and data management.
 
-**Static Method Approach (Field.use):**
+#### Static Method Approach (Field.use)
 
 In the static method approach, developers can use the Field.use static method to directly create and implement form fields with various input types.
 
-- **Field.use.input:**
+### Field.use.input
 
 The Field.use.input widget is used for collecting textual data from users, such as names, email addresses, or any other type of text-based information.
 
@@ -204,7 +204,7 @@ Field.use.input(
     );
 ```
 
-- **Field.use.select:**
+### Field.use.select
 
 The Field.use.select widget allows users to choose a single option from a list of items, implemented as a dropdown menu or select input.
 
@@ -248,7 +248,7 @@ The Field.use.select widget allows users to choose a single option from a list o
               );
 ```
 
-- **Field.use.date:**
+### Field.use.date
 
 The Field.use.date widget provides a date picker input for selecting dates.
 
@@ -290,7 +290,7 @@ Field.use.date(
     );
 ```
 
-- **Field.use.multiSelect:**
+### Field.use.multiSelect
 
 The Field.use.multiSelect widget allows users to select multiple options from a list of items.
 
@@ -335,7 +335,7 @@ The Field.use.multiSelect widget allows users to select multiple options from a 
               );
 ```
 
-- **Field.use.checkbox:**
+### Field.use.checkbox
 
 The Field.use.checkbox widget allows users to select or toggle a boolean value using a checkbox input.
 
@@ -358,7 +358,7 @@ The Field.use.checkbox widget allows users to select or toggle a boolean value u
         );
 ```
 
-- **Field.use.attachment:**
+### Field.use.attachment
 
 The Field.use.attachment widget is used to collect attachments or files from the user.
 
@@ -382,7 +382,7 @@ Field.use.attachment(
 ```
 
 
-- **Field.use.switch:**
+### Field.use.switch
 
 The Field.use.switch widget allows users to toggle a boolean value using a switch input.
 
@@ -406,21 +406,24 @@ Field.use.switch(
         );
 ```
 
-**Instance-based Approach (Field Class Instance):**
+#### Instance-based Approach (Field Class Instance)
 
 The instance-based approach involves creating an instance of the `Field` class, `fieldController`, which provides more control and flexibility over form handling.
 
 Using `fieldController`, developers can create and manage form fields using methods like `fieldController.field.input()`, and also implement listeners to receive form data changes using `fieldController.fieldUpdates.listen((data) {})`.
 
-**Recommendation:**
+### Recommendation
 
 It is recommended to use the instance-based approach, creating a Field class instance whenever input fields need to be implemented. This allows for better data management and responsiveness to form changes. Additionally, when using `PopupModel`, all `FieldValues.getInstance().instanceValues` and `fieldController.fieldUpdates` will be notified of changes, ensuring accurate data updates when sending data to the backend.
 
 **Note:** Ensure that the required dependencies and data endpoints are correctly set up to make the widgets work as intended. The form fields inside the `FormGroup` may have their custom validation logic and functionality based on the `FieldInputType`.
 
+### PageableDataTable
+
 - **PageableDataTable:** The `PageableDataTable` is a custom Flutter widget designed to display tabular data with features for querying data from an API endpoint, deleting data through a separate delete endpoint, implementing a search mechanism, and providing various action buttons for user interactions. Below is the documentation for the `PageableDataTable` widget:
 
 **Widget Description:**
+
 `PageableDataTable` is a versatile widget that provides a user-friendly and responsive way to display tabular data in a Flutter app. It offers several customizable options for querying data, managing data deletions, and defining user actions through action buttons.
 
 **Widget Properties:**
