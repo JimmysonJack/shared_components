@@ -34,7 +34,10 @@ class _TestingWidgetState extends State<TestingWidget> {
     super.initState();
   }
 
-  TextInput textInput = TextInput(fieldController: Field());
+  TextInput textInput = TextInput(
+      fieldController: FieldController(),
+      fieldValuesController: FieldValuesController());
+  FieldController fieldController = FieldController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,6 +54,7 @@ class _TestingWidgetState extends State<TestingWidget> {
                   child: const Text('Save Data'),
                   onPressed: () {
                     PopupModel(
+                        fieldController: fieldController,
                         endpointName: 'saveAgent',
                         queryFields: 'uid name',
                         responseResults: (response, onLoad) {},
@@ -60,6 +64,7 @@ class _TestingWidgetState extends State<TestingWidget> {
                         iconButton: Icons.save_outlined,
                         title: 'Testing Model',
                         formGroup: FormGroup(
+                          fieldController: fieldController,
                           // updateFields: [
                           //   {'fullName': 'Juma Hassan Kimaro'},
                           //   {'mobileNumber': '0753332777'},
@@ -72,7 +77,7 @@ class _TestingWidgetState extends State<TestingWidget> {
                           // ],
                           group: [
                             Group(header: "Test's info", children: [
-                              Field.use.input(
+                              fieldController.field.input(
                                 context: context,
                                 label: 'Full Name',
                                 key: 'fullName',
@@ -80,7 +85,7 @@ class _TestingWidgetState extends State<TestingWidget> {
                                 validate: true,
                                 widthSize: WidthSize.col3,
                               ),
-                              Field.use.input(
+                              fieldController.field.input(
                                 context: context,
                                 label: 'Mobile Number',
                                 key: 'mobileNumber',
@@ -88,7 +93,7 @@ class _TestingWidgetState extends State<TestingWidget> {
                                 validate: true,
                                 widthSize: WidthSize.col3,
                               ),
-                              Field.use.input(
+                              fieldController.field.input(
                                 context: context,
                                 label: 'Citizenship',
                                 key: 'nationality',
@@ -96,7 +101,7 @@ class _TestingWidgetState extends State<TestingWidget> {
                                 validate: true,
                                 widthSize: WidthSize.col3,
                               ),
-                              Field.use.multiSelect(
+                              fieldController.field.multiSelect(
                                 context: context,
                                 // customDisplayKey: 'name',
                                 label: 'Region',

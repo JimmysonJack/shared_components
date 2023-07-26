@@ -19,11 +19,10 @@ class ThemeChangerPopuoMenuItem<T> extends PopupMenuItem<T> {
                     'Theme Changer',
                     color: ThemeController.getInstance().darkMode(
                         darkColor: Colors.white54, lightColor: Colors.black45),
-                    fontSize:
-                        Theme.of(NavigationService.navigatorKey.currentContext!)
-                            .textTheme
-                            .titleLarge!
-                            .fontSize,
+                    fontSize: Theme.of(NavigationService.get.currentContext!)
+                        .textTheme
+                        .titleLarge!
+                        .fontSize,
                   ),
                 ),
                 Obx(() => Row(

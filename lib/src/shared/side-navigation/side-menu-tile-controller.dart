@@ -5,6 +5,7 @@ import '../../../shared_component.dart';
 
 class SideMenuTileController extends GetxController {
   final isSelected = false.obs;
+
   List<SideMenuItemDataTile>? buildTileAndPermissionCheck({
     required List<SideMenuTile> sideMenuTile,
     required int Function(int index) onTap,
@@ -12,6 +13,18 @@ class SideMenuTileController extends GetxController {
     Color? selectedColor,
     required int selectedIndex,
   }) {
+    var route = NavigationService.get.fullCurrentRoute.split('/');
+    int pageIndex = sideMenuTile.indexWhere(
+        (element) => element.url == route.elementAt(route.length - 1));
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      // This callback will be executed after the widget is fully built and laid out
+      if (callOnce) {
+        onTap(pageIndex == -1 ? 0 : pageIndex);
+        callOnce = false;
+        if (pageIndex == -1) Modular.to.navigate(sideMenuTile[0].url);
+      }
+    });
+
     if (sideMenuTile.isEmpty) {
       return null;
     }
@@ -33,13 +46,14 @@ class SideMenuTileController extends GetxController {
               onTap: () {
                 final newIndex = sideMenuTile.indexOf(e);
                 onTap(newIndex);
+
+                Modular.to.navigate(e.url);
               },
-              hoverColor:
-                  Theme.of(NavigationService.navigatorKey.currentContext!)
-                      .primaryColor
-                      .withOpacity(0.27),
+              hoverColor: Theme.of(NavigationService.get.currentContext!)
+                  .primaryColor
+                  .withOpacity(0.27),
               highlightSelectedColor: selectedColor ??
-                  Theme.of(NavigationService.navigatorKey.currentContext!)
+                  Theme.of(NavigationService.get.currentContext!)
                       .primaryColor
                       .withOpacity(0.6),
               tooltip: e.tooltip,
@@ -48,11 +62,10 @@ class SideMenuTileController extends GetxController {
                   darkColor:
                       const Color.fromARGB(255, 30, 104, 128), // light blue
 
-                  lightColor:
-                      Theme.of(NavigationService.navigatorKey.currentContext!)
-                          .textTheme
-                          .labelLarge!
-                          .color!),
+                  lightColor: Theme.of(NavigationService.get.currentContext!)
+                      .textTheme
+                      .labelLarge!
+                      .color!),
               title: e.title,
               icon: Icon(e.icon),
             ))

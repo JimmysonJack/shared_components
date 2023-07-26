@@ -15,48 +15,72 @@ void main() {
             devEnvFile: ".env.development", prodEnvFile: ".env.production");
       },
       routes: [
-        ChildRoute('/landing',
-            child: (context, args) => SideNavigation(
-                  appBarPosition: AppBarPosition.side,
-                  version: '2.0.3',
-                  topAppBarDetails: TopAppBarDetails(
-                      title: 'Top Bar',
-                      menuItems: [
-                        MenuItem<String>(
-                            title: 'Change Password',
-                            icon: Icons.logo_dev,
-                            value: 'password'),
-                        MenuItem<String>(
-                            title: 'Profile',
-                            icon: Icons.details,
-                            value: 'profile'),
-                      ],
-                      onTap: (value) {},
-                      userProfileDetails: UserProfileItem(
-                          onLogout: () {
-                            SettingsService.use
-                                .logout(Modular.initialRoute, context);
-                          },
-                          email: 'Jimmysonblack@gmail.com',
-                          userName: 'Jimmyson Jackson Mnunguri')),
-                  sideMenuTile: [
-                    SideMenuTile(
-                        title: 'Dashboard',
-                        icon: Icons.dashboard,
-                        permissions: ['ACCESS_BILLS']),
-                    SideMenuTile(
-                        title: 'Users',
-                        icon: Icons.people,
-                        permissions: ['ACCESS_ROLE', 'ACCESS']),
-                    SideMenuTile(
-                        title: 'Facility', icon: Icons.abc, permissions: []),
-                  ],
-                  body: const UserManager(),
-                ),
-            guards: [AuthGuard()]),
+        RouteService.childRoute(
+            routeName: '/landing/',
+            child: Scaffold(
+              body: SideNavigation(
+                appBarPosition: AppBarPosition.side,
+                version: '2.0.3',
+                topAppBarDetails: TopAppBarDetails(
+                    title: 'Top Bar',
+                    menuItems: [
+                      MenuItem<String>(
+                          title: 'Change Password',
+                          icon: Icons.logo_dev,
+                          value: 'password'),
+                      MenuItem<String>(
+                          title: 'Profile',
+                          icon: Icons.details,
+                          value: 'profile'),
+                    ],
+                    onTap: (value) {},
+                    userProfileDetails: UserProfileItem(
+                        onLogout: () {
+                          SettingsService.use.logout(Modular.initialRoute,
+                              NavigationService.get.currentContext!);
+                        },
+                        email: 'Jimmysonblack@gmail.com',
+                        userName: 'Jimmyson Jackson Mnunguri')),
+                sideMenuTile: [
+                  SideMenuTile(
+                      title: 'Dashboard',
+                      url: 'dashboard',
+                      icon: Icons.dashboard,
+                      permissions: ['ACCESS_BILLS']),
+                  SideMenuTile(
+                      title: 'Users Management',
+                      url: 'user-management',
+                      icon: Icons.people,
+                      permissions: ['ACCESS_BILLS', 'ACCESS']),
+                  SideMenuTile(
+                      title: 'Facility',
+                      url: 'facility-management',
+                      icon: Icons.abc,
+                      permissions: ['ACCESS_BILLS']),
+                ],
+                body: const RouterOutlet(),
+              ),
+            ),
+            guards: [
+              AuthGuard()
+            ],
+            children: [
+              RouteService.childRoute(
+                  routeName: '/dashboard',
+                  child: const SizedBox(
+                    child: UserManager(),
+                  )),
+              ChildRoute('/user-management',
+                  child: (context, args) => const SizedBox(
+                        child: Center(
+                          child: Text('User Management'),
+                        ),
+                      )),
+            ]),
 
-        ChildRoute('/login',
-            child: (context, args) => Login(
+        RouteService.childRoute(
+            routeName: '/login',
+            child: Login(
                 navigateTo: 'landing',
                 backgroundTheme: BackgroundTheme.techTheme)),
 
@@ -155,7 +179,8 @@ Map<int, Color> colorMap = {
 };
 
 class UsersWidget extends StatelessWidget {
-  const UsersWidget({super.key});
+  UsersWidget({super.key});
+  final FieldController fieldController = FieldController();
 
   @override
   Widget build(BuildContext context) {
@@ -202,6 +227,7 @@ class UsersWidget extends StatelessWidget {
 
   saveAndUpdateUser(context, data) {
     PopupModel(
+        fieldController: fieldController,
         buildContext: context,
         buttonLabel: 'Save User',
         checkUnSavedData: true,
@@ -209,23 +235,24 @@ class UsersWidget extends StatelessWidget {
         title: 'Create User',
         queryFields: 'uid',
         formGroup: FormGroup(
+          fieldController: fieldController,
           updateFields: data,
           group: [
             Group(children: [
-              Field.use.input(
+              fieldController.field.input(
                 context: context,
                 label: 'Fullname',
                 key: 'fullName',
                 validate: true,
                 // fieldInputType: FieldInputType
               ),
-              Field.use.input(
+              fieldController.field.input(
                   context: context,
                   label: 'Description',
                   key: 'description',
                   validate: true,
                   fieldInputType: FieldInputType.FullName),
-              Field.use.input(
+              fieldController.field.input(
                   context: context,
                   label: 'Imail',
                   key: 'email',
@@ -238,10 +265,12 @@ class UsersWidget extends StatelessWidget {
 
   setRoles(context, data) {
     PopupModel(
+        fieldController: fieldController,
         buildContext: context,
         title: 'Set Permission to ${data['name']}',
-        formGroup: const FormGroup(
-          group: [
+        formGroup: FormGroup(
+          fieldController: fieldController,
+          group: const [
             Group(children: [
               PermissionSettings(
                 endPointName: 'savePermissions',

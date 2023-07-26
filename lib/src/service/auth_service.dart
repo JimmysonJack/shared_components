@@ -115,7 +115,7 @@ class AuthServiceController extends GetxController {
                 'In order to proceed, you are advised to change your Password first',
             confirmBtnText: 'Ok',
             onConfirmBtnTap: () {
-              Navigator.pop(context, true);
+              Navigator.pop(NavigationService.get.currentContext!, true);
             });
         return Checking.firstLogin;
       } else if (res is Map && res['checking'] == Checking.passwordExpired) {
@@ -126,7 +126,7 @@ class AuthServiceController extends GetxController {
                 'In order to proceed, you are advised to change your Password first',
             confirmBtnText: 'Ok',
             onConfirmBtnTap: () {
-              Navigator.pop(context, true);
+              Navigator.pop(NavigationService.get.currentContext!, true);
             });
         return Checking.passwordExpired;
       } else if (res is Map && res['checking'] == Checking.otpExpired) {
@@ -137,7 +137,7 @@ class AuthServiceController extends GetxController {
                 'It seems like OTP is expired, you are advised to contact System Adminstrator',
             confirmBtnText: 'Ok',
             onConfirmBtnTap: () {
-              Navigator.pop(context, true);
+              Navigator.pop(NavigationService.get.currentContext!, true);
             });
         return Checking.otpExpired;
       }

@@ -28,6 +28,7 @@ class _SelectedRoleWidgetState extends State<SelectedRoleWidget> {
       child: Card(
         child: SizedBox(
           height: SizeConfig.fullScreen.height,
+          width: SizeConfig.fullScreen.width,
           child: Padding(
             padding: const EdgeInsets.all(10.0),
             child: LayoutBuilder(builder: (context, constraint) {
@@ -70,7 +71,9 @@ class _SelectedRoleWidgetState extends State<SelectedRoleWidget> {
                                       },
                                       child: Container(
                                         height: 50,
-                                        width: (constraint.maxWidth * 0.5) - 5,
+                                        width: (constraint.maxWidth * 0.5) > 0
+                                            ? (constraint.maxWidth * 0.5) - 5
+                                            : 0,
                                         color: ThemeController.getInstance()
                                             .darkMode(
                                                 darkColor: Colors.white30,

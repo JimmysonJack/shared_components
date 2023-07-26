@@ -1,7 +1,6 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:shared_component/shared_component.dart';
 
 import 'search-controller.dart';
@@ -23,11 +22,10 @@ class ContainerTile extends StatefulWidget {
       this.titalColor,
       this.showGradient = false}) {
     gradientColorsList ??= [
-      Theme.of(NavigationService.navigatorKey.currentContext!)
-          .secondaryHeaderColor,
-      Theme.of(NavigationService.navigatorKey.currentContext!).primaryColor
+      Theme.of(NavigationService.get.currentContext!).secondaryHeaderColor,
+      Theme.of(NavigationService.get.currentContext!).primaryColor
     ];
-    titalColor ??= Theme.of(NavigationService.navigatorKey.currentContext!)
+    titalColor ??= Theme.of(NavigationService.get.currentContext!)
         .textTheme
         .bodyMedium
         ?.color;

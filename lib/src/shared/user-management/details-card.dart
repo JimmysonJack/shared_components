@@ -21,11 +21,13 @@ class DetailCard extends StatefulWidget {
   final Map<String, dynamic> user;
   final UserDetails? userDetails;
   final Function() onDeleteUser;
+  final Function() onCloseDetailes;
 
   final Function(Map<String, dynamic> data) onEditUser;
   const DetailCard(
       {super.key,
       required this.height,
+      required this.onCloseDetailes,
       required this.userUid,
       this.userDetails,
       required this.user,
@@ -57,600 +59,1253 @@ class _DetailCardState extends State<DetailCard> {
   bool resetUserLoader = false;
   bool saveUserLoader = false;
 
+  FieldController fieldController = FieldController();
+  List<Map<String, dynamic>>? userInfors;
+  List<String> selectedRoles = [];
+
   @override
   void initState() {
     controller.getUserRolesByUser(widget.userUid, context);
+    fieldController.fieldUpdates.listen((event) {
+      userInfors = event['data'];
+    });
     super.initState();
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    // controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-        duration: const Duration(milliseconds: 1000),
-        width: widget.width,
-        curve: Curves.fastOutSlowIn,
-        child: TweenAnimationBuilder<double>(
-            tween: Tween<double>(begin: 1.0, end: widget.shakeIt ? 0.8 : 1.0),
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.elasticOut,
-            builder: (context, scale, child) {
-              return Transform.scale(
-                scale: scale,
-                child: SizedBox(
-                  child: AnimatedCrossFade(
-                      firstChild: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(40),
-                          child: SizedBox(
-                            height: widget.height,
-                            // width: width,
-                            child:
-                                LayoutBuilder(builder: (context, constraint) {
-                              return Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+    bool mobileSize = MediaQuery.of(context).size.width < 700;
+    return mobileSize && widget.width != 0
+        ? mobileView()
+        : AnimatedContainer(
+            duration: const Duration(milliseconds: 1000),
+            width: widget.width,
+            curve: Curves.fastOutSlowIn,
+            child: TweenAnimationBuilder<double>(
+                tween:
+                    Tween<double>(begin: 1.0, end: widget.shakeIt ? 0.8 : 1.0),
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.elasticOut,
+                builder: (context, scale, child) {
+                  return Transform.scale(
+                    scale: scale,
+                    child: SizedBox(
+                      child: AnimatedCrossFade(
+                          firstChild: Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(40),
+                              child: SizedBox(
+                                height: widget.height,
+                                // width: width,
+                                child: LayoutBuilder(
+                                    builder: (context, constraint) {
+                                  return Column(
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          CircleAvatar(
-                                            radius: 40,
-                                            backgroundColor:
-                                                ThemeController.getInstance()
+                                          Row(
+                                            children: [
+                                              CircleAvatar(
+                                                radius: 40,
+                                                backgroundColor: ThemeController
+                                                        .getInstance()
                                                     .darkMode(
                                                         darkColor:
                                                             Colors.white24,
                                                         lightColor:
                                                             Colors.black12),
-                                            child: Icon(
-                                              Icons.person,
-                                              size: 60,
-                                              color:
-                                                  ThemeController.getInstance()
-                                                      .darkMode(
-                                                          darkColor:
-                                                              Colors.white38,
-                                                          lightColor:
-                                                              Colors.black26),
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            width: 20,
-                                          ),
-                                          Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    widget.userDetails
-                                                            ?.fullName ??
-                                                        ' Name Not Available',
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .headlineSmall
-                                                        ?.copyWith(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 17,
-                                                            color: ThemeController
-                                                                    .getInstance()
-                                                                .darkMode(
-                                                                    darkColor:
-                                                                        Colors
-                                                                            .white54,
-                                                                    lightColor:
-                                                                        Colors
-                                                                            .grey)),
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 30,
-                                                  ),
-                                                  Tooltip(
-                                                    message: 'Edit User',
-                                                    child: IconButton(
-                                                        onPressed: () =>
-                                                            widget.onEditUser(
-                                                                widget.user),
-                                                        icon: Icon(
-                                                          Icons.edit,
-                                                          color:
-                                                              Colors.red[500],
-                                                        )),
-                                                  )
-                                                ],
-                                              ),
-                                              Text(
-                                                '${widget.userDetails?.email ?? ' Not Available'}  |  ${widget.userDetails?.phone ?? 'Not Provided'}',
-                                                overflow: TextOverflow.ellipsis,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleSmall,
-                                              ),
-                                              const SizedBox(
-                                                height: 5,
-                                              ),
-                                              Text(
-                                                widget.userDetails?.region ??
-                                                    'Not Provided',
-                                                overflow: TextOverflow.ellipsis,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleSmall,
-                                              ),
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                      Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          deleteUserLoader
-                                              ? Container(
-                                                  width: 150,
-                                                  alignment: Alignment.center,
-                                                  child: IndicateProgress
-                                                      .circular())
-                                              : TextButton(
-                                                  style: TextButton.styleFrom(
-                                                    fixedSize:
-                                                        const Size(150, 40),
-                                                    // shadowColor: Colors.black,
-                                                    foregroundColor:
-                                                        ThemeController
-                                                                .getInstance()
-                                                            .darkMode(
-                                                                darkColor: Colors
-                                                                    .white54,
-                                                                lightColor: Colors
-                                                                    .black87),
-                                                    backgroundColor: Colors.red
-                                                        .withOpacity(0.3),
-                                                  ),
-                                                  onPressed: () {
-                                                    deleteUser(widget.userUid);
-                                                  },
-                                                  child: const Text(
-                                                      'Delete User')),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          resetUserLoader
-                                              ? Container(
-                                                  width: 150,
-                                                  alignment: Alignment.center,
-                                                  child: IndicateProgress
-                                                      .circular(),
-                                                )
-                                              : TextButton(
-                                                  style: TextButton.styleFrom(
-                                                    fixedSize:
-                                                        const Size(150, 40),
-                                                    // shadowColor: Colors.black,
-                                                    foregroundColor:
-                                                        ThemeController
-                                                                .getInstance()
-                                                            .darkMode(
-                                                                darkColor: Colors
-                                                                    .white54,
-                                                                lightColor: Colors
-                                                                    .black87),
-                                                    backgroundColor:
-                                                        const Color.fromARGB(
-                                                                255,
-                                                                54,
-                                                                209,
-                                                                244)
-                                                            .withOpacity(0.3),
-                                                  ),
-                                                  onPressed: () {
-                                                    resetUser(widget.userUid);
-                                                  },
-                                                  child: const Text(
-                                                      'Reset Password')),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-
-                                  ///IS LOCKED ACTION
-                                  SizedBox(
-                                    height: constraint.maxHeight * 0.05,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'User is Locked',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium,
-                                      ),
-                                      Switch.adaptive(
-                                          value: widget.userDetails?.isLoked ??
-                                              false,
-                                          onChanged: (value) => widget
-                                              .userDetails
-                                              ?.onLocked(value))
-                                    ],
-                                  ),
-                                  const Divider(),
-
-                                  ///USER ACCESS ACTIONS
-                                  SizedBox(
-                                    height: constraint.maxHeight * 0.02,
-                                  ),
-                                  AnimatedOpacity(
-                                    curve: curves,
-                                    duration: Duration(milliseconds: duration),
-                                    opacity: opacityLevel,
-                                    child: AnimatedContainer(
-                                      curve: curves,
-                                      duration:
-                                          Duration(milliseconds: duration),
-                                      height: userDetailHeight ??
-                                          constraint.maxHeight * 0.3,
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: SingleChildScrollView(
-                                              physics:
-                                                  const NeverScrollableScrollPhysics(),
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    'User Access Actions',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodySmall,
-                                                  ),
-
-                                                  ///USER DISABLED
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        'User Is Disabled',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .titleMedium,
-                                                      ),
-                                                      Checkbox(
-                                                        shape: RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        100)),
-                                                        onChanged: (value) =>
-                                                            widget
-                                                                .userDetails
-                                                                ?.onDisabled(
-                                                                    value!),
-                                                        value: widget
-                                                                .userDetails
-                                                                ?.disabled ??
-                                                            false,
-                                                      )
-                                                    ],
-                                                  ),
-
-                                                  ///PASSWORD CAN EXPIRE
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        'User Password Can Expire',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .titleMedium,
-                                                      ),
-                                                      Checkbox(
-                                                        shape: RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        100)),
-                                                        onChanged: (value) => widget
-                                                            .userDetails
-                                                            ?.onPasswordCanExpire(
-                                                                value!),
-                                                        value: widget
-                                                                .userDetails
-                                                                ?.passwordCanExpire ??
-                                                            false,
-                                                      )
-                                                    ],
-                                                  ),
-
-                                                  ///IF PASSWORD EXPIRED
-                                                  widget.userDetails
-                                                              ?.passwordExpired ==
-                                                          false
-                                                      ? Text(
-                                                          'Password Expired',
-                                                          style: Theme.of(
-                                                                  context)
-                                                              .textTheme
-                                                              .labelSmall
-                                                              ?.copyWith(
-                                                                  color: Colors
-                                                                          .red[
-                                                                      400]),
-                                                        )
-                                                      : const SizedBox(),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 100,
-                                            width: 1,
-                                            child: DecoratedBox(
-                                              decoration: BoxDecoration(
+                                                child: Icon(
+                                                  Icons.person,
+                                                  size: 60,
                                                   color: ThemeController
                                                           .getInstance()
                                                       .darkMode(
                                                           darkColor:
                                                               Colors.white38,
                                                           lightColor:
-                                                              Colors.black38)),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: SingleChildScrollView(
-                                              physics:
-                                                  const NeverScrollableScrollPhysics(),
-                                              child: Column(
+                                                              Colors.black26),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 20,
+                                              ),
+                                              Column(
                                                 mainAxisSize: MainAxisSize.min,
-                                                // crossAxisAlignment:
-                                                //     CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        widget.userDetails
+                                                                ?.fullName ??
+                                                            ' Name Not Available',
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .headlineSmall
+                                                            ?.copyWith(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 17,
+                                                                color: ThemeController
+                                                                        .getInstance()
+                                                                    .darkMode(
+                                                                        darkColor:
+                                                                            Colors
+                                                                                .white54,
+                                                                        lightColor:
+                                                                            Colors.grey)),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 30,
+                                                      ),
+                                                      Tooltip(
+                                                        message: 'Edit User',
+                                                        child: IconButton(
+                                                            onPressed: () =>
+                                                                widget.onEditUser(
+                                                                    widget
+                                                                        .user),
+                                                            icon: Icon(
+                                                              Icons.edit,
+                                                              color: Colors
+                                                                  .red[500],
+                                                            )),
+                                                      )
+                                                    ],
+                                                  ),
                                                   Text(
-                                                    'Last Login',
+                                                    '${widget.userDetails?.email ?? ' Not Available'}  |  ${widget.userDetails?.phone ?? 'Not Provided'}',
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                     style: Theme.of(context)
                                                         .textTheme
-                                                        .bodySmall,
+                                                        .titleSmall,
                                                   ),
                                                   const SizedBox(
                                                     height: 5,
                                                   ),
                                                   Text(
-                                                    DateFormat(
-                                                            'MMM d, yyyy HH:mm')
-                                                        .format(DateTime.parse(widget
-                                                                .loggedInUserDetails
-                                                                ?.lastLogin ??
-                                                            '2022-03-27 0814')),
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .labelLarge,
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 10,
-                                                  ),
-                                                  Text(
-                                                    'Logged In Device',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodySmall,
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Text(
-                                                    widget.loggedInUserDetails ==
-                                                            null
-                                                        ? 'Not Provided'
-                                                        : '${widget.loggedInUserDetails?.loggedInDevice?.devicename} | Mac: ${widget.loggedInUserDetails?.loggedInDevice?.macAddress} | OS: ${widget.loggedInUserDetails?.loggedInDevice?.operatingSystem} | IP: ${widget.loggedInUserDetails?.loggedInDevice?.ipAddress}',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .labelLarge,
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 10,
-                                                  ),
-                                                  Text(
-                                                    'Last Logged In Location',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodySmall,
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Text(
-                                                    widget.loggedInUserDetails
-                                                            ?.lastLoginLocation ??
+                                                    widget.userDetails
+                                                            ?.region ??
                                                         'Not Provided',
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                     style: Theme.of(context)
                                                         .textTheme
-                                                        .labelLarge,
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 10,
-                                                  ),
-                                                  Text(
-                                                    'Authenticated Divice',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodySmall,
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Text(
-                                                    widget.loggedInUserDetails ==
-                                                            null
-                                                        ? 'Not Provided'
-                                                        : '${widget.loggedInUserDetails?.authenticatedDevice?.devicename} | Mac: ${widget.loggedInUserDetails?.authenticatedDevice?.macAddress} | OS: ${widget.loggedInUserDetails?.authenticatedDevice?.operatingSystem} | IP: ${widget.loggedInUserDetails?.authenticatedDevice?.ipAddress}',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .labelLarge,
+                                                        .titleSmall,
                                                   ),
                                                 ],
+                                              )
+                                            ],
+                                          ),
+                                          Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            children: [
+                                              deleteUserLoader
+                                                  ? Container(
+                                                      width: 150,
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: IndicateProgress
+                                                          .circular())
+                                                  : TextButton(
+                                                      style:
+                                                          TextButton.styleFrom(
+                                                        fixedSize:
+                                                            const Size(150, 40),
+                                                        // shadowColor: Colors.black,
+                                                        foregroundColor: ThemeController
+                                                                .getInstance()
+                                                            .darkMode(
+                                                                darkColor: Colors
+                                                                    .white54,
+                                                                lightColor: Colors
+                                                                    .black87),
+                                                        backgroundColor: Colors
+                                                            .red
+                                                            .withOpacity(0.3),
+                                                      ),
+                                                      onPressed: () {
+                                                        deleteUser(
+                                                            widget.userUid);
+                                                      },
+                                                      child: const Text(
+                                                          'Delete User')),
+                                              const SizedBox(
+                                                height: 10,
                                               ),
-                                            ),
+                                              resetUserLoader
+                                                  ? Container(
+                                                      width: 150,
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: IndicateProgress
+                                                          .circular(),
+                                                    )
+                                                  : TextButton(
+                                                      style:
+                                                          TextButton.styleFrom(
+                                                        fixedSize:
+                                                            const Size(150, 40),
+                                                        // shadowColor: Colors.black,
+                                                        foregroundColor: ThemeController
+                                                                .getInstance()
+                                                            .darkMode(
+                                                                darkColor: Colors
+                                                                    .white54,
+                                                                lightColor: Colors
+                                                                    .black87),
+                                                        backgroundColor:
+                                                            const Color.fromARGB(
+                                                                    255,
+                                                                    54,
+                                                                    209,
+                                                                    244)
+                                                                .withOpacity(
+                                                                    0.3),
+                                                      ),
+                                                      onPressed: () {
+                                                        resetUser(
+                                                            widget.userUid);
+                                                      },
+                                                      child: const Text(
+                                                          'Reset Password')),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: constraint.maxHeight * 0.02,
-                                  ),
-                                  const Divider(),
 
-                                  SizedBox(
-                                    height: constraint.maxHeight * 0.02,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        'Role Section',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium,
+                                      ///IS LOCKED ACTION
+                                      SizedBox(
+                                        height: constraint.maxHeight * 0.05,
                                       ),
-                                      TextButton(
-                                          style: TextButton.styleFrom(
-                                            fixedSize: const Size(150, 40),
-                                            // shadowColor: Colors.black,
-                                            foregroundColor:
-                                                ThemeController.getInstance()
-                                                    .darkMode(
-                                                        darkColor:
-                                                            Colors.white54,
-                                                        lightColor:
-                                                            Colors.black87),
-                                            backgroundColor: Theme.of(context)
-                                                .primaryColor
-                                                .withOpacity(0.3),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'User is Locked',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium,
                                           ),
-                                          onPressed: () {},
-                                          child: const Text('Save Changes')),
-                                    ],
-                                  ),
-                                  Flexible(
-                                    child: AnimatedContainer(
-                                      curve: curves,
-                                      duration:
-                                          Duration(milliseconds: duration),
-                                      height: roleDetailHeight,
-                                      child: MouseRegion(
-                                        onEnter: (value) {
-                                          setState(() {
-                                            roleDetailHeight =
-                                                constraint.maxHeight * 0.8;
-                                            userDetailHeight =
-                                                constraint.maxHeight * 0.03;
-                                            opacityLevel = 0;
-                                          });
-                                        },
-                                        onExit: (value) {
-                                          setState(() {
-                                            userDetailHeight = null;
-                                            roleDetailHeight = null;
-                                            opacityLevel = 1.0;
-                                          });
-                                        },
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: RolesListWidget(
-                                                animate: selectedData,
-                                                onSearch: (searchKey) {
-                                                  var roleList =
-                                                      controller.storedRoles;
-                                                  setState(() {
-                                                    if (searchKey.isNotEmpty) {
-                                                      controller.unAssignedRoleList = roleList
-                                                          .where((element) => element[
-                                                                  'name']
-                                                              .toString()
-                                                              .toLowerCase()
-                                                              .contains(searchKey
-                                                                  .toLowerCase()))
-                                                          .toList();
-                                                    }
-                                                  });
-                                                },
-                                                roleList: controller
-                                                    .unAssignedRoleList,
-                                                onSelected: (data) {
-                                                  controller.assgnedRoleList
-                                                      .add(data);
-                                                  controller.unAssignedRoleList
-                                                      .remove(data);
-                                                  setState(() {});
-                                                },
+                                          fieldController.field.toggle(
+                                            context: context,
+                                            currentValue:
+                                                widget.userDetails?.isLoked ??
+                                                    false,
+                                            inputType: 'Boolean',
+                                            key: 'userLocked',
+                                          ),
+                                        ],
+                                      ),
+                                      const Divider(),
+
+                                      ///USER ACCESS ACTIONS
+                                      SizedBox(
+                                        height: constraint.maxHeight * 0.02,
+                                      ),
+                                      AnimatedOpacity(
+                                        curve: curves,
+                                        duration:
+                                            Duration(milliseconds: duration),
+                                        opacity: opacityLevel,
+                                        child: AnimatedContainer(
+                                          curve: curves,
+                                          duration:
+                                              Duration(milliseconds: duration),
+                                          height: userDetailHeight ??
+                                              constraint.maxHeight * 0.3,
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: SingleChildScrollView(
+                                                  physics:
+                                                      const NeverScrollableScrollPhysics(),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        'User Access Actions',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodySmall,
+                                                      ),
+
+                                                      ///USER DISABLED
+                                                      Row(
+                                                        children: [
+                                                          Text(
+                                                            'User Is Disabled',
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .titleMedium,
+                                                          ),
+                                                          fieldController.field
+                                                              .checkBox(
+                                                            currentValue: widget
+                                                                    .userDetails
+                                                                    ?.disabled ??
+                                                                false,
+                                                            context: context,
+                                                            key: 'disableUser',
+                                                            inputType:
+                                                                'Boolean',
+                                                          ),
+                                                        ],
+                                                      ),
+
+                                                      ///PASSWORD CAN EXPIRE
+                                                      Row(
+                                                        children: [
+                                                          Text(
+                                                            'User Password Can Expire',
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .titleMedium,
+                                                          ),
+                                                          fieldController.field
+                                                              .checkBox(
+                                                            currentValue: widget
+                                                                    .userDetails
+                                                                    ?.passwordCanExpire ??
+                                                                false,
+                                                            context: context,
+                                                            key:
+                                                                'passwordCanExpire',
+                                                            inputType:
+                                                                'Boolean',
+                                                          ),
+                                                        ],
+                                                      ),
+
+                                                      ///IF PASSWORD EXPIRED
+                                                      widget.userDetails
+                                                                  ?.passwordExpired ??
+                                                              false
+                                                          ? Text(
+                                                              'Password Expired',
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .labelSmall
+                                                                  ?.copyWith(
+                                                                      color: Colors
+                                                                              .red[
+                                                                          400]),
+                                                            )
+                                                          : const SizedBox(),
+                                                    ],
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                            Expanded(
-                                              child: Obx(() {
-                                                return SelectedRoleWidget(
-                                                  animate: selectedData,
-                                                  selectedList: controller
-                                                      .assgnedRoleList.value,
-                                                  onDelete: (data) {
-                                                    controller.assgnedRoleList
-                                                        .remove(data);
-                                                    controller
-                                                        .unAssignedRoleList
-                                                        .insert(0, data);
-                                                    setState(() {});
-                                                  },
-                                                );
-                                              }),
-                                            ),
-                                          ],
+                                              SizedBox(
+                                                height: 100,
+                                                width: 1,
+                                                child: DecoratedBox(
+                                                  decoration: BoxDecoration(
+                                                      color: ThemeController
+                                                              .getInstance()
+                                                          .darkMode(
+                                                              darkColor: Colors
+                                                                  .white38,
+                                                              lightColor: Colors
+                                                                  .black38)),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: SingleChildScrollView(
+                                                  physics:
+                                                      const NeverScrollableScrollPhysics(),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    // crossAxisAlignment:
+                                                    //     CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        'Last Login',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodySmall,
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      Text(
+                                                        DateFormat(
+                                                                'MMM d, yyyy HH:mm')
+                                                            .format(DateTime.parse(widget
+                                                                    .loggedInUserDetails
+                                                                    ?.lastLogin ??
+                                                                '2022-03-27 0814')),
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .labelLarge,
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      Text(
+                                                        'Logged In Device',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodySmall,
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      Text(
+                                                        widget.loggedInUserDetails ==
+                                                                null
+                                                            ? 'Not Provided'
+                                                            : '${widget.loggedInUserDetails?.loggedInDevice?.devicename} | Mac: ${widget.loggedInUserDetails?.loggedInDevice?.macAddress} | OS: ${widget.loggedInUserDetails?.loggedInDevice?.operatingSystem} | IP: ${widget.loggedInUserDetails?.loggedInDevice?.ipAddress}',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .labelLarge,
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      Text(
+                                                        'Last Logged In Location',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodySmall,
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      Text(
+                                                        widget.loggedInUserDetails
+                                                                ?.lastLoginLocation ??
+                                                            'Not Provided',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .labelLarge,
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      Text(
+                                                        'Authenticated Divice',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodySmall,
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      Text(
+                                                        widget.loggedInUserDetails ==
+                                                                null
+                                                            ? 'Not Provided'
+                                                            : '${widget.loggedInUserDetails?.authenticatedDevice?.devicename} | Mac: ${widget.loggedInUserDetails?.authenticatedDevice?.macAddress} | OS: ${widget.loggedInUserDetails?.authenticatedDevice?.operatingSystem} | IP: ${widget.loggedInUserDetails?.authenticatedDevice?.ipAddress}',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .labelLarge,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
+                                      SizedBox(
+                                        height: constraint.maxHeight * 0.02,
+                                      ),
+                                      const Divider(),
+
+                                      SizedBox(
+                                        height: constraint.maxHeight * 0.02,
+                                      ),
+                                      controller.onSaveChangesLoader.value
+                                          ? IndicateProgress.cardLinear(
+                                              'Saving Changes')
+                                          : Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  'Role Section',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .titleMedium,
+                                                ),
+                                                TextButton(
+                                                    style: TextButton.styleFrom(
+                                                      fixedSize:
+                                                          const Size(150, 40),
+                                                      // shadowColor: Colors.black,
+                                                      foregroundColor: ThemeController
+                                                              .getInstance()
+                                                          .darkMode(
+                                                              darkColor: Colors
+                                                                  .white54,
+                                                              lightColor: Colors
+                                                                  .black87),
+                                                      backgroundColor:
+                                                          Theme.of(context)
+                                                              .primaryColor
+                                                              .withOpacity(0.3),
+                                                    ),
+                                                    onPressed: () {
+                                                      NotificationService
+                                                          .confirm(
+                                                        context: context,
+                                                        showCancelBtn: true,
+                                                        content:
+                                                            'Are You Sure?',
+                                                        confirmBtnText: 'Save',
+                                                        cancelBtnText: 'Cancel',
+                                                        title:
+                                                            'Saving User Changes!',
+                                                        onConfirmBtnTap: () {
+                                                          if (!SettingsService
+                                                              .use
+                                                              .isEmptyOrNull(
+                                                                  selectedRoles)) {
+                                                            ///Saving Role Here
+                                                            controller
+                                                                .saveChanges(
+                                                                    onResponse:
+                                                                        (data) {
+                                                                      selectedRoles
+                                                                          .clear();
+                                                                    },
+                                                                    endPointName:
+                                                                        'assignRoleToUser',
+                                                                    inputs: [
+                                                                      InputParameter(
+                                                                          fieldName:
+                                                                              'roleUids',
+                                                                          fieldValue:
+                                                                              selectedRoles,
+                                                                          inputType:
+                                                                              'String'),
+                                                                      InputParameter(
+                                                                          fieldName:
+                                                                              'userUid',
+                                                                          fieldValue: widget
+                                                                              .userUid,
+                                                                          inputType:
+                                                                              'String'),
+                                                                    ],
+                                                                    context:
+                                                                        context);
+                                                            Navigator.pop(
+                                                                NavigationService
+                                                                    .get
+                                                                    .currentContext!,
+                                                                true);
+                                                          }
+                                                          if (!SettingsService
+                                                              .use
+                                                              .isEmptyOrNull(
+                                                                  userInfors)) {
+                                                            ///Saving UserInfor here
+                                                            controller
+                                                                .saveChanges(
+                                                                    onResponse:
+                                                                        (data) {
+                                                                      userInfors!
+                                                                          .clear();
+                                                                    },
+                                                                    endPointName:
+                                                                        'updateUser',
+                                                                    inputs: [
+                                                                      InputParameter(
+                                                                          fieldName:
+                                                                              'userUid',
+                                                                          fieldValue: widget
+                                                                              .userUid,
+                                                                          inputType:
+                                                                              'String'),
+                                                                      InputParameter(
+                                                                          fieldName:
+                                                                              'userUid',
+                                                                          fieldValue:
+                                                                              userInfors,
+                                                                          inputType:
+                                                                              '[String]'),
+                                                                    ],
+                                                                    context:
+                                                                        context);
+                                                            Navigator.pop(
+                                                                NavigationService
+                                                                    .get
+                                                                    .currentContext!,
+                                                                true);
+                                                          }
+
+                                                          if (SettingsService
+                                                                  .use
+                                                                  .isEmptyOrNull(
+                                                                      userInfors) &&
+                                                              SettingsService
+                                                                  .use
+                                                                  .isEmptyOrNull(
+                                                                      selectedRoles)) {
+                                                            NotificationService
+                                                                .snackBarWarn(
+                                                                    context:
+                                                                        context,
+                                                                    title:
+                                                                        'No Changes Detected!');
+                                                          }
+                                                        },
+                                                      );
+                                                    },
+                                                    child: const Text(
+                                                        'Save Changes')),
+                                              ],
+                                            ),
+                                      Flexible(
+                                        child: AnimatedContainer(
+                                          curve: curves,
+                                          duration:
+                                              Duration(milliseconds: duration),
+                                          height: roleDetailHeight,
+                                          child: MouseRegion(
+                                            onEnter: (value) {
+                                              setState(() {
+                                                roleDetailHeight =
+                                                    constraint.maxHeight * 0.8;
+                                                userDetailHeight =
+                                                    constraint.maxHeight * 0.03;
+                                                opacityLevel = 0;
+                                              });
+                                            },
+                                            onExit: (value) {
+                                              setState(() {
+                                                userDetailHeight = null;
+                                                roleDetailHeight = null;
+                                                opacityLevel = 1.0;
+                                              });
+                                            },
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: RolesListWidget(
+                                                    animate: selectedData,
+                                                    onSearch: (searchKey) {
+                                                      var roleList = controller
+                                                          .storedRoles;
+                                                      setState(() {
+                                                        if (searchKey
+                                                            .isNotEmpty) {
+                                                          controller.unAssignedRoleList = roleList
+                                                              .where((element) => element[
+                                                                      'name']
+                                                                  .toString()
+                                                                  .toLowerCase()
+                                                                  .contains(
+                                                                      searchKey
+                                                                          .toLowerCase()))
+                                                              .toList();
+                                                        }
+                                                      });
+                                                    },
+                                                    roleList: controller
+                                                        .unAssignedRoleList,
+                                                    onSelected: (data) {
+                                                      controller.assgnedRoleList
+                                                          .add(data);
+                                                      selectedRoles
+                                                          .add(data['uid']);
+                                                      controller
+                                                          .unAssignedRoleList
+                                                          .remove(data);
+                                                      setState(() {});
+                                                    },
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Obx(() {
+                                                    return SelectedRoleWidget(
+                                                      animate: selectedData,
+                                                      selectedList: controller
+                                                          .assgnedRoleList
+                                                          .value,
+                                                      onDelete: (data) {
+                                                        controller
+                                                            .assgnedRoleList
+                                                            .remove(data);
+                                                        selectedRoles.remove(
+                                                            data['uid']);
+                                                        controller
+                                                            .unAssignedRoleList
+                                                            .insert(0, data);
+                                                        setState(() {});
+                                                      },
+                                                    );
+                                                  }),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  );
+                                }),
+                              ),
+                            ),
+                          ),
+                          secondChild: Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Container(
+                                height: widget.height,
+                              ),
+                            ),
+                          ),
+                          crossFadeState: widget.showDetails
+                              ? CrossFadeState.showFirst
+                              : CrossFadeState.showSecond,
+                          duration: const Duration(milliseconds: 1000)),
+                    ),
+                  );
+                }));
+  }
+
+  Widget mobileView() {
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 5000),
+      opacity: widget.width > 0 ? 1 : 0,
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width - 32,
+        child: LayoutBuilder(builder: (context, constraint) {
+          return Stack(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundColor: ThemeController.getInstance().darkMode(
+                            darkColor: Colors.white24,
+                            lightColor: Colors.black12),
+                        child: Icon(
+                          Icons.person,
+                          size: 60,
+                          color: ThemeController.getInstance().darkMode(
+                              darkColor: Colors.white38,
+                              lightColor: Colors.black26),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                widget.userDetails?.fullName ??
+                                    ' Name Not Available',
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall
+                                    ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 17,
+                                        color: ThemeController.getInstance()
+                                            .darkMode(
+                                                darkColor: Colors.white54,
+                                                lightColor: Colors.grey)),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            '${widget.userDetails?.email ?? ' Not Available'}  |  ${widget.userDetails?.phone ?? 'Not Provided'}',
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.titleSmall,
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            widget.userDetails?.region ?? 'Not Provided',
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.titleSmall,
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: constraint.maxHeight * 0.02,
+                  ),
+                  Row(
+                    // mainAxisSize: MainAxisSize.min,
+                    // crossAxisAlignment:
+                    // CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      deleteUserLoader
+                          ? Container(
+                              width: 150,
+                              alignment: Alignment.center,
+                              child: IndicateProgress.circular())
+                          : TextButton(
+                              style: TextButton.styleFrom(
+                                fixedSize: const Size(150, 40),
+                                // shadowColor: Colors.black,
+                                foregroundColor: ThemeController.getInstance()
+                                    .darkMode(
+                                        darkColor: Colors.white54,
+                                        lightColor: Colors.black87),
+                                backgroundColor: Colors.red.withOpacity(0.3),
+                              ),
+                              onPressed: () {
+                                deleteUser(widget.userUid);
+                              },
+                              child: const Text('Delete User')),
+                      resetUserLoader
+                          ? Container(
+                              width: 150,
+                              alignment: Alignment.center,
+                              child: IndicateProgress.circular(),
+                            )
+                          : TextButton(
+                              style: TextButton.styleFrom(
+                                fixedSize: const Size(150, 40),
+                                // shadowColor: Colors.black,
+                                foregroundColor: ThemeController.getInstance()
+                                    .darkMode(
+                                        darkColor: Colors.white54,
+                                        lightColor: Colors.black87),
+                                backgroundColor:
+                                    const Color.fromARGB(255, 54, 209, 244)
+                                        .withOpacity(0.3),
+                              ),
+                              onPressed: () {
+                                resetUser(widget.userUid);
+                              },
+                              child: const Text('Reset Password')),
+                    ],
+                  ),
+                  const Divider(),
+                  SizedBox(
+                    height: constraint.maxHeight * 0.02,
+                  ),
+                  Flexible(
+                    fit: FlexFit.tight,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      'User is Locked',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
                                     ),
-                                  )
+                                    fieldController.field.toggle(
+                                      context: context,
+                                      currentValue:
+                                          widget.userDetails?.isLoked ?? false,
+                                      inputType: 'Boolean',
+                                      key: 'userLocked',
+                                    ),
+                                  ],
+                                ),
+                                Tooltip(
+                                  message: 'Edit User',
+                                  child: IconButton(
+                                      onPressed: () =>
+                                          widget.onEditUser(widget.user),
+                                      icon: Icon(
+                                        Icons.edit,
+                                        color: Colors.red[500],
+                                      )),
+                                )
+                              ],
+                            ),
+                          ),
+                          const Divider(),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'User Access Actions',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+
+                              ///USER DISABLED
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'User Is Disabled',
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                  fieldController.field.checkBox(
+                                    currentValue:
+                                        widget.userDetails?.disabled ?? false,
+                                    context: context,
+                                    key: 'disableUser',
+                                    inputType: 'Boolean',
+                                  ),
                                 ],
-                              );
-                            }),
+                              ),
+
+                              ///PASSWORD CAN EXPIRE
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'User Password Can Expire',
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                  fieldController.field.checkBox(
+                                    currentValue:
+                                        widget.userDetails?.passwordCanExpire ??
+                                            false,
+                                    context: context,
+                                    key: 'passwordCanExpire',
+                                    inputType: 'Boolean',
+                                  ),
+                                ],
+                              ),
+
+                              ///IF PASSWORD EXPIRED
+                              widget.userDetails?.passwordExpired ?? false
+                                  ? Text(
+                                      'Password Expired',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall
+                                          ?.copyWith(color: Colors.red[400]),
+                                    )
+                                  : const SizedBox(),
+                            ],
                           ),
-                        ),
-                      ),
-                      secondChild: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Container(
-                            height: widget.height,
+                          const Divider(),
+                          const SizedBox(
+                            height: 20,
                           ),
-                        ),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            // crossAxisAlignment:
+                            //     CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Last Login',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Text(
+                                DateFormat('MMM d, yyyy HH:mm').format(
+                                    DateTime.parse(
+                                        widget.loggedInUserDetails?.lastLogin ??
+                                            '2022-03-27 0814')),
+                                style: Theme.of(context).textTheme.labelLarge,
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                'Last Logged In Device',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Text(
+                                widget.loggedInUserDetails == null
+                                    ? 'Not Provided'
+                                    : '${widget.loggedInUserDetails?.loggedInDevice?.devicename} | Mac: ${widget.loggedInUserDetails?.loggedInDevice?.macAddress} | OS: ${widget.loggedInUserDetails?.loggedInDevice?.operatingSystem} | IP: ${widget.loggedInUserDetails?.loggedInDevice?.ipAddress}',
+                                style: Theme.of(context).textTheme.labelLarge,
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                'Last Logged In Location',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Text(
+                                widget.loggedInUserDetails?.lastLoginLocation ??
+                                    'Not Provided',
+                                style: Theme.of(context).textTheme.labelLarge,
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                'Authenticated Divice',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Text(
+                                widget.loggedInUserDetails == null
+                                    ? 'Not Provided'
+                                    : '${widget.loggedInUserDetails?.authenticatedDevice?.devicename} | Mac: ${widget.loggedInUserDetails?.authenticatedDevice?.macAddress} | OS: ${widget.loggedInUserDetails?.authenticatedDevice?.operatingSystem} | IP: ${widget.loggedInUserDetails?.authenticatedDevice?.ipAddress}',
+                                style: Theme.of(context).textTheme.labelLarge,
+                              ),
+                            ],
+                          ),
+                          const Divider(),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Container(
+                            alignment: Alignment.bottomLeft,
+                            child: Text(
+                              'Roles List',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ),
+                          const Divider(),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Container(
+                            constraints: const BoxConstraints(
+                                minHeight: 100, maxHeight: 300),
+                            child: RolesListWidget(
+                              animate: selectedData,
+                              onSearch: (searchKey) {
+                                var roleList = controller.storedRoles;
+                                setState(() {
+                                  if (searchKey.isNotEmpty) {
+                                    controller.unAssignedRoleList = roleList
+                                        .where((element) => element['name']
+                                            .toString()
+                                            .toLowerCase()
+                                            .contains(searchKey.toLowerCase()))
+                                        .toList();
+                                  }
+                                });
+                              },
+                              roleList: controller.unAssignedRoleList,
+                              onSelected: (data) {
+                                controller.assgnedRoleList.add(data);
+                                selectedRoles.add(data['uid']);
+                                controller.unAssignedRoleList.remove(data);
+                                setState(() {});
+                              },
+                            ),
+                          ),
+                          const Divider(),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Container(
+                            alignment: Alignment.bottomLeft,
+                            child: Text(
+                              'Active Roles',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ),
+                          const Divider(),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Container(
+                            constraints: const BoxConstraints(
+                                minHeight: 100, maxHeight: 300),
+                            child: Obx(() => SelectedRoleWidget(
+                                  animate: selectedData,
+                                  selectedList:
+                                      controller.assgnedRoleList.value,
+                                  onDelete: (data) {
+                                    controller.assgnedRoleList.remove(data);
+                                    selectedRoles.remove(data['uid']);
+                                    controller.unAssignedRoleList
+                                        .insert(0, data);
+                                    setState(() {});
+                                  },
+                                )),
+                          ),
+                          const Divider(),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          controller.onSaveChangesLoader.value
+                              ? IndicateProgress.cardLinear('Saving Changes')
+                              : Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      '',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
+                                    ),
+                                    TextButton(
+                                        style: TextButton.styleFrom(
+                                          fixedSize: const Size(150, 40),
+                                          // shadowColor: Colors.black,
+                                          foregroundColor:
+                                              ThemeController.getInstance()
+                                                  .darkMode(
+                                                      darkColor: Colors.white54,
+                                                      lightColor:
+                                                          Colors.black87),
+                                          backgroundColor: Theme.of(context)
+                                              .primaryColor
+                                              .withOpacity(0.3),
+                                        ),
+                                        onPressed: () {
+                                          NotificationService.confirm(
+                                            context: context,
+                                            showCancelBtn: true,
+                                            content: 'Are You Sure?',
+                                            confirmBtnText: 'Save',
+                                            cancelBtnText: 'Cancel',
+                                            title: 'Saving User Changes!',
+                                            onConfirmBtnTap: () {
+                                              if (!SettingsService.use
+                                                  .isEmptyOrNull(
+                                                      selectedRoles)) {
+                                                ///Saving Role Here
+                                                controller.saveChanges(
+                                                    onResponse: (data) {
+                                                      selectedRoles.clear();
+                                                    },
+                                                    endPointName:
+                                                        'assignRoleToUser',
+                                                    inputs: [
+                                                      InputParameter(
+                                                          fieldName: 'roleUids',
+                                                          fieldValue:
+                                                              selectedRoles,
+                                                          inputType: 'String'),
+                                                      InputParameter(
+                                                          fieldName: 'userUid',
+                                                          fieldValue:
+                                                              widget.userUid,
+                                                          inputType: 'String'),
+                                                    ],
+                                                    context: context);
+                                                Navigator.pop(
+                                                    NavigationService
+                                                        .get.currentContext!,
+                                                    true);
+                                              }
+                                              if (!SettingsService.use
+                                                  .isEmptyOrNull(userInfors)) {
+                                                ///Saving UserInfor here
+                                                controller.saveChanges(
+                                                    onResponse: (data) {
+                                                      userInfors!.clear();
+                                                    },
+                                                    endPointName: 'updateUser',
+                                                    inputs: [
+                                                      InputParameter(
+                                                          fieldName: 'userUid',
+                                                          fieldValue:
+                                                              widget.userUid,
+                                                          inputType: 'String'),
+                                                      InputParameter(
+                                                          fieldName: 'userUid',
+                                                          fieldValue:
+                                                              userInfors,
+                                                          inputType:
+                                                              '[String]'),
+                                                    ],
+                                                    context: context);
+                                                Navigator.pop(
+                                                    NavigationService
+                                                        .get.currentContext!,
+                                                    true);
+                                              }
+
+                                              if (SettingsService.use
+                                                      .isEmptyOrNull(
+                                                          userInfors) &&
+                                                  SettingsService.use
+                                                      .isEmptyOrNull(
+                                                          selectedRoles)) {
+                                                NotificationService.snackBarWarn(
+                                                    context: context,
+                                                    title:
+                                                        'No Changes Detected!');
+                                              }
+                                            },
+                                          );
+                                        },
+                                        child: const Text('Save Changes')),
+                                  ],
+                                ),
+                        ],
                       ),
-                      crossFadeState: widget.showDetails
-                          ? CrossFadeState.showFirst
-                          : CrossFadeState.showSecond,
-                      duration: const Duration(milliseconds: 1000)),
-                ),
-              );
-            }));
+                    ),
+                  )
+                ],
+              ),
+              Align(
+                alignment: Alignment.topRight,
+                child: IconButton(
+                    onPressed: () {
+                      widget.onCloseDetailes();
+                    },
+                    icon: const Icon(Icons.clear)),
+              )
+            ],
+          );
+        }),
+      ),
+    );
   }
 
   deleteUser(String userUid) {
@@ -667,7 +1322,7 @@ class _DetailCardState extends State<DetailCard> {
           setState(() {
             deleteUserLoader = true;
           });
-          Navigator.pop(NavigationService.navigatorKey.currentContext!, true);
+          Navigator.pop(NavigationService.get.currentContext!, true);
           GraphQLService.mutate(
               successMessage: 'User is deleted Successfully',
               response: (value, loader) {
@@ -705,7 +1360,7 @@ class _DetailCardState extends State<DetailCard> {
           setState(() {
             resetUserLoader = true;
           });
-          Navigator.pop(NavigationService.navigatorKey.currentContext!, true);
+          Navigator.pop(NavigationService.get.currentContext!, true);
           GraphQLService.mutate(
               successMessage: 'Reset Completed Successfully',
               response: (data, loader) {

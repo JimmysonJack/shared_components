@@ -37,31 +37,31 @@ class UserProfilePopupMenuItem<T> extends PopupMenuItem<T> {
                       style: TextStyle(
                         color: ThemeController.getInstance().darkMode(
                             darkColor: Colors.white70,
-                            lightColor: Theme.of(NavigationService
-                                    .navigatorKey.currentContext!)
+                            lightColor:
+                                Theme.of(NavigationService.get.currentContext!)
+                                    .textTheme
+                                    .titleLarge!
+                                    .color!),
+                        fontWeight:
+                            Theme.of(NavigationService.get.currentContext!)
                                 .textTheme
                                 .titleLarge!
-                                .color!),
-                        fontWeight: Theme.of(
-                                NavigationService.navigatorKey.currentContext!)
-                            .textTheme
-                            .titleLarge!
-                            .fontWeight,
-                        fontFamily: Theme.of(
-                                NavigationService.navigatorKey.currentContext!)
-                            .textTheme
-                            .titleLarge!
-                            .fontFamily,
-                        fontSize: Theme.of(
-                                NavigationService.navigatorKey.currentContext!)
-                            .textTheme
-                            .titleLarge!
-                            .fontSize,
-                        fontStyle: Theme.of(
-                                NavigationService.navigatorKey.currentContext!)
-                            .textTheme
-                            .titleLarge!
-                            .fontStyle,
+                                .fontWeight,
+                        fontFamily:
+                            Theme.of(NavigationService.get.currentContext!)
+                                .textTheme
+                                .titleLarge!
+                                .fontFamily,
+                        fontSize:
+                            Theme.of(NavigationService.get.currentContext!)
+                                .textTheme
+                                .titleLarge!
+                                .fontSize,
+                        fontStyle:
+                            Theme.of(NavigationService.get.currentContext!)
+                                .textTheme
+                                .titleLarge!
+                                .fontStyle,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -73,8 +73,7 @@ class UserProfilePopupMenuItem<T> extends PopupMenuItem<T> {
                       color: ThemeController.getInstance().darkMode(
                           darkColor: Colors.white24,
                           lightColor: Colors.black26),
-                      fontSize: Theme.of(
-                              NavigationService.navigatorKey.currentContext!)
+                      fontSize: Theme.of(NavigationService.get.currentContext!)
                           .textTheme
                           .titleSmall!
                           .fontSize,
@@ -86,7 +85,10 @@ class UserProfilePopupMenuItem<T> extends PopupMenuItem<T> {
                       width: SizeConfig.fullScreen.width,
                       child: Button(
                           labelText: 'Logout',
-                          onPressed: userProfileItem.onLogout),
+                          onPressed: () {
+                            callOnce = true;
+                            userProfileItem.onLogout();
+                          }),
                     ),
                   ),
                   const Divider()

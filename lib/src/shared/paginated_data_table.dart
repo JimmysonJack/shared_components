@@ -99,8 +99,8 @@ class _PageableDataTableState extends State<PageableDataTable> {
           builder: (BuildContext context,
               AsyncSnapshot<ValueNotifier<GraphQLClient>> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: Text('Waiting'),
+              return Center(
+                child: IndicateProgress.circular(),
               );
             }
             if (snapshot.hasError) {

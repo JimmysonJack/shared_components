@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:shared_component/shared_component.dart';
 
+import 'navigation.service.dart';
+
 class AuthGuard extends RouteGuard {
   Api api = Api();
   AuthGuard();
@@ -17,9 +19,8 @@ class AuthGuard extends RouteGuard {
       }
     }
 
-    bool isValidated = await api.userToken(
-            false, NavigationService.navigatorKey.currentContext) !=
-        '';
+    bool isValidated =
+        await api.userToken(false, NavigationService.get.currentContext) != '';
 
     return isValidated;
   }

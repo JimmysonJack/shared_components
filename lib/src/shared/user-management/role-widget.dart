@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
 
-import '../../utils/table.dart';
-import '../form-group.dart';
-import '../list_data_table.dart';
-import '../paginated_data_table.dart';
-import '../permissions-widget/permission-set.dart';
-import '../pop-up-model.dart';
-import '../text-inputs.dart';
-
 class RoleWidget extends StatelessWidget {
-  const RoleWidget({super.key});
+  RoleWidget({super.key});
+
+  final FieldController fieldController = FieldController();
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +57,7 @@ class RoleWidget extends StatelessWidget {
 
   saveAndUpdateRole(context, data) {
     PopupModel(
+        fieldController: fieldController,
         buildContext: context,
         buttonLabel: data != null ? 'Update' : 'Save Role',
         checkUnSavedData: true,
@@ -72,10 +67,11 @@ class RoleWidget extends StatelessWidget {
         title: data != null ? 'Update Role' : 'Create Role',
         queryFields: 'uid',
         formGroup: FormGroup(
+          fieldController: fieldController,
           updateFields: data,
           group: [
             Group(children: [
-              Field.use.input(
+              fieldController.field.input(
                 inputType: 'String',
                 widthSize: WidthSize.col12,
                 context: context,
@@ -84,7 +80,7 @@ class RoleWidget extends StatelessWidget {
                 validate: true,
                 // fieldInputType: FieldInputType
               ),
-              Field.use.input(
+              fieldController.field.input(
                 context: context,
                 label: 'Description',
                 key: 'description',
@@ -98,9 +94,11 @@ class RoleWidget extends StatelessWidget {
 
   setPermissions(context, data) {
     PopupModel(
+        fieldController: fieldController,
         buildContext: context,
         title: 'Set Permission to ${data['name']}',
         formGroup: FormGroup(
+          fieldController: fieldController,
           group: [
             Group(children: [
               PermissionSettings(

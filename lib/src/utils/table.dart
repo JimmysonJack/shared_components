@@ -455,7 +455,7 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
 
   deleteConfirm(index) {
     return NotificationService.confirmWarn(
-      context: NavigationService.navigatorKey.currentContext!,
+      context: NavigationService.get.currentContext!,
       buttonColor: Theme.of(context).colorScheme.error,
       cancelBtnText: 'Cancel',
       confirmBtnText: 'Delete',
@@ -465,7 +465,7 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
       onConfirmBtnTap: () {
         pressedIndex = index;
         widget.onDelete!(widget.dataList[index]);
-        Navigator.pop(NavigationService.navigatorKey.currentContext!, true);
+        Navigator.pop(NavigationService.get.currentContext!, true);
       },
       // onCancelBtnTap: () {
       //   // Navigator.pop(context, true);

@@ -5,9 +5,14 @@ import 'package:shared_component/shared_component.dart';
 ValueNotifier<dynamic> notifierValue = ValueNotifier('');
 
 class FormGroup extends StatefulWidget {
-  const FormGroup({super.key, this.group, this.updateFields});
+  const FormGroup(
+      {super.key,
+      required this.fieldController,
+      this.group,
+      this.updateFields});
   final List<Group>? group;
   final Map<String, dynamic>? updateFields;
+  final FieldController fieldController;
 
   @override
   State<FormGroup> createState() => _FormGroupState();
@@ -31,20 +36,22 @@ class _FormGroupState extends State<FormGroup> {
     }
     convertedUpdatedFields =
         tempDataList.isEmpty ? null : tempDataList.map((e) => e).toList();
-    Field.updateFieldList = List.generate(
+
+    widget.fieldController.updateFieldList = List.generate(
         convertedUpdatedFields?.length ?? 0,
         (index) => {
               '${convertedUpdatedFields?[index].keys.first}_':
                   convertedUpdatedFields?[index].values.first
             });
     if (convertedUpdatedFields != null) {
-      Field.use.setUpdateFields(convertedUpdatedFields);
+      widget.fieldController.field.setUpdateFields(convertedUpdatedFields);
 
-      Field.updateFieldList = List.generate(
-          Field.updateFieldList.length,
+      widget.fieldController.updateFieldList = List.generate(
+          widget.fieldController.updateFieldList.length,
           (index) => {
-                Field.updateFieldList[index].keys.first.replaceAll('_', ''):
-                    Field.updateFieldList[index].values.first
+                widget.fieldController.updateFieldList[index].keys.first
+                        .replaceAll('_', ''):
+                    widget.fieldController.updateFieldList[index].values.first
               });
       checkForInputsEquality();
       notifierValue.addListener(() {
@@ -61,21 +68,24 @@ class _FormGroupState extends State<FormGroup> {
 
   checkForInputsEquality() {
     var dataToBeUpdated = convertedUpdatedFields ??
-        FieldValues.getInstance().instanceValues.map((e) => e).toList();
-    if (Field.updateFieldList.every((el) => dataToBeUpdated
+        widget.fieldController.field.fieldValuesController.instanceValues
+            .map((e) => e)
+            .toList();
+    if (widget.fieldController.updateFieldList.every((el) => dataToBeUpdated
             .any((e) => e[el.keys.first] == el[el.keys.first])) &&
-        Field.updateFieldList.isNotEmpty) {
-      Field.use.updateState = true;
-    } else if (Field.updateFieldList.isNotEmpty || dataToBeUpdated.isNotEmpty) {
-      Field.use.updateState = false;
+        widget.fieldController.updateFieldList.isNotEmpty) {
+      widget.fieldController.field.updateState = true;
+    } else if (widget.fieldController.updateFieldList.isNotEmpty ||
+        dataToBeUpdated.isNotEmpty) {
+      widget.fieldController.field.updateState = false;
     } else {
-      Field.use.updateState = true;
+      widget.fieldController.field.updateState = true;
     }
   }
 
   @override
   void dispose() {
-    Field.clearFields();
+    widget.fieldController.clearFields();
     // notifierValue.dispose();
     super.dispose();
   }
@@ -86,7 +96,8 @@ class _FormGroupState extends State<FormGroup> {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (!Field.use.updateState && Field.updateFieldList.isNotEmpty)
+          if (!widget.fieldController.field.updateState &&
+              widget.fieldController.updateFieldList.isNotEmpty)
             Container(
                 color: ThemeController.getInstance().darkMode(
                     darkColor: const Color.fromARGB(255, 14, 146, 146),

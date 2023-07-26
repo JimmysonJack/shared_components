@@ -20,48 +20,13 @@ class AppWidget extends StatelessWidget {
           return Theme(
             data: ThemeController.getInstance().customTheme(),
             child: Navigator(
-              key: NavigationService.navigatorKey,
+              key: NavigationService.get.navigatorKey,
               onGenerateRoute: (settings) => MaterialPageRoute(
                   builder: (context) => child!, settings: settings),
             ),
           );
         });
       },
-      // builder: (context, router) {
-      //   return CustomMaterialApp(
-      //       debugShowCheckedModeBanner: false,
-      //       navigatorKey: NavigationService.navigatorKey,
-      //       theme: ThemeController.getInstance().customTheme(),
-      //       home: Obx(() {
-      //         ThemeController.getInstance().isDarkTheme.value;
-      //         return router!;
-      //       }));
-      // },
-      // home: Obx(() {
-      //   // Ensure that you're updating the value of isDarkTheme
-      //   // and returning a widget from the builder function
-      //   ThemeController.getInstance().isDarkTheme.value;
-      //   return MaterialApp.router(
-      //     debugShowCheckedModeBanner: false,
-      //     title: appName,
-      //     routeInformationParser: Modular.routeInformationParser,
-      //     routerDelegate: Modular.routerDelegate,
-      //     theme: ThemeController.getInstance().customTheme(),
-      //   );
-      // }),
     ));
   }
 }
-
-// MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       navigatorKey: NavigationService.navigatorKey,
-//       home: CustomMaterialApp.router(
-//         navigatorKey: NavigationService.navigatorKey,
-//         debugShowCheckedModeBanner: false,
-//         title: appName,
-//         routeInformationParser: Modular.routeInformationParser,
-//         routerDelegate: Modular.routerDelegate,
-//         theme: ThemeController.getInstance().customTheme(),
-//       ),
-//     )

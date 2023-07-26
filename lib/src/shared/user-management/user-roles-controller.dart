@@ -10,6 +10,9 @@ class UserRolesController extends GetxController {
   final loading = false.obs;
   final loadingUsers = false.obs;
   final noMoreData = false.obs;
+  final requestFailed = false.obs;
+  final onSaveChangesLoader = false.obs;
+  String? responseMessage;
   int nextPage = 0;
   int totalPages = -1;
   int currentPage = 0;
@@ -66,10 +69,14 @@ class UserRolesController extends GetxController {
                       uid
                       ''',
           response: (PageableResponse? data, bool loading) {
-            if (data != null) {
+            console(data?.status);
+            if (data != null && data.status) {
               currentPage = data.currentPage;
               nextPage = data.currentPage;
               totalPages = data.pages;
+            } else {
+              requestFailed.value = data?.status ?? true;
+              responseMessage = data?.message ?? 'Failed To Fetch Data!';
             }
           },
           pageableParams: PageableParams(
@@ -95,5 +102,24 @@ class UserRolesController extends GetxController {
 
     noMoreData.value = true;
     loadingUsers.value = false;
+  }
+
+  saveChanges(
+      {required String endPointName,
+      required List<InputParameter> inputs,
+      required Function(Map<String, dynamic>?) onResponse,
+      required BuildContext context}) {
+    onSaveChangesLoader.value = true;
+    GraphQLService.mutate(
+        response: (data, loading) {
+          onSaveChangesLoader.value = loading;
+          if (data != null) {
+            onResponse(data);
+          }
+        },
+        endPointName: endPointName,
+        queryFields: 'uid',
+        inputs: inputs,
+        context: context);
   }
 }

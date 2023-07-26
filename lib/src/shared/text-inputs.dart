@@ -18,12 +18,19 @@ part 'text-inputs.g.dart';
 ValueNotifier valueNotifier = ValueNotifier('');
 
 class TextInput extends _TextInputBase with _$TextInput {
-  TextInput({super.updateFields, required super.fieldController});
+  TextInput(
+      {super.updateFields,
+      required super.fieldController,
+      required super.fieldValuesController});
 }
 
 abstract class _TextInputBase with Store {
-  _TextInputBase({this.updateFields, required this.fieldController});
-  final Field? fieldController;
+  _TextInputBase(
+      {this.updateFields,
+      required this.fieldController,
+      required this.fieldValuesController});
+  final FieldController? fieldController;
+  final FieldValuesController fieldValuesController;
 
   static const _locale = 'sw';
   static const _customKey = CustomDisplayKey();
@@ -61,7 +68,7 @@ abstract class _TextInputBase with Store {
   bool _checkBoxState = false;
 
   @action
-  setCheckBoxState(bool? value) => _checkBoxState = value ?? false;
+  setCheckBoxState(bool? value) => _checkBoxState = !_checkBoxState;
 
   @observable
   bool _switchState = false;
@@ -72,8 +79,10 @@ abstract class _TextInputBase with Store {
   @observable
   bool hasErrors = false;
 
+  String? selectedKey;
+
   @action
-  setSwitchState(bool? value) => _switchState = value ?? false;
+  setSwitchState(bool? value) => _switchState = !_switchState;
 
   Widget input(
       {required BuildContext context,
@@ -93,6 +102,8 @@ abstract class _TextInputBase with Store {
     // checkForUpdate(key, label, fieldInputType, validate, null);
 
     return LayoutBuilder(builder: (context, x) {
+      console('instance value ${fieldValuesController.instanceValues}');
+      console('update fields $updateFields');
       return SizedBox(
         width: sizeSet(widthSize, context, fixed: fixed),
         child: TextFormField(
@@ -624,16 +635,35 @@ abstract class _TextInputBase with Store {
     WidthSize? widthSize,
     Function(bool?)? onChanged,
     bool fixed = false,
+    bool currentValue = false,
     String? inputType = 'Boolean',
-    required String label,
+    String? label,
     required String key,
   }) {
-    // checkForUpdate(key, label, null, false, updateFields ?? []);
+    if (updateFields == null ||
+        updateFields!.where((element) => element.containsKey(key)).isEmpty) {
+      if (fieldValuesController.instanceValues
+              .where((element) => element.containsKey(key))
+              .isEmpty ||
+          fieldValuesController.instanceValues
+                  .where((element) => element.containsKey(key))
+                  .first
+                  .values
+                  .first !=
+              currentValue) {
+        onInitialValue([
+          {key: currentValue}
+        ], key, null, false, 'Checkbox', inputType!);
+      }
+    } else {
+      _checkBoxState = onInitialValue(
+              updateFields, key, null, false, 'Checkbox', inputType!) ??
+          false;
+    }
+    return Observer(builder: (context) {
+      ///Helping to rebuild when a value changes
+      _checkBoxState;
 
-    _checkBoxState = onInitialValue(
-            updateFields, key, null, false, 'Checkbox', inputType!) ??
-        false;
-    return LayoutBuilder(builder: (context, x) {
       return SizedBox(
         width: widthSize != null
             ? sizeSet(widthSize, context, fixed: fixed)
@@ -644,14 +674,19 @@ abstract class _TextInputBase with Store {
             Checkbox(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(100)),
-                value: _checkBoxState,
+                value: fieldValuesController.instanceValues
+                    .where((element) => element.keys.first == key)
+                    .first
+                    .values
+                    .first,
                 onChanged: (value) {
                   setCheckBoxState(value);
                   _onUpdate(key, value, inputType);
+
                   if (onChanged != null) onChanged(value);
                 }),
             Text(
-              label,
+              label ?? '',
               style: const TextStyle(fontSize: 10),
             )
           ],
@@ -665,21 +700,46 @@ abstract class _TextInputBase with Store {
     WidthSize? widthSize,
     String? inputType = 'Boolean',
     bool fixed = false,
+    bool currentValue = false,
     Function(bool?)? onChanged,
     required String key,
   }) {
     // checkForUpdate(key, null, null, false, updateFields ?? []);
 
-    _switchState =
-        onInitialValue(updateFields, key, null, false, 'Switch', inputType!) ??
-            false;
-    return LayoutBuilder(builder: (context, x) {
+    if (updateFields == null ||
+        updateFields!.where((element) => element.containsKey(key)).isEmpty) {
+      if (fieldValuesController.instanceValues
+              .where((element) => element.containsKey(key))
+              .isEmpty ||
+          fieldValuesController.instanceValues
+                  .where((element) => element.containsKey(key))
+                  .first
+                  .values
+                  .first !=
+              currentValue) {
+        onInitialValue([
+          {key: currentValue}
+        ], key, null, false, 'Checkbox', inputType!);
+      }
+    } else {
+      _switchState = onInitialValue(
+              updateFields, key, null, false, 'Checkbox', inputType!) ??
+          false;
+    }
+
+    return Observer(builder: (context) {
+      ///Helps to rebuild a state
+      _switchState;
       return SizedBox(
         width: widthSize != null
             ? sizeSet(widthSize, context, fixed: fixed)
             : null,
         child: Switch(
-            value: _switchState,
+            value: fieldValuesController.instanceValues
+                .where((element) => element.keys.first == key)
+                .first
+                .values
+                .first,
             onChanged: (value) {
               setSwitchState(value);
               _onUpdate(key, value, inputType);
@@ -780,7 +840,7 @@ abstract class _TextInputBase with Store {
 
   _onUpdate(String key, dynamic value, String? inputType) async {
     ///this is used for singleton
-    final instanceValues = FieldValues.getInstance().instanceValues;
+    final instanceValues = fieldValuesController.instanceValues;
 
     /// this is used for single instance only
     final fieldInstanceValues = fieldController?.instanceValues;
@@ -796,13 +856,13 @@ abstract class _TextInputBase with Store {
     if ('noKey' == foundKey) {
       Map<String, dynamic> json = {key: value, 'inputType': inputType};
       useFieldValue
-          ? FieldValues.getInstance().addValue(json)
+          ? fieldValuesController.addValue(json)
           : fieldController!.addValue(json);
     } else {
       valueIndex =
           dataList.indexWhere((rawValue) => rawValue.keys.first == foundKey);
       useFieldValue
-          ? FieldValues.getInstance().updateValue(value, foundKey, valueIndex)
+          ? fieldValuesController.updateValue(value, foundKey, valueIndex)
           : fieldController!.updateValue(value, foundKey, valueIndex);
     }
     if (!useFieldValue) {
@@ -897,15 +957,15 @@ abstract class _TextInputBase with Store {
           continue;
         }
 
-        if (data.keys.first == key) {
+        if (data.keys.first == key || data.keys.first == 'uid') {
           data.addAll({'inputType': inputType});
           uniqueListData.add(data);
           uniqueKeys.add(data); // Add the key to the Set to mark it as unique.
         }
       }
     }
-
-    FieldValues.getInstance().setValue(uniqueListData);
+    // console(dataList);
+    fieldValuesController.setValue(uniqueListData);
     dataMap = uniqueListData.firstWhere((data) => data.keys.first == key,
         orElse: () => <String, dynamic>{});
 
@@ -1057,22 +1117,24 @@ class UpdateField {
   // }
 }
 
-class Field {
+class FieldController {
   TextInput? _instance;
   bool hasErrors = true;
   static TextInput? _textInputnstance;
   List<Map<String, dynamic>> _values = [];
-  List<Map<String, dynamic>> _storage = [];
-  static List<Map<String, dynamic>> updateFieldList = [];
+  // List<Map<String, dynamic>> _storage = [];
+  List<Map<String, dynamic>> updateFieldList = [];
 
   ///Creating a SingleTon of [TextInput]
   static TextInput _use() {
-    _textInputnstance ??= TextInput(fieldController: Field());
+    _textInputnstance ??= TextInput(
+        fieldController: FieldController(),
+        fieldValuesController: FieldValuesController());
     return _textInputnstance!;
   }
 
   ///Clearing the Instance
-  static clearFields() {
+  void clearFields() {
     _textInputnstance = null;
   }
 
@@ -1080,20 +1142,21 @@ class Field {
   static TextInput get use => _use();
 
   TextInput get field {
-    _instance ??= TextInput(fieldController: this);
+    _instance ??= TextInput(
+        fieldController: this, fieldValuesController: FieldValuesController());
     return _instance!;
   }
 
   void setValue(List<Map<String, dynamic>>? value) {
-    _values = value ??= [];
-    _storage = value;
+    value ??= [];
+    _values = SettingsService.use.updateListWithNoDublicate(_values, value);
   }
 
   void addValue(dynamic value) => _values.add(value);
 
   List<Map<String, dynamic>> get instanceValues => _values;
 
-  List<Map<String, dynamic>> get updateStorage => _storage;
+  // List<Map<String, dynamic>> get updateStorage => _storage;
 
   updateValue(dynamic value, String key, int index) {
     if (value is String && value.isEmpty || value == null) {
@@ -1120,29 +1183,29 @@ class Field {
   }
 }
 
-class FieldValues {
-  static FieldValues? _instance;
+class FieldValuesController {
   List<Map<String, dynamic>> _values = [];
-  List<Map<String, dynamic>> _storage = [];
-  static FieldValues getInstance() {
-    _instance ??= FieldValues();
-    return _instance!;
-  }
+  // List<Map<String, dynamic>> _storage = [];
 
-  static void clearInstance() {
-    _instance = null;
+  void clearInstance() {
+    instanceValues.clear();
   }
 
   void setValue(List<Map<String, dynamic>>? value) {
-    _values = value ??= [];
-    _storage = value;
+    value ??= [];
+    _values = SettingsService.use.isEmptyOrNull(instanceValues)
+        ? value
+        : SettingsService.use.updateListWithNoDublicate(_values, value);
   }
 
-  void addValue(dynamic value) => _values.add(value);
+  void addValue(dynamic value) {
+    _values.add(value);
+  }
 
   List<Map<String, dynamic>> get instanceValues => _values;
+  set instanceValues(value) => _values = value;
 
-  List<Map<String, dynamic>> get updateStorage => _storage;
+  // List<Map<String, dynamic>> get updateStorage => _storage;
 
   updateValue(dynamic value, String key, int index) {
     if (value is String && value.isEmpty || value == null) {

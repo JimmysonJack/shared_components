@@ -48,7 +48,7 @@ class SettingsService {
             content:
                 'In order to proceed, you are advised to change your Password first',
             onConfirmBtnTap: () {
-              Navigator.pop(context, true);
+              Navigator.pop(NavigationService.get.currentContext!, true);
             });
         return Checking.firstLogin;
       } else if (userState == Checking.passwordExpired) {
@@ -58,7 +58,7 @@ class SettingsService {
             content:
                 'In order to proceed, you are advised to change your Password first',
             onConfirmBtnTap: () {
-              Navigator.pop(context, true);
+              Navigator.pop(NavigationService.get.currentContext!, true);
             });
         return Checking.passwordExpired;
       } else if (userState == Checking.otpExpired) {
@@ -68,7 +68,7 @@ class SettingsService {
             content:
                 'It seems like OTP is expired, you are advised to contact System Adminstrator',
             onConfirmBtnTap: () {
-              Navigator.pop(context, true);
+              Navigator.pop(NavigationService.get.currentContext!, true);
             });
         return Checking.otpExpired;
       }
@@ -205,5 +205,28 @@ class SettingsService {
     }
 
     return false;
+  }
+
+  List<Map<String, dynamic>> updateListWithNoDublicate<T>(
+      List<Map<String, dynamic>> updatedList,
+      List<Map<String, dynamic>> newList) {
+    if (!SettingsService.use.areEqual(updatedList, newList)) {
+      for (var updateMap in newList) {
+        if (updatedList
+            .where((element) => element.containsKey(updateMap.keys.first))
+            .isEmpty) {
+          updatedList.add(updateMap);
+        } else {
+          int index = updatedList.indexWhere(
+              (element) => element.containsKey(updateMap.keys.first));
+          if (!(updatedList.elementAt(index).values.first ==
+              updateMap.values.first)) {
+            updatedList.elementAt(index).update(
+                updateMap.keys.first, (value) => updateMap.values.first);
+          }
+        }
+      }
+    }
+    return updatedList;
   }
 }

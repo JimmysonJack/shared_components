@@ -24,12 +24,14 @@ class PopupModel extends _PopupModelBase with _$PopupModel {
       super.endpointName,
       super.refetchData,
       super.inputObjectFieldName,
+      required super.fieldController,
       super.onButtonPressed});
 }
 
 abstract class _PopupModelBase with Store {
   _PopupModelBase(
       {required this.buildContext,
+      required this.fieldController,
       this.title = 'dialog Service',
       required this.formGroup,
       this.queryFields,
@@ -87,6 +89,9 @@ abstract class _PopupModelBase with Store {
   ///This provides inputs type
   final String? inputType;
 
+  /// [fieldController] is used to control form fields and action button, as well as obtaining values from field inputs by using [fieldControll.field.fieldValuesController]
+  final FieldController fieldController;
+
   @observable
   double buildSize = 0;
 
@@ -115,7 +120,9 @@ abstract class _PopupModelBase with Store {
     hasError.addListener(() {
       _errors = hasError.value;
     });
-    FieldValues.clearInstance();
+    // console(fieldController.field.fieldValuesController.instanceValues);
+    fieldController.field.fieldValuesController.clearInstance();
+    fieldController.field.setUpdateFields(null);
 
     showAnimatedDialog(
       context: buildContext,
@@ -128,6 +135,7 @@ abstract class _PopupModelBase with Store {
       barrierColor: Colors.transparent,
       builder: (BuildContext context) {
         buildSize = MediaQuery.of(context).size.width;
+        bool mobileSize = buildSize < 500;
         var size = MediaQuery.of(context).size;
         return WillPopScope(
           onWillPop: () async => false,
@@ -139,7 +147,8 @@ abstract class _PopupModelBase with Store {
               child: Dialog(
                 child: Container(
                   color: Theme.of(context).cardColor,
-                  width: buildSize * (modelWidth ?? 0.5),
+                  width:
+                      mobileSize ? buildSize : buildSize * (modelWidth ?? 0.5),
                   child: Column(
                     // direction: Axis.vertical,
                     mainAxisSize: MainAxisSize.min,
@@ -163,8 +172,8 @@ abstract class _PopupModelBase with Store {
                               borderRadius: BorderRadius.circular(100),
                               onTap: () async {
                                 if (checkUnSavedData) {
-                                  console(!Field.use.updateState);
-                                  if (!Field.use.updateState) {
+                                  console(!fieldController.field.updateState);
+                                  if (!fieldController.field.updateState) {
                                     if (await _onWillPop(context)) {
                                       Navigator.pop(context);
                                     }
@@ -207,7 +216,7 @@ abstract class _PopupModelBase with Store {
                             child: Padding(
                               padding: const EdgeInsets.only(
                                   bottom: 10.0, right: 10, left: 10),
-                              child: Field.use.button(
+                              child: fieldController.field.button(
                                   // widthSize: WidthSize.col1,
                                   context: context,
                                   icon: iconButton,
@@ -260,14 +269,14 @@ abstract class _PopupModelBase with Store {
   }
 
   List<InputParameter> inputMaker() {
-    console(FieldValues.getInstance().instanceValues);
+    console(fieldController.field.fieldValuesController.instanceValues);
     if (inputObjectFieldName != null) {
       return [
         InputParameter(
             inputType: inputType!,
             fieldName: inputObjectFieldName!,
-            objectValues: FieldValues.getInstance()
-                .instanceValues
+            objectValues: fieldController
+                .field.fieldValuesController.instanceValues
                 .map((e) => InputParameter(
                     inputType: e[e.keys.last],
                     fieldName: e.keys.first,
@@ -277,8 +286,7 @@ abstract class _PopupModelBase with Store {
                 .toList())
       ];
     }
-    return FieldValues.getInstance()
-        .instanceValues
+    return fieldController.field.fieldValuesController.instanceValues
         .map((e) => InputParameter(
             inputType: e[e.keys.last],
             fieldName: e.keys.first,

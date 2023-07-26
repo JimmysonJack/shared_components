@@ -133,11 +133,14 @@ Shared_Component is a comprehensive collection of reusable components, classes, 
 
 - **formGroup**: A FormGroup object representing the form structure and data for the popup. The FormGroup contains a list of Group widgets, which group form fields together. Each Group widget may contain one or more form fields, represented by Field.use.input.
 
+- **fieldController**: This element takes an Instance of FieldController to both `PopupModel` and `FormGroup`
+
 **Example Usage:**
 
 ```dart 
     PopupModel(
         buildContext: context,
+        fieldController: fieldController,
         buttonLabel: data != null ? 'Update' : 'Save Role',
         checkUnSavedData: true,
         inputType: 'SaveRoleDtoInput',
@@ -146,6 +149,7 @@ Shared_Component is a comprehensive collection of reusable components, classes, 
         title: data != null ? 'Update Role' : 'Create Role',
         queryFields: 'uid',
         formGroup: FormGroup(
+            fieldController: fieldController,
             updateFields: data,
             group: [
             Group(children: [
@@ -177,11 +181,11 @@ The actual functionality of the PopupModel widget may depend on specific impleme
 ### Field Widget and Form Handling
 - **Field Widget and Form Handling:** The `Field` widget is a versatile form handling component in Flutter that enables developers to collect and manage user input efficiently. It offers various input field options, such as text inputs, dropdown menus, date pickers, multi-selects, attachments, checkboxes, and switches. The Field widget supports two main approaches for implementation: the static method approach (`Field.use`) and the instance-based approach (`Field` class instance). Both approaches provide effective form handling capabilities and data management.
 
-#### Static Method Approach (Field.use)
+### Static Method Approach (FieldController.use)
 
 In the static method approach, developers can use the Field.use static method to directly create and implement form fields with various input types.
 
-### Field.use.input
+### FieldController.use.input
 
 The Field.use.input widget is used for collecting textual data from users, such as names, email addresses, or any other type of text-based information.
 
@@ -195,7 +199,7 @@ The Field.use.input widget is used for collecting textual data from users, such 
 
 **Example**
 ```dart 
-Field.use.input(
+FieldController.use.input(
     context: context,
     label: 'Role',
     key: 'name',
@@ -204,7 +208,7 @@ Field.use.input(
     );
 ```
 
-### Field.use.select
+### FieldController.use.select
 
 The Field.use.select widget allows users to choose a single option from a list of items, implemented as a dropdown menu or select input.
 
@@ -226,7 +230,7 @@ The Field.use.select widget allows users to choose a single option from a list o
 
 **Example**
 ```dart 
-	Field.use.select(
+	FieldController.use.select(
         context: context,
   		endPointName: 'getRoles',
         isPageable: true,
@@ -248,7 +252,7 @@ The Field.use.select widget allows users to choose a single option from a list o
               );
 ```
 
-### Field.use.date
+### FieldController.use.date
 
 The Field.use.date widget provides a date picker input for selecting dates.
 
@@ -271,7 +275,7 @@ The Field.use.date widget provides a date picker input for selecting dates.
 **Example**
 
 ```dart 
-Field.use.date(
+FieldController.use.date(
     context: context,
     inputType: 'String',
     widthSize: WidthSize.col12,
@@ -290,7 +294,7 @@ Field.use.date(
     );
 ```
 
-### Field.use.multiSelect
+### FieldController.use.multiSelect
 
 The Field.use.multiSelect widget allows users to select multiple options from a list of items.
 
@@ -313,7 +317,7 @@ The Field.use.multiSelect widget allows users to select multiple options from a 
 
 **Example**
 ```dart 
-	Field.use.multiSelect(
+	FieldController.use.multiSelect(
         context: context,
   		endPointName: 'getRoles',
         isPageable: true,
@@ -335,7 +339,7 @@ The Field.use.multiSelect widget allows users to select multiple options from a 
               );
 ```
 
-### Field.use.checkbox
+### FieldController.use.checkbox
 
 The Field.use.checkbox widget allows users to select or toggle a boolean value using a checkbox input.
 
@@ -349,7 +353,7 @@ The Field.use.checkbox widget allows users to select or toggle a boolean value u
 
 **Example**
 ```dart 
-    Field.use.checkbox(
+    FieldController.use.checkbox(
         context: context,
         label: 'Role',
         key: 'name',
@@ -358,7 +362,7 @@ The Field.use.checkbox widget allows users to select or toggle a boolean value u
         );
 ```
 
-### Field.use.attachment
+### FieldController.use.attachment
 
 The Field.use.attachment widget is used to collect attachments or files from the user.
 
@@ -372,7 +376,7 @@ The Field.use.attachment widget is used to collect attachments or files from the
 
 **Example**
 ```dart 
-Field.use.attachment(
+FieldController.use.attachment(
     context: context,
     label: 'Role',
     key: 'name',
@@ -382,7 +386,7 @@ Field.use.attachment(
 ```
 
 
-### Field.use.switch
+### FieldController.use.switch
 
 The Field.use.switch widget allows users to toggle a boolean value using a switch input.
 
@@ -397,7 +401,7 @@ The Field.use.switch widget allows users to toggle a boolean value using a switc
 **Example**
 
 ```dart 
-Field.use.switch(
+FieldController.use.switch(
     context: context,
     label: 'Role',
     key: 'name',
@@ -406,15 +410,15 @@ Field.use.switch(
         );
 ```
 
-#### Instance-based Approach (Field Class Instance)
+### Instance-based Approach (FieldController Class Instance)
 
-The instance-based approach involves creating an instance of the `Field` class, `fieldController`, which provides more control and flexibility over form handling.
+The instance-based approach involves creating an instance of the `FieldController` class, `fieldController`, which provides more control and flexibility over form handling.
 
 Using `fieldController`, developers can create and manage form fields using methods like `fieldController.field.input()`, and also implement listeners to receive form data changes using `fieldController.fieldUpdates.listen((data) {})`.
 
 ### Recommendation
 
-It is recommended to use the instance-based approach, creating a Field class instance whenever input fields need to be implemented. This allows for better data management and responsiveness to form changes. Additionally, when using `PopupModel`, all `FieldValues.getInstance().instanceValues` and `fieldController.fieldUpdates` will be notified of changes, ensuring accurate data updates when sending data to the backend.
+It is recommended to use the instance-based approach, creating a Field class instance whenever input fields need to be implemented. This allows for better data management and responsiveness to form changes. Additionally, when using `PopupModel`, all `FieldControllerValues.getInstance().instanceValues` and `fieldController.fieldUpdates` will be notified of changes, ensuring accurate data updates when sending data to the backend.
 
 **Note:** Ensure that the required dependencies and data endpoints are correctly set up to make the widgets work as intended. The form fields inside the `FormGroup` may have their custom validation logic and functionality based on the `FieldInputType`.
 
@@ -517,7 +521,7 @@ It is recommended to use the instance-based approach, creating a Field class ins
 ## Installation
 
 To install `Shared_Component` package, follow the steps below:
-1. Download Shared_Component from git Repository and then place it any whare you want. We are only doing it because its not yet published.
+1. First, you need to download the 'Shared_Component' from a git repository. After that, you can put it anywhere you prefer on your computer. The reason we're doing this is that the component hasn't been officially published yet.
 2. Add the package to your Flutter project's `pubspec.yaml` file, in the path put an address where you placed Shared_component package.
 
 ```yaml
@@ -532,8 +536,8 @@ To install `Shared_Component` package, follow the steps below:
 ## Getting Started
 
 **Configuration Staps**
-- By using `Shared_Component` package you dont have to call a `runAp()` to initialize your App, its already taken care of. What you have to do is to call a `initApp()` fuction inside the `main()`, and it will handle the rest.
--  `Shared_Component` is using `flutter_module` to manage routing and manage module architecture in the project. Its also using `GetX` for dependence injection and state management.
+- By using the `Shared_Component` package, you can skip calling `runApp()` to initialize your App; it's already taken care of for you. What you need to do is call the `initApp()` function inside the `main()` function, and it will handle everything else for you.
+-  The `Shared_Component` package utilizes `flutter_module` to handle routing and implement the module architecture in your project. Additionally, it leverages `GetX` for dependency injection and state management.
 
     ```dart
     void main() async{

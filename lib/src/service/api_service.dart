@@ -35,15 +35,14 @@ class Api {
     AuthServiceController authServiceController = AuthServiceController();
 
     var mediaQuery = MediaQueryData.fromView(WidgetsBinding.instance.window);
+    FieldController fieldController = FieldController();
 
-    var width = (context ?? NavigationService.navigatorKey.currentContext!)
-        .layout
-        .value(
-            xs: mediaQuery.size.width * 0.8,
-            sm: mediaQuery.size.width * 0.4,
-            md: mediaQuery.size.width * 0.3,
-            lg: mediaQuery.size.width * 0.3,
-            xl: mediaQuery.size.width * 0.2);
+    var width = (context ?? NavigationService.get.currentContext!).layout.value(
+        xs: mediaQuery.size.width * 0.8,
+        sm: mediaQuery.size.width * 0.4,
+        md: mediaQuery.size.width * 0.3,
+        lg: mediaQuery.size.width * 0.3,
+        xl: mediaQuery.size.width * 0.2);
     var principal = await StorageService.getJson('user');
     String? userName;
     String? userEmail;
@@ -115,7 +114,7 @@ class Api {
                                 children: [
                                   if (authServiceController.loading.value)
                                     IndicateProgress.linear(),
-                                  Field.use.button(
+                                  fieldController.field.button(
                                     widthSize: WidthSize.col12,
                                     validate: false,
                                     label: 'Confirm',
@@ -137,6 +136,9 @@ class Api {
                                                                     .text) ==
                                                     Checking.proceed) {
                                                   Modular.to.pop();
+                                                  Navigator.pop(
+                                                      NavigationService
+                                                          .get.currentContext!);
                                                 }
                                                 authServiceController
                                                     .loading.value = false;
@@ -149,7 +151,7 @@ class Api {
                                 height: 10,
                               ),
                               if (!authServiceController.loading.value)
-                                Field.use.button(
+                                fieldController.field.button(
                                   widthSize: WidthSize.col12,
                                   validate: false,
                                   label: 'Go To Start Over',
@@ -417,8 +419,4 @@ class ModalState {
     _instance ??= ModalState();
     return _instance!;
   }
-}
-
-class NavigationService {
-  static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 }

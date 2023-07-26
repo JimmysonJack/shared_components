@@ -5,3 +5,5 @@ console(dynamic log) {
     print(log);
   }
 }
+
+bool callOnce = true;
