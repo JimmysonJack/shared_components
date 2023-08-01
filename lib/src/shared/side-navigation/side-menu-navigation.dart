@@ -13,6 +13,7 @@ class SideNavigation extends StatefulWidget {
       required this.body,
       required this.sideMenuTile,
       this.version,
+      this.showSideNav = true,
       this.appBarPosition = AppBarPosition.side,
       this.selectedColor,
       this.useBorderRadius = false});
@@ -24,6 +25,7 @@ class SideNavigation extends StatefulWidget {
   final Widget body;
   final TopAppBarDetails? topAppBarDetails;
   final List<SideMenuTile> sideMenuTile;
+  final bool showSideNav;
 
   @override
   State<SideNavigation> createState() => _SideNavigationState();
@@ -84,40 +86,43 @@ class _SideNavigationState extends State<SideNavigation>
                 body: widget.body,
               ))
           : null,
-      body: Row(
-        children: [
-          if (!mobileWidthSize)
-            SideMenu(
-                toggleController: toggleController,
-                backgroundColor: Colors.black12,
-                hasResizer: false,
-                hasResizerToggle: true,
-                mode: SideMenuMode.auto,
-                builder: (data) => sideMenuTiles(
-                    sideMenuTile: widget.sideMenuTile,
-                    selectedIndex: selectedIndex,
-                    version: widget.version,
-                    selectedColor: widget.selectedColor,
-                    useBorderRadius: widget.useBorderRadius,
-                    onTap: (index) => selectedIndex = index)),
-          Expanded(
-            child: widget.useAppBar &&
-                    widget.topAppBarDetails != null &&
-                    widget.appBarPosition == AppBarPosition.side
-                ? TopAppBar(
-                    onSettings: () {},
-                    title: mobileWidthSize
-                        ? selectedTitle ?? ''
-                        : widget.topAppBarDetails!.title ?? '',
-                    userDetails: widget.topAppBarDetails!.userProfileDetails,
-                    onTap: widget.topAppBarDetails!.onTap,
-                    menuItems: widget.topAppBarDetails!.menuItems,
-                    body: widget.body,
-                  )
-                : Center(child: widget.body),
-          ),
-        ],
-      ),
+      body: widget.showSideNav
+          ? widget.body
+          : Row(
+              children: [
+                if (!mobileWidthSize)
+                  SideMenu(
+                      toggleController: toggleController,
+                      backgroundColor: Colors.black12,
+                      hasResizer: false,
+                      hasResizerToggle: true,
+                      mode: SideMenuMode.auto,
+                      builder: (data) => sideMenuTiles(
+                          sideMenuTile: widget.sideMenuTile,
+                          selectedIndex: selectedIndex,
+                          version: widget.version,
+                          selectedColor: widget.selectedColor,
+                          useBorderRadius: widget.useBorderRadius,
+                          onTap: (index) => selectedIndex = index)),
+                Expanded(
+                  child: widget.useAppBar &&
+                          widget.topAppBarDetails != null &&
+                          widget.appBarPosition == AppBarPosition.side
+                      ? TopAppBar(
+                          onSettings: () {},
+                          title: mobileWidthSize
+                              ? selectedTitle ?? ''
+                              : widget.topAppBarDetails!.title ?? '',
+                          userDetails:
+                              widget.topAppBarDetails!.userProfileDetails,
+                          onTap: widget.topAppBarDetails!.onTap,
+                          menuItems: widget.topAppBarDetails!.menuItems,
+                          body: widget.body,
+                        )
+                      : Center(child: widget.body),
+                ),
+              ],
+            ),
       bottomNavigationBar: mobileWidthSize
           ? Container(
               alignment: Alignment.center,

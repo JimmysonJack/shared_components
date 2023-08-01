@@ -110,6 +110,134 @@ Shared_Component is a comprehensive collection of reusable components, classes, 
       ],
     );
 ```
+### SideNavigation
+- The **SideNavigation** is a customizable widget that provides a side navigation menu for your application. It allows users to easily access different sections of your app through the side navigation menu. Below is the detailed documentation of the SideNavigation widget along with its properties and usage.
+
+**Properties:**
+
+- **selectedColor:**  The color used to indicate the selected item in the side navigation menu.
+
+- **showSideNav:**  Determines whether the side navigation menu should be shown or hidden.
+
+- **useAppBar:**  Determines whether to use the app bar in conjunction with the side navigation menu.
+
+- **useBorderRadius:**  Determines whether to use border radius for the side navigation menu or not.
+
+- **appBarPosition:**  Defines the position of the app bar in relation to the side navigation menu. It can be either `AppBarPosition.top` or `AppBarPosition.side`.
+
+- **version:** Specifies the version of your App widget.
+
+- **topAppBarDetails:** Contains the configuration for the top app bar when `useAppBar` is set to true.
+
+- **sideMenuTile:**  Contains a list of side menu tiles to be displayed in the side navigation menu.
+
+- **body:**  The main content of the page that will be displayed below the side navigation menu and/or app bar.
+
+**Usage**
+
+```dart 
+    SideNavigation(
+  selectedColor: Colors.black,
+  showSideNav: true,
+  useAppBar: false,
+  useBorderRadius: false,
+  appBarPosition: AppBarPosition.side,
+  version: '2.0.3',
+  topAppBarDetails: TopAppBarDetails(
+    title: 'Top Bar',
+    menuItems: [
+      MenuItem<String>(
+        title: 'Change Password',
+        icon: Icons.logo_dev,
+        value: 'password',
+      ),
+      MenuItem<String>(
+        title: 'Profile',
+        icon: Icons.details,
+        value: 'profile',
+      ),
+    ],
+    onTap: (value) {
+      // Handle menu item tap event here.
+    },
+    userProfileDetails: UserProfileItem(
+      onLogout: () {
+        // Handle logout action here.
+        SettingsService.use.logout(Modular.initialRoute, NavigationService.get.currentContext!);
+      },
+      email: 'Jimmysonblack@gmail.com',
+      userName: 'Jimmyson Jackson Mnunguri',
+    ),
+  ),
+  sideMenuTile: [
+    SideMenuTile(
+      title: 'Dashboard',
+      url: 'dashboard',
+      icon: Icons.dashboard,
+      permissions: ['ACCESS_BILLS'],
+    ),
+    SideMenuTile(
+      title: 'Users Management',
+      url: 'user-management',
+      icon: Icons.people,
+      permissions: ['ACCESS_BILLS', 'ACCESS'],
+    ),
+    SideMenuTile(
+      title: 'Facility',
+      url: 'facility-management',
+      icon: Icons.abc,
+      permissions: ['ACCESS_BILLS'],
+    ),
+  ],
+  body: const RouterOutlet(),
+)
+
+```
+
+
+### TilesSearch
+
+The `TilesSearch` is a widget that displays a list of tiles with search functionality. It allows users to search and filter the tiles based on their titles. Below is the detailed documentation of the `TilesSearch` widget along with its properties and usage.
+
+**Properties**
+
+- **gradientColors:**  The gradient colors to be applied to the background of the widget.
+
+- **showGradient:** Determines whether to display the gradient background or not.
+
+- **titleColor:** The color of the title text in the tiles.
+
+- **tileFields:** Contains a list of `TileFields` to be displayed in the TilesSearch widget.
+
+**Usage**
+
+To use the `TilesSearch` widget, create an instance of it and provide the desired properties. Below is an example of how to use the TilesSearch widget:
+
+```dart 
+    TilesSearch(
+  gradientColors: [Colors.red, Colors.blue],
+  showGradient: true,
+  titleColor: Colors.white,
+  tileFields: [
+    TileFields(
+      icon: Icons.login,
+      title: 'Facilities',
+      url: '/facilities',
+      permissions: ['ACCESS_FACILITY'],
+    ),
+    TileFields(
+      icon: Icons.people,
+      title: 'User Management',
+      url: '/user-management',
+      permissions: ['ACCESS_USERS'],
+    ),
+    // Add more TileFields as needed
+  ],
+)
+
+```
+
+
 ### PopupModel Widget
 - **PopupModel Widget:** The `PopupModel` widget is a flexible and reusable component in Flutter that allows the display of a popup or dialog to collect user input or show information. It is particularly useful for creating and updating data records with a form-like interface. The widget is highly customizable, supporting dynamic titles, input validation, and data prefilling for update operations.
 
@@ -252,6 +380,34 @@ The Field.use.select widget allows users to choose a single option from a list o
               );
 ```
 
+
+### GraphQLService
+
+The `GraphQLService` is a utility class that provides three static methods (query, mutation, and queryPageable) for making GraphQL requests in a Flutter app. It allows you to perform GraphQL queries and mutations to interact with GraphQL endpoints efficiently.
+
+**Query**
+
+```dart 
+    GraphQLService.query(
+  endPointName: endPointName,
+  responseFields: responseFields,
+  context: context,
+  fetchPolicy: fetchPolicy,
+  parameters: [OtherParameters(keyName: 'name', keyValue: nameValue, keyType: 'String')],
+);
+```
+
+**Mutation**
+```dart 
+     GraphQLService.mutate(
+        response: (data, loader){}, 
+        endPointName: endPointName, 
+        queryFields: queryFields, 
+        inputs: [InputParameter(fieldName: fieldName, inputType: inputTypfieldValue: fieldValue)], 
+        refetchData: true,
+        successMessage: 'User Created Successfully',
+        context: context)
+```
 ### FieldController.use.date
 
 The Field.use.date widget provides a date picker input for selecting dates.
