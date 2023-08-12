@@ -71,7 +71,7 @@ class _ContainerTileState extends State<ContainerTile> {
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 2,
+                  spreadRadius: 1,
                   blurRadius: 5,
                   offset: const Offset(0, 3),
                 ),
@@ -103,14 +103,18 @@ class _ContainerTileState extends State<ContainerTile> {
                       color: widget.iconColor,
                     ),
                     const SizedBox(height: 10),
-                    GText(
+                    Text(
                       widget.fields.title,
-                      fontWeight: FontWeight.bold,
-                      color: widget.titalColor,
-                      fontSize: SearchTileController()
-                          .sizeCalc(
-                              max: 20, min: 13, minWidthScreenSize: minWidth)
-                          .width,
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            // fontWeight: FontWeight.bold,
+                            color: widget.titalColor,
+                            fontSize: SearchTileController()
+                                .sizeCalc(
+                                    max: 20,
+                                    min: 13,
+                                    minWidthScreenSize: minWidth)
+                                .width,
+                          ),
                     ),
                   ],
                 ),

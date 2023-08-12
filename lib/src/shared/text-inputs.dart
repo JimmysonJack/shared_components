@@ -187,6 +187,7 @@ abstract class _TextInputBase with Store {
       List<Map<String, dynamic>>? items,
       bool isPageable = false,
       String Function(Map<String, dynamic>)? inFieldString,
+      Function(bool isOpenned)? onOverlay,
       CustomDisplayKey customDisplayKey = _customKey,
       String? queryFields,
       String? endPointName,
@@ -195,6 +196,7 @@ abstract class _TextInputBase with Store {
       String? optionalResponseField,
       List<OtherParameters>? otherParameters,
       FieldInputType? fieldInputType}) {
+    bool isOpenned = false;
     // checkForUpdate(key, label, fieldInputType, validate, updateFields ?? []);
 
     final size = MediaQuery.of(context).size;
@@ -245,7 +247,16 @@ abstract class _TextInputBase with Store {
                         border: InputBorder.none,
                         filled: true,
                         fillColor: Theme.of(context).dividerColor)),
+                onDismissed: () {
+                  if (onOverlay != null) {
+                    onOverlay(false);
+                  }
+                },
                 containerBuilder: (cxt, widget) {
+                  if (onOverlay != null) {
+                    onOverlay(true);
+                  }
+
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -538,6 +549,7 @@ abstract class _TextInputBase with Store {
     bool fixed = false,
     WidthSize? widthSize,
     Function(dynamic)? onSelectedDate,
+    Function(bool isOpenned)? onOverlay,
     required String label,
     required String key,
   }) {
@@ -547,6 +559,11 @@ abstract class _TextInputBase with Store {
       return SizedBox(
         width: sizeSet(widthSize, context, fixed: fixed),
         child: CustomDate(
+          onOverlay: (isOpenned) {
+            if (onOverlay != null) {
+              onOverlay(isOpenned);
+            }
+          },
           onSelected: (value) {
             validateErrors(key, label, null, validate, value);
             _onUpdate(key, value.toString(), inputType);

@@ -9,7 +9,7 @@ export 'src/exceptions/api_results.dart';
 export 'src/exceptions/network_exceptions.dart';
 export 'src/languages/en.dart';
 export 'src/languages/sw.dart';
-export 'src/languages/intl.dart';
+export 'src/languages/intlx.dart';
 export 'src/models/notification.dart';
 export 'src/models/token.dart';
 export 'src/models/user_model.dart';
@@ -75,3 +75,11 @@ export 'src/shared/permissions-widget/permission-set.dart';
 export 'src/shared/user-management/users-manager.dart';
 export 'src/service/navigation.service.dart';
 export 'src/service/route.service.dart';
+export 'package:get/get.dart'
+    hide
+        FormData,
+        MultipartFile,
+        RouterOutlet,
+        RouterOutletState,
+        Response,
+        CustomTransition;

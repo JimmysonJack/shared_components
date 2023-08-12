@@ -59,12 +59,15 @@ class _SideNavigationState extends State<SideNavigation>
       }
     });
     var route = NavigationService.get.fullCurrentRoute.split('/');
-    int pageIndex = widget.sideMenuTile.indexWhere(
-        (element) => element.url == route.elementAt(route.length - 1));
-    setState(() {
-      selectedTitle =
-          widget.sideMenuTile[pageIndex == -1 ? 0 : pageIndex].title;
-    });
+    if (!SettingsService.use.isEmptyOrNull(widget.sideMenuTile)) {
+      int pageIndex = widget.sideMenuTile.indexWhere(
+          (element) => element.url == route.elementAt(route.length - 1));
+      setState(() {
+        selectedTitle =
+            widget.sideMenuTile[pageIndex == -1 ? 0 : pageIndex].title;
+      });
+    }
+
     super.initState();
   }
 
@@ -85,8 +88,19 @@ class _SideNavigationState extends State<SideNavigation>
                 menuItems: widget.topAppBarDetails!.menuItems,
                 body: widget.body,
               ))
-          : null,
-      body: widget.showSideNav
+          : widget.showSideNav
+              ? null
+              : PreferredSize(
+                  preferredSize: const Size.fromHeight(60),
+                  child: TopAppBar(
+                    onSettings: () {},
+                    title: widget.topAppBarDetails!.title ?? '',
+                    userDetails: widget.topAppBarDetails!.userProfileDetails,
+                    onTap: widget.topAppBarDetails!.onTap,
+                    menuItems: widget.topAppBarDetails!.menuItems,
+                    body: SizedBox.shrink(),
+                  )),
+      body: !widget.showSideNav
           ? widget.body
           : Row(
               children: [
@@ -303,6 +317,7 @@ class _SideNavigationState extends State<SideNavigation>
       final String? version,
       Color? selectedColor}) {
     return SideMenuData(
+        // customChild: customChild,
         header: Column(
           children: [
             AnimatedContainer(

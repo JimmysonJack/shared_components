@@ -315,9 +315,11 @@ class CustomDate extends StatefulWidget {
     required this.onSelected,
     this.disableFuture = false,
     this.disablePast = false,
+    this.onOverlay,
   }) : super(key: key);
 
   final VoidCallback? onTap;
+  final Function(bool isOpenned)? onOverlay;
   final String? Function(String?)? validator;
   final bool? enabled;
   final bool? readyOnly;
@@ -373,9 +375,11 @@ class _CustomDateState extends State<CustomDate> {
     if (sourceFocused) {
       _overlayEntry = _createOverlay();
       Overlay.of(context).insert(_overlayEntry!);
+      widget.onOverlay!(true);
     } else {
       _overlayEntry?.remove();
       _overlayEntry = null;
+      widget.onOverlay!(false);
       if (sourceFocused) {
         _overlayEntry = _createOverlay();
         Overlay.of(context).insert(_overlayEntry!);

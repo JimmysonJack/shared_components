@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
-import '../languages/intl.dart';
+import '../languages/intlx.dart';
 
 part 'auth_guard_store.g.dart';
 
