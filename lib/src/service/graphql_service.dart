@@ -137,76 +137,17 @@ class GraphQLService {
     return repositories ?? [];
   }
 
-  static Future<List<Map<String, dynamic>>> query(
-      {required String endPointName,
-      required String responseFields,
-      List<OtherParameters>? parameters,
-      FetchPolicy? fetchPolicy,
-      required BuildContext context,
-      String? optionResponseFields}) async {
-    Map<String, dynamic>? otherParams = {};
-    Map values = {};
-    Map variables = {};
-    if (parameters != null) {
-      for (var element in parameters) {
-        variables.addAll({'\$${element.keyName}': element.keyType});
-        values.addAll({element.keyName: '\$${element.keyName}'});
-        otherParams.addAll({element.keyName: element.keyValue});
-      }
-    }
-    var graphVariables =
-        variables.toString().replaceAll('{', '').replaceAll('}', '');
-    var graphValues = values.toString().replaceAll('{', '').replaceAll('}', '');
-    var withParams = '''
-  query $endPointName($graphVariables){
-    $endPointName($graphValues){
-        $baseResponseFields
-        data{
-            ${optionResponseFields ?? responseFields}
-        }
-    }
-}
-  ''';
-
-    var withoutParams = '''
-  query $endPointName{
-    $endPointName{
-        $baseResponseFields
-        data{
-            ${optionResponseFields ?? responseFields}
-        }
-    }
-}
-  ''';
+//
+  static Future<List<Map<String, dynamic>>> getEnum(
+      {required BuildContext context, required String enumString}) async {
     final QueryOptions options = QueryOptions(
-      operationName: endPointName,
-      document: gql(parameters != null ? withParams : withoutParams),
-      variables: {...otherParams},
-      fetchPolicy: fetchPolicy ?? FetchPolicy.networkOnly,
+      document: gql(_privateEnumGraph(enumString)),
     );
-
     final client = await graphClient(context);
-
     final QueryResult result = await client.value.query(options);
 
-    if (result.hasException) {}
-
-    if (result.isLoading) {}
-    List<Map<String, dynamic>>? repositories = result.data?[endPointName]
-            ?['data']
-        .map((e) => e)
-        .cast<Map<String, dynamic>>()
-        .toList();
-
-    if (result.data?[endPointName]?['status'] == false) {
-      NotificationService.snackBarError(
-        context: context,
-        title: result.data?[endPointName]?['message'],
-      );
-    }
-    if (repositories == null) {}
     if (result.hasException) {
-      LinkException exception = result.exception!.linkException!;
+      LinkException? exception = result.exception?.linkException;
       if (exception.runtimeType == ServerException) {
         NotificationService.snackBarError(
           context: context,
@@ -228,15 +169,200 @@ class GraphQLService {
             title: 'Something is wrong',
           );
         }
+      } else if (SettingsService.use.isEmptyOrNull(exception)) {
+        if (SettingsService.use
+            .isEmptyOrNull(result.data?['__type']['enumValues'])) {
+          List errorsList = result.exception!.graphqlErrors;
+          NotificationService.errors(
+              title: 'GraphQL Errors!', context: context, contents: errorsList);
+        }
+      }
+    }
+    //
+    return List<Map<String, dynamic>>.from(
+        result.data?['__type']['enumValues']);
+  }
+
+  static String _privateEnumGraph(String enumString) {
+    return '''
+      query getEnums {
+        __type(name: "$enumString") {
+          name
+          enumValues {
+            name
+          }
+        }
+      }
+    ''';
+  }
+
+  static Future<Map<String, dynamic>> getPropertyType(
+      {required BuildContext context, required String name}) async {
+    final QueryOptions options = QueryOptions(
+      document: gql(_privatePropertyTypeGraph(name)),
+    );
+    final client = await graphClient(context);
+    final QueryResult result = await client.value.query(options);
+
+    if (result.hasException) {
+      LinkException? exception = result.exception?.linkException;
+      if (exception.runtimeType == ServerException) {
+        NotificationService.snackBarError(
+          context: context,
+          title: 'Connection Error',
+        );
+      } else if (exception.runtimeType == HttpLinkServerException) {
+        HttpLinkServerException serverException =
+            exception as HttpLinkServerException;
+        var errorResponse =
+            serverException.parsedResponse!.response['message'].split(':');
+        if (errorResponse[0] == "Invalid access token") {
+          NotificationService.snackBarError(
+            context: context,
+            title: errorResponse[0],
+          );
+        } else {
+          NotificationService.snackBarError(
+            context: context,
+            title: 'Something is wrong',
+          );
+        }
+      } else if (SettingsService.use.isEmptyOrNull(exception)) {
+        if (SettingsService.use.isEmptyOrNull(result.data?['__type'])) {
+          List errorsList = result.exception!.graphqlErrors;
+          NotificationService.errors(
+              title: 'GraphQL Errors!', context: context, contents: errorsList);
+        }
+      }
+    }
+    return Map<String, dynamic>.from(result.data?['__type']);
+  }
+
+  static String _privatePropertyTypeGraph(String name) {
+    return '''
+      query getPropertyType {
+        __type(name: "$name") {
+          kind
+          name
+          fields {
+            name
+            type {
+              name
+            }
+          }
+        }
+      }
+    ''';
+  }
+
+  static Future<ResponseData> query({
+    required String endPointName,
+    required String? responseFields,
+    List<OtherParameters>? parameters,
+    FetchPolicy? fetchPolicy,
+    required BuildContext context,
+  }) async {
+    Map<String, dynamic>? otherParams = {};
+    Map values = {};
+    Map variables = {};
+    if (parameters != null) {
+      for (var element in parameters) {
+        variables.addAll({'\$${element.keyName}': element.keyType});
+        values.addAll({element.keyName: '\$${element.keyName}'});
+        otherParams.addAll({element.keyName: element.keyValue});
+      }
+    }
+    var graphVariables =
+        variables.toString().replaceAll('{', '').replaceAll('}', '');
+    var graphValues = values.toString().replaceAll('{', '').replaceAll('}', '');
+    var withParams = '''
+  query $endPointName($graphVariables){
+    $endPointName($graphValues){
+        $baseResponseFields
+       ${SettingsService.use.isEmptyOrNull(responseFields) ? '''data''' : '''data{
+            $responseFields
+        }'''} 
+    }
+}
+  ''';
+
+    var withoutParams = '''
+  query $endPointName{
+    $endPointName{
+        $baseResponseFields
+       ${SettingsService.use.isEmptyOrNull(responseFields) ? '''data''' : '''data{
+            $responseFields
+        }'''} 
+    }
+}
+  ''';
+    final QueryOptions options = QueryOptions(
+      operationName: endPointName,
+      document: gql(parameters != null ? withParams : withoutParams),
+      variables: {...otherParams},
+      fetchPolicy: fetchPolicy ?? FetchPolicy.networkOnly,
+    );
+
+    final client = await graphClient(context);
+
+    final QueryResult result = await client.value.query(options);
+
+    if (result.hasException) {}
+
+    if (result.isLoading) {}
+    // List<Map<String, dynamic>>? repositories = result.data?[endPointName]
+    //         ?['data']
+    //     .map((e) => e)
+    //     .cast<Map<String, dynamic>>()
+    //     .toList();
+    var resData = result.data?[endPointName];
+    ResponseData? repositories =
+        resData != null ? ResponseData.fromJson(resData) : null;
+    if (repositories?.status == false) {
+      NotificationService.snackBarError(
+        context: context,
+        title: repositories?.message ?? '',
+      );
+    }
+    // if (SettingsService.use.isEmptyOrNull(repositories)) {}
+    if (result.hasException) {
+      LinkException? exception = result.exception?.linkException;
+      if (exception.runtimeType == ServerException) {
+        NotificationService.snackBarError(
+          context: context,
+          title: 'Connection Error',
+        );
+      } else if (exception.runtimeType == HttpLinkServerException) {
+        HttpLinkServerException serverException =
+            exception as HttpLinkServerException;
+        var errorResponse =
+            serverException.parsedResponse!.response['message'].split(':');
+        if (errorResponse[0] == "Invalid access token") {
+          NotificationService.snackBarError(
+            context: context,
+            title: errorResponse[0],
+          );
+        } else {
+          NotificationService.snackBarError(
+            context: context,
+            title: 'Something is wrong',
+          );
+        }
+      } else if (SettingsService.use.isEmptyOrNull(exception)) {
+        if (SettingsService.use.isEmptyOrNull(repositories)) {
+          List errorsList = result.exception!.graphqlErrors;
+          NotificationService.errors(
+              title: 'GraphQL Errors!', context: context, contents: errorsList);
+        }
       }
     } else {
-      if (result.data?[endPointName] == null) {
+      if (SettingsService.use.isEmptyOrNull(repositories)) {
         List errorsList = result.exception!.graphqlErrors;
         NotificationService.errors(
             title: 'GraphQL Errors!', context: context, contents: errorsList);
       }
     }
-    return repositories ?? [];
+    return repositories ?? ResponseData();
   }
 
   ///This [response]is used to return server response and loading state.
@@ -513,4 +639,20 @@ class PageableResponse {
       'status': status
     };
   }
+}
+
+class ResponseData {
+  final String? message;
+  final bool? status;
+  final dynamic data;
+
+  ResponseData({this.data, this.message, this.status});
+
+  factory ResponseData.fromJson(Map<String, dynamic> json) => ResponseData(
+      message: json['message'] as String?,
+      data: json['data'] as dynamic,
+      status: json['status'] as bool?);
+
+  Map<String, dynamic> toJson() =>
+      {'message': message, 'data': data, 'status': status};
 }

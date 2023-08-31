@@ -32,7 +32,7 @@ abstract class _TextInputBase with Store {
   final FieldController? fieldController;
   final FieldValuesController fieldValuesController;
 
-  static const _locale = 'sw';
+  static const _locale = 'sw_TZ';
   static const _customKey = CustomDisplayKey();
 
   String get _currency =>
@@ -96,14 +96,13 @@ abstract class _TextInputBase with Store {
       int minLines = 1,
       String? inputType = 'String',
       bool readOnly = false,
+      bool enabled = true,
       bool? validate = false,
       bool show = false,
       FieldInputType? fieldInputType}) {
     // checkForUpdate(key, label, fieldInputType, validate, null);
 
     return LayoutBuilder(builder: (context, x) {
-      console('instance value ${fieldValuesController.instanceValues}');
-      console('update fields $updateFields');
       return SizedBox(
         width: sizeSet(widthSize, context, fixed: fixed),
         child: TextFormField(
@@ -140,6 +139,7 @@ abstract class _TextInputBase with Store {
                   ? maxLines
                   : minLines,
           readOnly: readOnly,
+          enabled: enabled,
           initialValue: onInitialValue(updateFields, key, fieldInputType,
               validate ?? false, label, inputType!),
           autovalidateMode: onInitialValue(updateFields, key, fieldInputType,
@@ -193,10 +193,9 @@ abstract class _TextInputBase with Store {
       String? endPointName,
       String? inputType = 'String',
       bool fixed = false,
-      String? optionalResponseField,
+      bool? isMap = false,
       List<OtherParameters>? otherParameters,
       FieldInputType? fieldInputType}) {
-    bool isOpenned = false;
     // checkForUpdate(key, label, fieldInputType, validate, updateFields ?? []);
 
     final size = MediaQuery.of(context).size;
@@ -204,6 +203,7 @@ abstract class _TextInputBase with Store {
       return SizedBox(
         width: sizeSet(widthSize, context, fixed: fixed),
         child: DropdownSearch<Map<String, dynamic>>(
+            isPageable: isPageable,
             enabled: !readOnly,
             clearButtonProps: const ClearButtonProps(
               icon: Icon(Icons.close),
@@ -226,6 +226,7 @@ abstract class _TextInputBase with Store {
                 textAlignVertical: TextAlignVertical.center,
                 baseStyle: const TextStyle(fontSize: 16),
                 dropdownSearchDecoration: InputDecoration(
+                    enabled: !readOnly,
                     filled: true,
                     fillColor: Theme.of(context).cardColor,
                     border: null,
@@ -334,10 +335,12 @@ abstract class _TextInputBase with Store {
                   final results = await GraphQLService.query(
                       context: context,
                       endPointName: endPointName,
-                      optionResponseFields: optionalResponseField,
                       parameters: otherParameters,
                       responseFields: queryFields ?? '');
-                  return results
+
+                  var mapResults =
+                      List<Map<String, dynamic>>.from(results.data);
+                  return mapResults
                       .where((element) =>
                           element[customDisplayKey.titleDisplayLabelKey]
                               .toString()
@@ -355,9 +358,11 @@ abstract class _TextInputBase with Store {
             selectedItem: onInitialValue(updateFields, key, fieldInputType,
                 validate ?? false, label, inputType),
             onChanged: (data) {
+              if (isMap == false) {
+                data?['inputValueField'] = customDisplayKey.inputValueField;
+              }
               validateErrors(key, label, fieldInputType, validate,
                   data?[customDisplayKey.titleDisplayLabelKey]);
-              data?['inputValueField'] = customDisplayKey.inputValueField;
               _onUpdate(key, data, inputType);
             }),
       );
@@ -390,6 +395,7 @@ abstract class _TextInputBase with Store {
       return SizedBox(
         width: sizeSet(widthSize, context, fixed: fixed),
         child: DropdownSearch<Map<String, dynamic>>.multiSelection(
+            isPageable: isPageable,
             enabled: !readOnly,
             clearButtonProps: const ClearButtonProps(
               icon: Icon(Icons.close),
@@ -510,7 +516,9 @@ abstract class _TextInputBase with Store {
                       endPointName: endPointName,
                       parameters: otherParameters,
                       responseFields: queryFields ?? '');
-                  return results
+                  var mapResults =
+                      List<Map<String, dynamic>>.from(results.data);
+                  return mapResults
                       .where((element) =>
                           element[customDisplayKey.titleDisplayLabelKey]
                               .toString()
@@ -598,6 +606,7 @@ abstract class _TextInputBase with Store {
       bool? validate,
       String? inputType = 'String',
       required String key,
+      required String fileNameKey,
       bool fixed = false,
       required BuildContext context}) {
     // checkForUpdate(key, label, fieldInputType, validate, updateFields ?? []);
@@ -621,13 +630,8 @@ abstract class _TextInputBase with Store {
               validateErrors(
                   key, label, fieldInputType, validate, fileData.name);
 
-              _onUpdate(
-                  key,
-                  {
-                    'fileName': fileData.name,
-                    'value': base64.encode(fileData.bytes!)
-                  },
-                  inputType);
+              _onUpdate(key, base64.encode(fileData.bytes!), inputType);
+              _onUpdate(fileNameKey, fileData.name, inputType);
             }
           },
           readOnly: true,
@@ -655,29 +659,31 @@ abstract class _TextInputBase with Store {
     bool currentValue = false,
     String? inputType = 'Boolean',
     String? label,
+    MainAxisAlignment? align,
     required String key,
   }) {
-    if (updateFields == null ||
-        updateFields!.where((element) => element.containsKey(key)).isEmpty) {
-      if (fieldValuesController.instanceValues
-              .where((element) => element.containsKey(key))
-              .isEmpty ||
-          fieldValuesController.instanceValues
-                  .where((element) => element.containsKey(key))
-                  .first
-                  .values
-                  .first !=
-              currentValue) {
-        onInitialValue([
-          {key: currentValue}
-        ], key, null, false, 'Checkbox', inputType!);
-      }
-    } else {
-      _checkBoxState = onInitialValue(
-              updateFields, key, null, false, 'Checkbox', inputType!) ??
-          false;
-    }
     return Observer(builder: (context) {
+      if (updateFields == null ||
+          updateFields!.where((element) => element.containsKey(key)).isEmpty) {
+        if (fieldValuesController.instanceValues
+                .where((element) => element.containsKey(key))
+                .isEmpty ||
+            fieldValuesController.instanceValues
+                    .where((element) => element.containsKey(key))
+                    .first
+                    .values
+                    .first !=
+                currentValue) {
+          onInitialValue([
+            {key: currentValue}
+          ], key, null, false, 'Checkbox', inputType!);
+        }
+      } else {
+        _checkBoxState = onInitialValue(
+                updateFields, key, null, false, 'Checkbox', inputType!) ??
+            false;
+      }
+
       ///Helping to rebuild when a value changes
       _checkBoxState;
 
@@ -687,6 +693,9 @@ abstract class _TextInputBase with Store {
             : null,
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: SettingsService.use.isEmptyOrNull(align)
+              ? MainAxisAlignment.start
+              : align!,
           children: [
             Checkbox(
                 shape: RoundedRectangleBorder(
@@ -719,6 +728,7 @@ abstract class _TextInputBase with Store {
     bool fixed = false,
     bool currentValue = false,
     Function(bool?)? onChanged,
+    Alignment? align,
     required String key,
   }) {
     // checkForUpdate(key, null, null, false, updateFields ?? []);
@@ -747,7 +757,10 @@ abstract class _TextInputBase with Store {
     return Observer(builder: (context) {
       ///Helps to rebuild a state
       _switchState;
-      return SizedBox(
+      return Container(
+        alignment: SettingsService.use.isEmptyOrNull(align)
+            ? Alignment.centerLeft
+            : align!,
         width: widthSize != null
             ? sizeSet(widthSize, context, fixed: fixed)
             : null,
@@ -777,43 +790,43 @@ abstract class _TextInputBase with Store {
       IconData? icon}) {
     if (icon == null) {
       return Observer(
-          warnWhenNoObservables: false,
+          // warnWhenNoObservables: false,
           builder: (context) {
-            return ConstrainedBox(
-              constraints: BoxConstraints.tightFor(
-                width: widthSize != null
-                    ? sizeSet(widthSize, context, fixed: fixed)
-                    : null,
+        return ConstrainedBox(
+          constraints: BoxConstraints.tightFor(
+            width: widthSize != null
+                ? sizeSet(widthSize, context, fixed: fixed)
+                : null,
+          ),
+          child: ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                  (Set<MaterialState> states) {
+                    if (states.contains(MaterialState.pressed)) {
+                      return Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withOpacity(0.5);
+                    } else if (states.contains(MaterialState.disabled)) {
+                      return Theme.of(context).disabledColor;
+                    }
+                    return backgroundColor ??
+                        Theme.of(context)
+                            .primaryColor; // Use the component's default.
+                  },
+                ),
               ),
-              child: ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                      (Set<MaterialState> states) {
-                        if (states.contains(MaterialState.pressed)) {
-                          return Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.5);
-                        } else if (states.contains(MaterialState.disabled)) {
-                          return Theme.of(context).disabledColor;
-                        }
-                        return backgroundColor ??
-                            Theme.of(context)
-                                .primaryColor; // Use the component's default.
-                      },
-                    ),
-                  ),
-                  onPressed: validate
-                      ? updateState &&
-                              !SettingsService.use.isEmptyOrNull(updateFields)
+              onPressed: validate
+                  ? updateState &&
+                          !SettingsService.use.isEmptyOrNull(updateFields)
+                      ? null
+                      : hasErrors
                           ? null
-                          : hasErrors
-                              ? null
-                              : onPressed
-                      : onPressed,
-                  child: Text(label)),
-            );
-          });
+                          : onPressed
+                  : onPressed,
+              child: Text(label)),
+        );
+      });
     }
     return Observer(
         warnWhenNoObservables: false,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:shared_component/src/utils/filter.dart';
 import '../../shared_component.dart';
 
 class DataSourceTable<T> extends StatefulWidget {
@@ -21,6 +22,8 @@ class DataSourceTable<T> extends StatefulWidget {
       this.noSearchResults = false,
       required this.paginatePage,
       required this.currentPageSize,
+      this.filter,
+      this.primaryAction,
       required this.dataList})
       : super(key: key);
   final List<ButtonActivities>? buttonActivities;
@@ -40,6 +43,8 @@ class DataSourceTable<T> extends StatefulWidget {
   final bool noSearchResults;
   final int currentPageSize;
   final bool loadingOnUpdateData;
+  final DataFilter? filter;
+  final PrimaryAction? primaryAction;
 
   @override
   _DataSourceTableState<T> createState() => _DataSourceTableState<T>();
@@ -47,6 +52,7 @@ class DataSourceTable<T> extends StatefulWidget {
 
 class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
   TextEditingController searchController = TextEditingController();
+  bool searchIsOn = false;
 
   @override
   void dispose() {
@@ -101,10 +107,10 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
                                                 onTap: () {
                                                   setState(() {
                                                     searchController.clear();
-                                                    if (widget
-                                                            .noSearchResults &&
+                                                    if (searchIsOn &&
                                                         widget.onEmptySearch !=
                                                             null) {
+                                                      searchIsOn = false;
                                                       widget.onEmptySearch!();
                                                     }
                                                   });
@@ -120,6 +126,7 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
                                   ),
                                   onFieldSubmitted: (value) {
                                     if (widget.onSearch != null) {
+                                      searchIsOn = true;
                                       widget.onSearch!(value);
                                     }
                                   },
@@ -127,6 +134,7 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
                                     setState(() {});
                                     if (value.isEmpty &&
                                         widget.onEmptySearch != null) {
+                                      searchIsOn = false;
                                       widget.onEmptySearch!();
                                     }
                                   },
@@ -151,8 +159,8 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
                                                               index]
                                                           .toolTip ??
                                                       '',
-                                                  child: InkWell(
-                                                    onTap: widget
+                                                  child: OutlinedButton(
+                                                    onPressed: widget
                                                         .buttonActivities![
                                                             index]
                                                         .onTap,
@@ -177,6 +185,7 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
                         Expanded(
                           child: !widget.noSearchResults
                               ? TableCustom<T>(
+                                  primaryAction: widget.primaryAction,
                                   loadingOnUpdateData:
                                       widget.loadingOnUpdateData,
                                   currentPageSize: widget.currentPageSize,
@@ -191,7 +200,11 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
                                   actionButton: widget.actionButton,
                                   paginatePage: widget.paginatePage,
                                   onDelete: widget.onDelete,
-                                  dataList: widget.dataList,
+                                  dataList: DataFilter.filter(
+                                      widget.dataList,
+                                      widget.filter?.filterString,
+                                      widget.filter?.filterField,
+                                      widget.filter?.equal),
                                 )
                               : Center(
                                   child: GErrorMessage(

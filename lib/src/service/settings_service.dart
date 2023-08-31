@@ -1,7 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_component/shared_component.dart';
 
 class SettingsService {
@@ -135,7 +139,6 @@ class SettingsService {
         searchList.any((searchElement) => userAuthorities
             .where((element) => element["authority"] == searchElement)
             .isNotEmpty);
-
     return found;
   }
 
@@ -228,5 +231,57 @@ class SettingsService {
       }
     }
     return updatedList;
+  }
+
+  String dateFormat(DateTimeFormat? format, String date) {
+    if (!isEmptyOrNull(date) && date != '---') {
+      switch (format) {
+        case DateTimeFormat.short:
+          return DateFormat.yMd().add_jm().format(DateTime.parse(date));
+        case DateTimeFormat.medium:
+          return DateFormat.yMMMd().add_jm().format(DateTime.parse(date));
+        default:
+          return date;
+      }
+    }
+    return '---';
+  }
+
+  viewPdf(
+      {required BuildContext context,
+      required String base64String,
+      required String title}) {
+    Uint8List byte = base64.decode(base64String);
+    PopDialog.showWidget(
+        title: title,
+        modelWidth: 0.6,
+        context: context,
+        child: CustomPdfViewer(
+          showAvatar: byte.isEmpty,
+          documentBytes: byte,
+        ));
+  }
+
+  Map<String, dynamic> convertListOfMapToMap(
+      List<Map<String, dynamic>> listOfMaps) {
+    Map<String, dynamic> mergedMap = {};
+
+    for (var map in listOfMaps) {
+      mergedMap.addAll(map);
+    }
+
+    return mergedMap;
+  }
+
+  Map<String, dynamic> removeFieldFromMap(
+      {required Map<String, dynamic> map,
+      String? objectFieldKeyName,
+      required String fieldToBeDeleted}) {
+    if (!isEmptyOrNull(objectFieldKeyName) && map[objectFieldKeyName] is Map) {
+      map[objectFieldKeyName].remove(fieldToBeDeleted);
+      return Map<String, dynamic>.from(map);
+    }
+    map.remove(fieldToBeDeleted);
+    return Map<String, dynamic>.from(map);
   }
 }

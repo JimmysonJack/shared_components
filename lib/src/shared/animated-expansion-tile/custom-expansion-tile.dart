@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_component/shared_component.dart';
 
-
 class CustomExpansionTile extends StatefulWidget {
   final List<Widget> bodyWidget;
   final int? activeElement;
@@ -10,6 +9,7 @@ class CustomExpansionTile extends StatefulWidget {
   final Map<String, dynamic> selectedData;
   final List<ActionButtonItem>? actionButton;
   final Future<bool> Function()? onDelete;
+  final PrimaryAction? primaryAction;
 
   const CustomExpansionTile(
       {super.key,
@@ -18,6 +18,7 @@ class CustomExpansionTile extends StatefulWidget {
       required this.selectedData,
       this.actionButton,
       required this.onDelete,
+      required this.primaryAction,
       required this.titleValue});
 
   @override
@@ -121,30 +122,49 @@ class _CustomExpansionTileState extends State<CustomExpansionTile>
                                     ],
                                   ),
                                 ),
-                              ...List.generate(
-                                  widget.actionButton!.length,
-                                  (buttonIndex) => Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            IconButton(
-                                                onPressed: () {
-                                                  widget.actionButton![
+                              if (widget.primaryAction != null &&
+                                  SettingsService.use.permissionCheck(
+                                      widget.primaryAction?.permissions ?? []))
+                                OutlinedButton(
+                                    onPressed: () {
+                                      widget.primaryAction
+                                          ?.onPressed(widget.selectedData);
+                                    },
+                                    child: Text(
+                                      widget.primaryAction?.buttonName ?? '',
+                                      style: TextStyle(
+                                          color: ThemeController.getInstance()
+                                              .darkMode(
+                                                  darkColor: Colors.white54,
+                                                  lightColor: Theme.of(context)
+                                                      .primaryColor)),
+                                    )),
+                              if (widget.primaryAction == null)
+                                ...List.generate(
+                                    widget.actionButton!.length,
+                                    (buttonIndex) => Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              IconButton(
+                                                  onPressed: () {
+                                                    widget.actionButton![
+                                                            buttonIndex]
+                                                        .onPressed(widget
+                                                            .selectedData);
+                                                  },
+                                                  icon: Icon(widget
+                                                      .actionButton![
                                                           buttonIndex]
-                                                      .onPressed(
-                                                          widget.selectedData);
-                                                },
-                                                icon: Icon(widget
-                                                    .actionButton![buttonIndex]
-                                                    .icon)),
-                                            GText(widget
-                                                .actionButton![buttonIndex]
-                                                .name)
-                                          ],
-                                        ),
-                                      )),
+                                                      .icon)),
+                                              GText(widget
+                                                  .actionButton![buttonIndex]
+                                                  .name)
+                                            ],
+                                          ),
+                                        )),
                             ],
                           ),
                         )),

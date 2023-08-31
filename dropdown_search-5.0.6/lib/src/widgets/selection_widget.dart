@@ -17,10 +17,12 @@ class SelectionWidget<T> extends StatefulWidget {
   final List<T> defaultSelectedItems;
   final PopupPropsMultiSelection<T> popupProps;
   final bool isMultiSelectionMode;
+  final bool isPageable;
 
   const SelectionWidget({
     Key? key,
     required this.popupProps,
+    required this.isPageable,
     this.defaultSelectedItems = const [],
     this.isMultiSelectionMode = false,
     this.items = const [],
@@ -62,13 +64,14 @@ class SelectionWidgetState<T> extends State<SelectionWidget<T>> {
         _manageItemsByFilter(searchBoxController.text);
       });
     });
-
-    scrollController.addListener(() {
-      if (scrollController.position.pixels ==
-          scrollController.position.maxScrollExtent) {
-        getNextPageFromOnline();
-      }
-    });
+    if (widget.isPageable) {
+      scrollController.addListener(() {
+        if (scrollController.position.pixels ==
+            scrollController.position.maxScrollExtent) {
+          getNextPageFromOnline();
+        }
+      });
+    }
 
     Future.delayed(
       Duration.zero,

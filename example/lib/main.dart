@@ -205,6 +205,7 @@ class UsersWidget extends StatelessWidget {
           buttonName: 'Create User'),
       topActivityButtons: [
         TopActivityButton(
+            permissions: ['ROLE_CREATE_USER'],
             onTap: () {
               saveAndUpdateUser(context, null);
             },

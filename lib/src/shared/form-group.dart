@@ -125,7 +125,7 @@ class Group extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 20),
-      color: Theme.of(context).secondaryHeaderColor,
+      color: Theme.of(context).scaffoldBackgroundColor,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -11,14 +11,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 const String defaultDialogTitle = '';
 
-enum FileType {
-  any,
-  media,
-  image,
-  video,
-  audio,
-  custom,
-}
+enum FileType { any, media, image, video, audio, custom, csv, pdf }
 
 enum FilePickerStatus {
   picking,

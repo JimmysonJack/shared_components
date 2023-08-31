@@ -35,6 +35,7 @@ class RoleWidget extends StatelessWidget {
           buttonName: 'Create Role'),
       topActivityButtons: [
         TopActivityButton(
+            permissions: ['ROLE_CREATE_ROLE'],
             onTap: () {
               saveAndUpdateRole(context, null);
             },
@@ -61,7 +62,7 @@ class RoleWidget extends StatelessWidget {
         buildContext: context,
         buttonLabel: data != null ? 'Update' : 'Save Role',
         checkUnSavedData: true,
-        inputType: 'SaveRoleDtoInput',
+        objectInputType: 'SaveRoleDtoInput',
         endpointName: 'saveRole',
         inputObjectFieldName: 'roleDto',
         title: data != null ? 'Update Role' : 'Create Role',

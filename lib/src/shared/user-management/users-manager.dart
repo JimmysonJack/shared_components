@@ -164,7 +164,7 @@ class _UserManagerState extends State<UserManager>
         title: updatingData == null ? 'Create User' : 'Update User',
         checkUnSavedData: true,
         endpointName: endpointName,
-        inputType: 'SaveUserDtoInput',
+        objectInputType: 'SaveUserDtoInput',
         inputObjectFieldName: 'userDto',
         queryFields: 'uid',
         responseResults: (data, loading) {

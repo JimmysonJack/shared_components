@@ -72,6 +72,8 @@ class ThemeController extends GetxController {
     return base.copyWith(
       colorScheme: defaultColorScheme,
       primaryColor: color.shade400,
+      scaffoldBackgroundColor:
+          isDarkTheme.value ? null : Colors.blueGrey.shade50,
       buttonTheme: ButtonThemeData(buttonColor: color.shade400),
       // appBarTheme: AppBarTheme(backgroundColor: color.shade50),
       // cardTheme: CardTheme(color: color.shade100),

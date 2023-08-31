@@ -32,9 +32,7 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   void initState() {
-    fieldConroller.fieldUpdates.listen((event) {
-      console(event);
-    });
+    fieldConroller.fieldUpdates.listen((event) {});
     super.initState();
   }
 

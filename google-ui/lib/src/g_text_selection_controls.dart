@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/src/foundation/change_notifier.dart';
 
 /// Change [selectionHandleColor] for [TextFormField].
 /// Note [selectionHandleColor] only changed on first build.
@@ -33,26 +34,26 @@ class GTextSelectionControls extends TextSelectionControls {
     );
   }
 
-  @override
-  Widget buildToolbar(
-      BuildContext context,
-      Rect globalEditableRegion,
-      double textLineHeight,
-      Offset position,
-      List<TextSelectionPoint> endpoints,
-      TextSelectionDelegate delegate,
-      ClipboardStatusNotifier? clipboardStatus,
-      Offset? lastSecondaryTapDownPosition) {
-    return _controls.buildToolbar(
-        context,
-        globalEditableRegion,
-        textLineHeight,
-        position,
-        endpoints,
-        delegate,
-        clipboardStatus,
-        lastSecondaryTapDownPosition);
-  }
+  // @override
+  // Widget buildToolbar(
+  //     BuildContext context,
+  //     Rect globalEditableRegion,
+  //     double textLineHeight,
+  //     Offset position,
+  //     List<TextSelectionPoint> endpoints,
+  //     TextSelectionDelegate delegate,
+  //     ClipboardStatusNotifier? clipboardStatus,
+  //     Offset? lastSecondaryTapDownPosition) {
+  //   return _controls.buildToolbar(
+  //       context,
+  //       globalEditableRegion,
+  //       textLineHeight,
+  //       position,
+  //       endpoints,
+  //       delegate,
+  //       clipboardStatus,
+  //       lastSecondaryTapDownPosition);
+  // }
 
   @override
   Offset getHandleAnchor(
@@ -67,5 +68,27 @@ class GTextSelectionControls extends TextSelectionControls {
   @override
   Size getHandleSize(double textLineHeight) {
     return _controls.getHandleSize(textLineHeight);
+  }
+
+  @override
+  Widget buildToolbar(
+      BuildContext context,
+      Rect globalEditableRegion,
+      double textLineHeight,
+      Offset selectionMidpoint,
+      List<TextSelectionPoint> endpoints,
+      TextSelectionDelegate delegate,
+      ValueListenable<ClipboardStatus>? clipboardStatus,
+      Offset? lastSecondaryTapDownPosition) {
+    // TODO: implement buildToolbar
+    return _controls.buildToolbar(
+        context,
+        globalEditableRegion,
+        textLineHeight,
+        selectionMidpoint,
+        endpoints,
+        delegate,
+        clipboardStatus,
+        lastSecondaryTapDownPosition);
   }
 }

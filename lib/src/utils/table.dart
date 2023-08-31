@@ -17,6 +17,7 @@ class TableCustom<T> extends StatefulWidget {
       this.deleteData = false,
       this.actionButton,
       this.paginatePage,
+      this.primaryAction,
       required this.onPageSize})
       : super(key: key);
   final List<dynamic> dataList;
@@ -30,6 +31,7 @@ class TableCustom<T> extends StatefulWidget {
   final Color? color;
   final int currentPageSize;
   final bool loadingOnUpdateData;
+  final PrimaryAction? primaryAction;
 
   @override
   _TableCustomState<T> createState() => _TableCustomState<T>();
@@ -46,6 +48,7 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
   void initState() {
     widget.actionButton
         ?.removeWhere((element) => element.permissionGranted == false);
+
     super.initState();
   }
 
@@ -53,6 +56,7 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
   Widget build(BuildContext context) {
     if (SizeConfig.fullScreen.width <= 820) {
       return MobileDataTable(
+          primaryAction: widget.primaryAction,
           dataList: widget.dataList,
           headTitle: widget.headTitles,
           onDelete: !widget.deleteData
@@ -119,7 +123,9 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
                           ))),
                 if (widget.headTitles.actionTitle != null &&
                         widget.actionButton!.isNotEmpty ||
-                    widget.deleteData)
+                    widget.deleteData ||
+                    SettingsService.use.permissionCheck(
+                        widget.primaryAction?.permissions ?? []))
                   Container(
                     width: 122,
                     alignment: Alignment.center,
@@ -132,7 +138,7 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
                   ),
                 if (widget.headTitles.actionTitle == null ||
                     widget.actionButton!.isEmpty && !widget.deleteData)
-                  const SizedBox(width: 0)
+                  const SizedBox(width: 0),
               ],
             ),
           ),
@@ -193,28 +199,46 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
                                                         .titleKey] ==
                                                     null
                                                 ? '---'
-                                                : widget.dataList[index][widget
-                                                            .headTitles
-                                                            .headTileItems?[i]
-                                                            .titleKey][
-                                                        widget
-                                                            .headTitles
-                                                            .headTileItems?[i]
-                                                            .objectKeyField]
-                                                    .toString()
-                                                    .replaceAll('_', ' ')
-                                                    .replaceAll('null', '---'),
+                                                : formatter(
+                                                    widget
+                                                        .headTitles
+                                                        .headTileItems![i]
+                                                        .isMoney!,
+                                                    widget
+                                                        .headTitles
+                                                        .headTileItems?[i]
+                                                        .dateFormat,
+                                                    widget
+                                                        .dataList[index][widget
+                                                                .headTitles
+                                                                .headTileItems?[i]
+                                                                .titleKey][
+                                                            widget
+                                                                .headTitles
+                                                                .headTileItems?[
+                                                                    i]
+                                                                .objectKeyField]
+                                                        .toString()
+                                                        .replaceAll('_', ' ')
+                                                        .replaceAll(
+                                                            'null', '---')),
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 2,
                                           )
                                         : Text(
-                                            widget.dataList[index][widget
-                                                    .headTitles
-                                                    .headTileItems?[i]
-                                                    .titleKey]
-                                                .toString()
-                                                .replaceAll('_', ' ')
-                                                .replaceAll('null', '---'),
+                                            formatter(
+                                              widget.headTitles
+                                                  .headTileItems![i].isMoney!,
+                                              widget.headTitles
+                                                  .headTileItems?[i].dateFormat,
+                                              widget.dataList[index][widget
+                                                      .headTitles
+                                                      .headTileItems?[i]
+                                                      .titleKey]
+                                                  .toString()
+                                                  .replaceAll('_', ' ')
+                                                  .replaceAll('null', '---'),
+                                            ),
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 2,
                                           ),
@@ -239,34 +263,55 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
                                                         .titleKey] ==
                                                     null
                                                 ? '---'
-                                                : widget.dataList[index][widget
-                                                            .headTitles
-                                                            .headTileItems?[i]
-                                                            .titleKey][
-                                                        widget
-                                                            .headTitles
-                                                            .headTileItems?[i]
-                                                            .objectKeyField]
-                                                    .toString()
-                                                    .replaceAll('_', ' ')
-                                                    .replaceAll('null', '---'),
+                                                : formatter(
+                                                    widget
+                                                        .headTitles
+                                                        .headTileItems![i]
+                                                        .isMoney!,
+                                                    widget
+                                                        .headTitles
+                                                        .headTileItems?[i]
+                                                        .dateFormat,
+                                                    widget
+                                                        .dataList[index][widget
+                                                                .headTitles
+                                                                .headTileItems?[i]
+                                                                .titleKey][
+                                                            widget
+                                                                .headTitles
+                                                                .headTileItems?[
+                                                                    i]
+                                                                .objectKeyField]
+                                                        .toString()
+                                                        .replaceAll('_', ' ')
+                                                        .replaceAll(
+                                                            'null', '---')),
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 2,
                                           )
                                         : Text(
-                                            widget.dataList[index][widget
+                                            formatter(
+                                                widget.headTitles
+                                                    .headTileItems![i].isMoney!,
+                                                widget
                                                     .headTitles
                                                     .headTileItems?[i]
-                                                    .titleKey]
-                                                .toString()
-                                                .replaceAll('_', ' ')
-                                                .replaceAll('null', '---'),
+                                                    .dateFormat,
+                                                widget.dataList[index][widget
+                                                        .headTitles
+                                                        .headTileItems?[i]
+                                                        .titleKey]
+                                                    .toString()
+                                                    .replaceAll('_', ' ')
+                                                    .replaceAll('null', '---')),
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 2,
                                           ),
                                   ))),
                         if (widget.headTitles.actionTitle!.isNotEmpty &&
-                            widget.actionButton!.isNotEmpty)
+                                widget.actionButton!.isNotEmpty ||
+                            SettingsService.use.permissionCheck(
+                                widget.primaryAction?.permissions ?? []))
                           SizedBox(
                             width: 122,
                             height: 30,
@@ -277,7 +322,10 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
                                       ? MainAxisAlignment.spaceAround
                                       : MainAxisAlignment.center,
                               children: [
-                                if (widget.actionButton!.isNotEmpty)
+                                if (widget.actionButton!.isNotEmpty ||
+                                    SettingsService.use.permissionCheck(
+                                        widget.primaryAction?.permissions ??
+                                            []))
                                   Obx(() {
                                     final bool loading =
                                         dataTableController.onLoadMore.value;
@@ -296,46 +344,79 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
                                               ),
                                             ),
                                           )
-                                        : QudsPopupButton(
-                                            tooltip: 'More',
-                                            items: List.generate(
-                                                widget.actionButton!.length,
-                                                (pressIndex) =>
-                                                    QudsPopupMenuItem(
-                                                        leading: Icon(widget
-                                                            .actionButton![
-                                                                pressIndex]
-                                                            .icon),
-                                                        title: Text(widget
-                                                            .actionButton![
-                                                                pressIndex]
-                                                            .name),
-                                                        onPressed: () {
-                                                          loadingIndex = index;
-                                                          widget.actionButton![
-                                                                  pressIndex]
-                                                              .onPressed(widget
-                                                                      .dataList[
-                                                                  index]);
-                                                        })),
-                                            // widthSize: 200,
-                                            child: FloatingActionButton(
-                                              backgroundColor: Theme.of(context)
-                                                  .primaryColor
-                                                  .withOpacity(0.7),
-                                              mini: true,
-                                              elevation: 10,
-                                              onPressed: null,
-                                              child: Icon(
-                                                Icons.more_vert_sharp,
-                                                size: 15,
-                                                color:
-                                                    Theme.of(context).cardColor,
-                                              ),
-                                            ),
-                                          );
+                                        : SettingsService.use.permissionCheck(
+                                                widget.primaryAction
+                                                        ?.permissions ??
+                                                    [])
+                                            ? OutlinedButton(
+                                                onPressed: () {
+                                                  widget.primaryAction
+                                                      ?.onPressed(widget
+                                                          .dataList[index]);
+                                                },
+                                                child: Text(
+                                                  widget.primaryAction
+                                                          ?.buttonName ??
+                                                      '',
+                                                  style: TextStyle(
+                                                      color: ThemeController
+                                                              .getInstance()
+                                                          .darkMode(
+                                                              darkColor: Colors
+                                                                  .white54,
+                                                              lightColor: Theme
+                                                                      .of(context)
+                                                                  .primaryColor)),
+                                                ))
+                                            : QudsPopupButton(
+                                                tooltip: 'More',
+                                                items: List.generate(
+                                                    widget.actionButton!.length,
+                                                    (pressIndex) =>
+                                                        QudsPopupMenuItem(
+                                                            leading: Icon(widget
+                                                                .actionButton![
+                                                                    pressIndex]
+                                                                .icon),
+                                                            title: Text(widget
+                                                                .actionButton![
+                                                                    pressIndex]
+                                                                .name),
+                                                            onPressed: () {
+                                                              loadingIndex =
+                                                                  index;
+                                                              widget
+                                                                  .actionButton![
+                                                                      pressIndex]
+                                                                  .onPressed(widget
+                                                                          .dataList[
+                                                                      index]);
+                                                            })),
+                                                // widthSize: 200,
+                                                child: FloatingActionButton(
+                                                  backgroundColor:
+                                                      Theme.of(context)
+                                                          .primaryColor
+                                                          .withOpacity(0.7),
+                                                  mini: true,
+                                                  elevation: 10,
+                                                  onPressed: null,
+                                                  child: Icon(
+                                                    Icons.more_vert_sharp,
+                                                    size: 15,
+                                                    color: ThemeController
+                                                            .getInstance()
+                                                        .darkMode(
+                                                            darkColor:
+                                                                Colors.white,
+                                                            lightColor:
+                                                                Colors.white54),
+                                                  ),
+                                                ),
+                                              );
                                   }),
-                                if (widget.actionButton!.isNotEmpty)
+                                if (widget.actionButton!.isNotEmpty ||
+                                    widget.primaryAction != null)
                                   Container(
                                     width: 5,
                                   ),
@@ -512,7 +593,9 @@ class _PaginatePageState extends State<PaginatePage> {
               mini: true,
               child: Text(
                 (1).toString(),
-                style: Theme.of(context).textTheme.bodySmall,
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                    color: ThemeController.getInstance().darkMode(
+                        darkColor: Colors.white, lightColor: Colors.white)),
               ),
               onPressed: () {
                 setState(() {
@@ -532,7 +615,9 @@ class _PaginatePageState extends State<PaginatePage> {
                 Expanded(child: Container()),
                 Text(
                   '.....',
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: ThemeController.getInstance().darkMode(
+                          darkColor: Colors.white, lightColor: Colors.white)),
                 )
               ],
             ),
@@ -546,7 +631,9 @@ class _PaginatePageState extends State<PaginatePage> {
               elevation: 7,
               mini: true,
               child: Text((widget.currentPage - 1).toString(),
-                  style: Theme.of(context).textTheme.bodySmall),
+                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      color: ThemeController.getInstance().darkMode(
+                          darkColor: Colors.white, lightColor: Colors.white))),
               onPressed: () {
                 widget.onNavigateToPage!(PaginatePage(
                   nextPage: widget.currentPage - 1,
@@ -567,7 +654,8 @@ class _PaginatePageState extends State<PaginatePage> {
               (widget.currentPage).toString(),
               style: TextStyle(
                   fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
-                  color: Theme.of(context).cardColor),
+                  color: ThemeController.getInstance().darkMode(
+                      darkColor: Colors.white, lightColor: Colors.white)),
             ),
             onPressed: () {}),
 
@@ -647,14 +735,20 @@ class HeadTitleItem {
   final String? objectKeyField;
   final double? columnSize;
   final Alignment? alignment;
+  final bool? isMoney;
+  final DateTimeFormat? dateFormat;
 
   HeadTitleItem(
       {this.titleKey,
       this.titleName,
       this.objectKeyField,
       this.columnSize,
+      this.isMoney = false,
+      this.dateFormat,
       this.alignment});
 }
+
+enum DateTimeFormat { short, medium }
 
 class ActionButtonItem<T> {
   final IconData icon;
@@ -690,6 +784,17 @@ class PagingValues {
   setPageSize(value) => _pageSize = value;
 }
 
+class PrimaryAction {
+  final String buttonName;
+  final Function(dynamic) onPressed;
+  final List<String> permissions;
+
+  PrimaryAction(
+      {required this.buttonName,
+      required this.onPressed,
+      required this.permissions});
+}
+
 class DataTableController extends GetxController {
   final onDeleteLoad = false.obs;
   final onLoadMore = false.obs;
@@ -714,5 +819,15 @@ class RebuildToRefetch {
     if (changeRefetchState(true)) {
       controller.rebuild.value = !controller.rebuild.value;
     }
+  }
+}
+
+String formatter(bool isMoney, DateTimeFormat? format, String data) {
+  if (!SettingsService.use.isEmptyOrNull(format)) {
+    return SettingsService.use.dateFormat(format, data);
+  } else if (isMoney) {
+    return currencyFormatter(data);
+  } else {
+    return data;
   }
 }

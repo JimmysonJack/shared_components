@@ -162,6 +162,9 @@ class DropdownSearch<T> extends StatefulWidget {
   ///if the callBack return FALSE, the opening of the popup will be cancelled
   final BeforePopupOpeningMultiSelection<T>? onBeforePopupOpeningMultiSelection;
 
+  ///a boolean that will be used to controll if the coming data is pageable or not
+  final bool isPageable;
+
   DropdownSearch({
     Key? key,
     this.onSaved,
@@ -181,6 +184,7 @@ class DropdownSearch<T> extends StatefulWidget {
     this.compareFn,
     this.onBeforeChange,
     this.onBeforePopupOpening,
+    required this.isPageable,
     PopupProps<T> popupProps = const PopupProps.menu(),
   })  : assert(
           !popupProps.showSelectedItems || T == String || compareFn != null,
@@ -209,6 +213,7 @@ class DropdownSearch<T> extends StatefulWidget {
     this.itemAsString,
     this.compareFn,
     this.selectedItems = const [],
+    required this.isPageable,
     this.popupProps = const PopupPropsMultiSelection.menu(),
     FormFieldSetter<List<T>>? onSaved,
     ValueChanged<List<T>>? onChanged,
@@ -644,6 +649,7 @@ class DropdownSearchState<T> extends State<DropdownSearch<T>> {
   Widget _popupWidgetInstance() {
     return SelectionWidget<T>(
       key: _popupStateKey,
+      isPageable: widget.isPageable,
       popupProps: widget.popupProps,
       itemAsString: widget.itemAsString,
       filterFn: widget.filterFn,

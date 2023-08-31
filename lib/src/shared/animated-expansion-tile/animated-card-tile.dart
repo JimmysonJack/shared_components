@@ -11,6 +11,7 @@ class AnimatedCardTile extends StatefulWidget {
     required this.dataList,
     required this.titleKey,
     required this.onDelete,
+    required this.primaryAction,
     required this.actionButton,
   }) : super(key: key);
 
@@ -19,6 +20,7 @@ class AnimatedCardTile extends StatefulWidget {
   final String titleKey;
   final List<ActionButtonItem>? actionButton;
   final Future<bool> Function(Map<String, dynamic>, int)? onDelete;
+  final PrimaryAction? primaryAction;
 
   @override
   _AnimatedCardTileState createState() => _AnimatedCardTileState();
@@ -35,6 +37,7 @@ class _AnimatedCardTileState extends State<AnimatedCardTile> {
       itemBuilder: (BuildContext context, int index) {
         return CustomExpansionTile(
           // activeElement: 5,
+          primaryAction: widget.primaryAction,
           onDelete: () {
             return widget.onDelete!(widget.dataList[index], index);
           },

@@ -1,6 +1,6 @@
 class OtherParameters {
   final String keyName;
-  final String keyValue;
+  final dynamic keyValue;
   final String keyType;
 
   OtherParameters(
@@ -17,7 +17,7 @@ class OtherParameters {
   factory OtherParameters.fromMap(Map<String, dynamic> map) {
     return OtherParameters(
       keyName: map['keyName'] as String,
-      keyValue: map['keyValue'] as String,
+      keyValue: map['keyValue'] as dynamic,
       keyType: map['keyType'] as String,
     );
   }

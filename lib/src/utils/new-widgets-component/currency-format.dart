@@ -11,12 +11,11 @@ String currencyFormatter(amount) {
           .replaceAllMapped(reg, (Match match) => '${match[1]},');
 }
 
-Widget textCurrency({required String amount, TextStyle? style}) {
+Widget textCurrency({required String? amount, TextStyle? style}) {
   final currencyStyle =
       style ?? const TextStyle(); // Use an empty style if style is null
-
   final currencyText = Text(
-    currencyFormatter(amount),
+    currencyFormatter(amount == 'null' || amount == null ? '0' : amount),
     style: currencyStyle,
   );
 
@@ -35,14 +34,15 @@ Widget textCurrency({required String amount, TextStyle? style}) {
       children: [
         currencyText,
         const SizedBox(width: 2), // Add some spacing between the texts
-        Padding(
-          padding: EdgeInsets.only(
-              bottom: (currencyStyle.fontSize == null
-                      ? ((14 * 0.5) * 0.20)
-                      : currencyStyle.fontSize! * 0.5) *
-                  0.20),
-          child: currencySymbolText,
-        ),
+        if (amount != null || amount != 'null')
+          Padding(
+            padding: EdgeInsets.only(
+                bottom: (currencyStyle.fontSize == null
+                        ? ((14 * 0.5) * 0.20)
+                        : currencyStyle.fontSize! * 0.5) *
+                    0.20),
+            child: currencySymbolText,
+          ),
       ],
     ),
   );

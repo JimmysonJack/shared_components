@@ -29,7 +29,7 @@ class UserRolesController extends GetxController {
               keyName: 'userUid', keyValue: userUid, keyType: 'String')
         ],
         context: context);
-    filterAssignedRoles(res);
+    filterAssignedRoles(res.data);
     loading.value = false;
   }
 
@@ -69,7 +69,6 @@ class UserRolesController extends GetxController {
                       uid
                       ''',
           response: (PageableResponse? data, bool loading) {
-            console(data?.status);
             if (data != null && data.status) {
               currentPage = data.currentPage;
               nextPage = data.currentPage;

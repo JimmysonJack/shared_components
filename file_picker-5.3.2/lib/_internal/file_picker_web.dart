@@ -169,6 +169,12 @@ class FilePickerWeb extends FilePicker {
       case FileType.media:
         return 'video/*|image/*';
 
+      case FileType.csv:
+        return '.csv';
+
+      case FileType.pdf:
+        return '.pdf';
+
       case FileType.custom:
         return allowedExtensions!
             .fold('', (prev, next) => '${prev.isEmpty ? '' : '$prev,'} .$next');

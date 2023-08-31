@@ -10,16 +10,19 @@ class MobileDataTable extends StatelessWidget {
       required this.headTitle,
       required this.actionButton,
       required this.onDelete,
+      required this.primaryAction,
       required this.titleKey});
   final List<dynamic> dataList;
   final HeadTitle headTitle;
   final String titleKey;
   final List<ActionButtonItem>? actionButton;
   final Future<bool> Function(Map<String, dynamic>, int)? onDelete;
+  final PrimaryAction? primaryAction;
 
   @override
   Widget build(BuildContext context) {
     return AnimatedCardTile(
+      primaryAction: primaryAction,
       titleKey: titleKey,
       dataList: dataList,
       headTitle: headTitle,

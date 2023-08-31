@@ -3,30 +3,33 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:shared_component/shared_component.dart';
+import 'package:shared_component/src/utils/filter.dart';
 
 import '../utils/new-widgets-component/base_fields.dart';
 
 class PageableDataTable extends StatefulWidget {
-  const PageableDataTable({
-    Key? key,
-    this.deleteUidFieldName,
-    required this.endPointName,
-    required this.queryFields,
-    this.optionalResponseFields,
-    this.otherParameters,
-    this.tableAddButton,
-    this.mapFunction,
-    required this.headColumns,
-    this.topActivityButtons,
-    this.deleteEndPointName,
-    this.actionButtons,
-  }) : super(key: key);
+  const PageableDataTable(
+      {Key? key,
+      this.deleteUidFieldName,
+      required this.endPointName,
+      required this.queryFields,
+      this.optionalResponseFields,
+      this.otherParameters,
+      this.tableAddButton,
+      this.mapFunction,
+      required this.headColumns,
+      this.topActivityButtons,
+      this.deleteEndPointName,
+      this.actionButtons,
+      this.primaryAction,
+      this.filter})
+      : super(key: key);
 
   final String endPointName;
   final String queryFields;
   final String? optionalResponseFields;
   final TableAddButton? tableAddButton;
-
+  final DataFilter? filter;
   final List<OtherParameters>? otherParameters;
   final Map<String, dynamic> Function(Map<String, dynamic> item)? mapFunction;
 
@@ -36,6 +39,7 @@ class PageableDataTable extends StatefulWidget {
   final String? deleteEndPointName;
   final List<ActionButtonItem>? actionButtons;
   final String? deleteUidFieldName;
+  final PrimaryAction? primaryAction;
 
   @override
   State<PageableDataTable> createState() => _PageableDataTableState();
@@ -208,26 +212,42 @@ class _PageableDataTableState extends State<PageableDataTable> {
                               );
                             }
                           } else {
-                            Future.delayed(const Duration(milliseconds: 500),
-                                () {
-                              if (result.data?[widget.endPointName] == null) {
-                                List errorsList =
-                                    result.exception!.graphqlErrors;
+                            List<GraphQLError>? errorsList =
+                                result.exception?.graphqlErrors;
+                            bool accessDenied = errorsList!
+                                .where((element) => element.message
+                                    .toString()
+                                    .contains('Access is denied'))
+                                .isNotEmpty;
+                            if (!accessDenied &&
+                                SettingsService.use.isEmptyOrNull(
+                                    result.data?[widget.endPointName])) {
+                              Future.delayed(const Duration(microseconds: 100),
+                                  () {
                                 NotificationService.errors(
                                     title: 'GraphQL Errors!',
                                     context: context,
                                     contents: errorsList);
-                              }
-                            });
-
-                            return const GErrorMessage(
-                              icon: Icon(Icons.block),
-                              title: 'Errors Occurred',
-                            );
+                              });
+                              return const GErrorMessage(
+                                icon: Icon(Icons.block),
+                                title: 'Errors Occurred',
+                              );
+                            } else {
+                              return const GErrorMessage(
+                                icon: Icon(Icons.lock),
+                                title: 'You Are Not Authorized!',
+                                subtitle: 'Access Denied',
+                              );
+                            }
                           }
                         } else if (!result.isOptimistic) {
-                          repositories =
-                              result.data?[widget.endPointName]?['data'];
+                          repositories = DataFilter.filter(
+                              List<Map<String, dynamic>>.from(
+                                  result.data?[widget.endPointName]?['data']),
+                              widget.filter?.filterField,
+                              widget.filter?.filterString,
+                              widget.filter?.equal);
                           if (_searchKeyValue != null &&
                               result.data?[widget.endPointName]?['data']
                                   .isEmpty) {
@@ -236,7 +256,8 @@ class _PageableDataTableState extends State<PageableDataTable> {
                             noSearchResults = false;
                           }
 
-                          if (repositories!.isEmpty && !noSearchResults) {
+                          if (SettingsService.use.isEmptyOrNull(repositories) &&
+                              !noSearchResults) {
                             return GErrorMessage(
                               icon: const Icon(Icons.error),
                               title: 'No Data Yet',
@@ -314,11 +335,13 @@ class _PageableDataTableState extends State<PageableDataTable> {
 
                         return DataSourceTable(
                             title: '',
+                            primaryAction: widget.primaryAction,
                             serialNumberTitle: 'SN',
                             loadingOnUpdateData: result.isLoading,
                             headTileItems: widget.headColumns,
                             deleteData:
                                 widget.deleteEndPointName?.isNotEmpty ?? false,
+                            filter: widget.filter,
                             onDelete: (rowData) {
                               dataTableController.onDeleteLoad.value = true;
 
@@ -444,9 +467,14 @@ class TopActivityButton {
   final String? buttonName;
   final IconData? iconData;
   final String? toolTip;
+  final List<String> permissions;
 
   TopActivityButton(
-      {required this.onTap, this.buttonName, this.iconData, this.toolTip})
+      {required this.onTap,
+      this.buttonName,
+      this.iconData,
+      this.toolTip,
+      required this.permissions})
       : assert((iconData == null || buttonName == null),
             'One of Fields must be provided');
 }

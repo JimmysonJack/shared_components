@@ -23,7 +23,7 @@ class PermissionController extends GetxController {
     //     endPointName: 'getPermissions',
     //     responseFields: 'groupName permissions{uid displayName name active}',
     //     context: context);
-    _permissionList = await GraphQLService.query(
+    final permissionList = await GraphQLService.query(
         fetchPolicy: FetchPolicy.networkOnly,
         endPointName: 'getPermissionsByRole',
         responseFields: 'groupName permissions{uid displayName name active}',
@@ -32,6 +32,7 @@ class PermissionController extends GetxController {
               keyName: 'roleUid', keyValue: roleUid, keyType: 'String')
         ],
         context: context);
+    _permissionList = permissionList.data;
     loadingOnGetPermissions.value = false;
   }
 
