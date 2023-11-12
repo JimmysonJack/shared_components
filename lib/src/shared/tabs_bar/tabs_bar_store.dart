@@ -1,3 +1,4 @@
+// ignore: depend_on_referenced_packages
 import 'package:mobx/mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 

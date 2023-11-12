@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
-import 'package:shared_component/src/shared/user-management/details-card.dart';
+import 'package:shared_component/src/shared/user-management/details_card.dart';
 import 'package:shared_component/src/shared/user-management/role-widget.dart';
 
 import 'helper-classes.dart';
-import 'dashboard/user-dashboard.dart';
+import 'dashboard/user_dashboard.dart';
 import 'user-list-widget.dart';
 
 class UserManager extends StatefulWidget {

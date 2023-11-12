@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:shared_component/shared_component.dart';
 
-import 'permission-controler.dart';
+import 'permission_controler.dart';
 import 'dart:math';
 
 class PermissionTile extends StatefulWidget {

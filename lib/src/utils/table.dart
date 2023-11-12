@@ -54,7 +54,7 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
 
   @override
   Widget build(BuildContext context) {
-    if (SizeConfig.fullScreen.width <= 820) {
+    if (MediaQuery.of(context).size.width <= 820) {
       return MobileDataTable(
           primaryAction: widget.primaryAction,
           dataList: widget.dataList,

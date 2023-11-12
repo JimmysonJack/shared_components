@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:shared_component/shared_component.dart';
 
-import 'container-tile.dart';
+import 'container_tile.dart';
 
 class SearchTileController extends GetxController {
   final searchinputs = TextEditingController();

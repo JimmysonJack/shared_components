@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:shared_component/shared_component.dart';
-import 'package:shared_component/src/utils/filter.dart';
 
 import '../utils/new-widgets-component/base_fields.dart';
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../themes/theme.dart';
-import 'dash-tile-data.dart';
+import 'dash_tile_data.dart';
 
 class DashTile extends StatefulWidget {
   const DashTile(

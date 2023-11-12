@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class Background extends StatelessWidget {
@@ -43,6 +45,9 @@ class Background extends StatelessWidget {
               ),
             if (backgroudTheme == BackgroundTheme.sunSetTheme)
               const SunsetBackground(),
+            if (backgroudTheme == BackgroundTheme.artTheme) ArtBackground(),
+            if (backgroudTheme == BackgroundTheme.dotTheme)
+              const GradientDotsBackground(),
             Align(
               alignment: Alignment.center,
               child: Column(
@@ -317,4 +322,199 @@ class _SunsetPainter extends CustomPainter {
   }
 }
 
-enum BackgroundTheme { techTheme, defaultTheme, sunSetTheme }
+class ArtBackground extends StatelessWidget {
+  final Random _random = Random();
+
+  // Define a list of text styles with varying font sizes
+  final List<TextStyle> _textStyles = [
+    const TextStyle(fontSize: 20),
+    const TextStyle(fontSize: 30),
+    const TextStyle(fontSize: 40),
+    const TextStyle(fontSize: 50),
+  ];
+
+  // // Define fixed positions for the "NPG" characters
+  // final List<Offset> fixedPositions = [
+  //   Offset(50, 100),
+  //   Offset(200, 300),
+  //   Offset(300, 150),
+  //   Offset(400, 400),
+  //   // Add more positions as needed
+  // ];
+  // Calculate the number of rows and columns to fill the screen
+  final int rows = 5; // Adjust the number of rows as needed
+  final int columns = 5; // Adjust the number of columns as needed
+
+  // // Calculate the horizontal and vertical spacing
+  // final double horizontalSpacing;
+  // final double verticalSpacing;
+
+  ArtBackground({super.key});
+
+  List<Offset> calculateFixedPositions() {
+    final double horizontalSpacing =
+        (MediaQueryData.fromView(WidgetsBinding.instance.window).size.width) /
+            columns;
+    final double verticalSpacing =
+        (MediaQueryData.fromView(WidgetsBinding.instance.window).size.height) /
+            rows;
+    final List<Offset> positions = [];
+
+    for (int row = 0; row < rows; row++) {
+      for (int col = 0; col < columns; col++) {
+        positions.add(Offset(col * horizontalSpacing, row * verticalSpacing));
+      }
+    }
+
+    return positions;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Define a list of positions for the "NPG" characters
+    final List<Offset> fixedPositions = calculateFixedPositions();
+    return Scaffold(
+      body: SizedBox(
+        // color: Colors.blue, // Set the background color
+        child: Stack(
+          children: List.generate(
+            fixedPositions.length, // Adjust the number of words as needed
+            (index) {
+              const word = '.';
+
+              // Randomly select a text style
+              final textStyle =
+                  _textStyles[_random.nextInt(_textStyles.length)];
+
+              // Get the fixed position
+              final position = fixedPositions[index];
+
+              // Randomly generate rotation degrees between -180 and 180
+              final rotation = _random.nextDouble() * 360 - 180;
+
+              // Randomly choose between uppercase and lowercase
+              final isUppercase = _random.nextBool();
+              final text = isUppercase ? word : word.toLowerCase();
+
+              return Positioned(
+                left: position.dx,
+                top: position.dy,
+                child: Transform.rotate(
+                  angle: rotation * pi / 180,
+                  child: Text(
+                    text,
+                    style: textStyle,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class GradientDotsBackground extends StatelessWidget {
+  const GradientDotsBackground({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    bool isMobileSize = MediaQuery.of(context).size.width <= 820;
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF0D2B3E),
+            Color(0xFF174758),
+            Color(0xFF3E6973),
+            Color(0xFF4C7C9B),
+          ],
+        ),
+      ), // Set the background color
+      child: Stack(
+        children: [
+          // const Align(
+          //   alignment: Alignment.centerLeft,
+          //   child: Text(
+          //     'N',
+          //     style: TextStyle(
+          //       fontSize: 1400,
+          //       fontWeight: FontWeight.bold,
+          //       color: Colors.black12,
+          //     ),
+          //   ),
+          // ),
+          Image.asset(
+              scale: 0.01,
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              color: Colors.black12,
+              // colorBlendMode: BlendMode.saturation,
+              'assets/logo.png',
+              package: 'shared_component'),
+          // const ColorFiltered(
+          //   colorFilter: ColorFilter.mode(Colors.grey, BlendMode.saturation),
+          //   child: Image(
+          //       image:
+          //           AssetImage('assets/logo.png', package: 'shared_component')),
+          // ),
+          ..._generateDots(context, isMobileSize)
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _generateDots(BuildContext context, bool mobile) {
+    final List<Widget> dots = [];
+    final int rowCount = mobile ? 100 : 30; // Number of rows
+    final int colCount = mobile ? 50 : 60; // Number of columns
+    const double maxDotSize = 30.0; // Maximum dot size
+    const double minDotSize = 5.0; // Minimum dot size
+
+    // Calculate the size difference between rows
+    final double sizeStep = (maxDotSize - minDotSize) / rowCount;
+
+    // Calculate the spacing between dots
+    final double dotSpacing = MediaQuery.of(context).size.width / colCount;
+
+    // Generate dots in rows and columns
+    for (int row = 0; row < rowCount; row++) {
+      final double dotSize = maxDotSize - (row * sizeStep);
+
+      for (int col = 0; col < colCount; col++) {
+        final double left = col.toDouble() * dotSpacing;
+        final double top = row.toDouble() * dotSpacing;
+        // final Color color =
+
+        dots.add(
+          Positioned(
+            left: left,
+            top: top,
+            child: Text(
+              '.',
+              style: TextStyle(
+                fontSize: dotSize,
+                color: Colors.black54,
+              ),
+            ),
+          ),
+        );
+      }
+    }
+
+    return dots;
+  }
+}
+
+enum BackgroundTheme {
+  techTheme,
+  defaultTheme,
+  sunSetTheme,
+  artTheme,
+  dotTheme
+}

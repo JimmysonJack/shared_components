@@ -1,10 +1,11 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
+// ignore: unnecessary_import
 import 'package:get/get.dart';
 import 'package:shared_component/shared_component.dart';
 
-import 'permission-controler.dart';
+import 'permission_controler.dart';
 
 class PermissionBody extends StatefulWidget {
   PermissionBody({

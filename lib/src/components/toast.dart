@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:shared_component/shared_component.dart';
 
 typedef StringCallback = void Function(String);
 
@@ -56,21 +57,29 @@ class ToastViewContainer {
             content,
             strip))); // pos, ToastView.createView(type, message, dismiss, pos)});
     overlayState ??= Overlay.of(context);
-    addEntry();
+    addEntry(context);
     await Future.delayed(const Duration(seconds: 6));
     dismiss(id);
   }
 
-  static void addEntry() {
+  static void addEntry(BuildContext context) {
+    bool isMobileSize = MediaQuery.of(context).size.width <= 820;
     if (overlayEntry != null) overlayEntry!.remove();
     overlayEntry = OverlayEntry(
-        builder: (BuildContext context) => Positioned(
-            top: 4,
-            left: 20,
+      builder: (BuildContext context) => Positioned(
+          // alignment:
+          //     isMobileSize ? Alignment.topCenter : Alignment.bottomLeft,
+          // top: 4,
+          left: 0,
+          right: isMobileSize ? 0 : null,
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: widgets.map((e) => e.widget).toList(),
-            )));
+            ),
+          )),
+    );
     overlayState!.insert(overlayEntry!);
   }
 
@@ -80,7 +89,7 @@ class ToastViewContainer {
       if (widget.id == index) toRemove = widget;
     }
     widgets.remove(toRemove);
-    addEntry();
+    addEntry(NavigationService.get.currentContext!);
   }
 }
 
@@ -146,7 +155,7 @@ class ToastView {
                           fontSize: 16,
                           color: strip
                               ? Theme.of(context).hintColor
-                              : Theme.of(context).cardColor)),
+                              : Colors.white60)),
                   // if(content != null) const SizedBox(height: 10,),
                   if (content != null)
                     Text(content,
@@ -155,7 +164,7 @@ class ToastView {
                             fontSize: 12,
                             color: strip
                                 ? Theme.of(context).hintColor
-                                : Theme.of(context).cardColor)),
+                                : Colors.white60)),
                 ],
               ),
             ],

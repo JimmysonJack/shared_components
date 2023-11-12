@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
 
-import 'search-controller.dart';
+import 'search_controller.dart';
 
 class ContainerTile extends StatefulWidget {
   final TileFields fields;
@@ -31,6 +31,7 @@ class ContainerTile extends StatefulWidget {
         ?.color;
   }
   @override
+  // ignore: library_private_types_in_public_api
   _ContainerTileState createState() => _ContainerTileState();
 }
 

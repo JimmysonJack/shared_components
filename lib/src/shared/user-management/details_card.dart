@@ -1,14 +1,13 @@
 // ignore_for_file: invalid_use_of_protected_member
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:shared_component/shared_component.dart';
 
-import '../../themes/theme.dart';
 import 'helper-classes.dart';
 import 'role-list-widget.dart';
 import 'selected-roles-widget.dart';
 import 'user-roles-controller.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
 class DetailCard extends StatefulWidget {
@@ -277,7 +276,8 @@ class _DetailCardState extends State<DetailCard> {
                                                                 lightColor: Colors
                                                                     .black87),
                                                         backgroundColor:
-                                                            const Color.fromARGB(
+                                                            const Color
+                                                                    .fromARGB(
                                                                     255,
                                                                     54,
                                                                     209,

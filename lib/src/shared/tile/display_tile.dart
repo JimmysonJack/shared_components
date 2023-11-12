@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shaky_animated_listview/scroll_animator.dart';
 
-import 'container-tile.dart';
+import 'container_tile.dart';
 
 class DisplayTile extends StatelessWidget {
   final List<ContainerTile> tilesList;

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+// ignore: unnecessary_import
 import 'package:get/get.dart';
 import 'package:shared_component/shared_component.dart';
 
-import 'permission-body.dart';
-import 'permission-controler.dart';
-import 'permission-tile.dart';
+import 'permission_body.dart';
+import 'permission_controler.dart';
+import 'permission_tile.dart';
 
 class PermissionSettings extends StatefulWidget {
   const PermissionSettings({
@@ -19,10 +20,10 @@ class PermissionSettings extends StatefulWidget {
   final String? roleUidFieldName;
 
   @override
-  _PermissionSettingsState createState() => _PermissionSettingsState();
+  PermissionSettingsState createState() => PermissionSettingsState();
 }
 
-class _PermissionSettingsState extends State<PermissionSettings> {
+class PermissionSettingsState extends State<PermissionSettings> {
   int selectedIndex = -1;
   final PermissionController permissionController =
       Get.put(PermissionController());

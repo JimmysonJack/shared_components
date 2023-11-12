@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_component/shared_component.dart';
 
 String currencyFormatter(amount) {
   final RegExp reg = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
@@ -15,7 +16,10 @@ Widget textCurrency({required String? amount, TextStyle? style}) {
   final currencyStyle =
       style ?? const TextStyle(); // Use an empty style if style is null
   final currencyText = Text(
-    currencyFormatter(amount == 'null' || amount == null ? '0' : amount),
+    currencyFormatter(
+        amount == 'null' || SettingsService.use.isEmptyOrNull(amount)
+            ? '0.00'
+            : double.parse(amount ?? '0').toStringAsFixed(2)),
     style: currencyStyle,
   );
 

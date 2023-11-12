@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'text-inputs.dart';
+part of 'text_inputs.dart';
 
 // **************************************************************************
 // StoreGenerator

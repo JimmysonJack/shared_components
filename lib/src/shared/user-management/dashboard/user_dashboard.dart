@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../shared_component.dart';
-import 'dash-tile-data.dart';
-import 'dash-tile.dart';
-import 'user-per-role.dart';
+import 'dash_tile_data.dart';
+import 'dash_tile.dart';
+import 'user_per_role.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard(

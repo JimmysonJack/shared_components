@@ -6,10 +6,10 @@ import 'package:layout/layout.dart';
 
 import '../../models/user_model.dart';
 import '../../utils/size_config.dart';
-import '../nothing-found.dart';
-import 'display-tile.dart';
-import 'search-controller.dart';
-import 'search-field.dart';
+import '../nothing_found.dart';
+import 'display_tile.dart';
+import 'search_controller.dart';
+import 'search_field.dart';
 
 class TilesSearch extends StatefulWidget {
   final List<TileFields> tileFields;

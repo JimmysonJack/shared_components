@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
 
-import 'side-menu-tile-controller.dart';
+import 'side_menu_tile_controller.dart';
 
 enum AppBarPosition { top, side }
 
@@ -98,7 +98,7 @@ class _SideNavigationState extends State<SideNavigation>
                     userDetails: widget.topAppBarDetails!.userProfileDetails,
                     onTap: widget.topAppBarDetails!.onTap,
                     menuItems: widget.topAppBarDetails!.menuItems,
-                    body: SizedBox.shrink(),
+                    body: const SizedBox.shrink(),
                   )),
       body: !widget.showSideNav
           ? widget.body
@@ -138,28 +138,30 @@ class _SideNavigationState extends State<SideNavigation>
               ],
             ),
       bottomNavigationBar: mobileWidthSize
-          ? Container(
-              alignment: Alignment.center,
-              height: 50,
-              decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  boxShadow: [
-                    BoxShadow(
-                      color: ThemeController.getInstance().darkMode(
-                          darkColor: Colors.white38,
-                          lightColor: Colors.black45),
-                      blurRadius: 5,
-                      blurStyle: BlurStyle.outer,
-                    )
-                  ],
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(20))),
-              child: InkWell(
-                  onTap: () {
-                    bottomNav();
-                  },
-                  child: const Text('view menu')),
-            )
+          ? widget.sideMenuTile.isEmpty
+              ? const SizedBox.shrink()
+              : Container(
+                  alignment: Alignment.center,
+                  height: 50,
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      boxShadow: [
+                        BoxShadow(
+                          color: ThemeController.getInstance().darkMode(
+                              darkColor: Colors.white38,
+                              lightColor: Colors.black45),
+                          blurRadius: 5,
+                          blurStyle: BlurStyle.outer,
+                        )
+                      ],
+                      borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(20))),
+                  child: InkWell(
+                      onTap: () {
+                        bottomNav();
+                      },
+                      child: const Text('view menu')),
+                )
           : const SizedBox.shrink(),
     );
   }

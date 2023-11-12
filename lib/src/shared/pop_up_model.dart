@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+// ignore: depend_on_referenced_packages
 import 'package:mobx/mobx.dart';
 
 import '../../../shared_component.dart';
