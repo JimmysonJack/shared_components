@@ -68,148 +68,152 @@ class LoginInputs extends StatelessWidget {
                       width: 1,
                       color: Theme.of(context).cardColor.withOpacity(0.5))),
               child: Center(
-                child: AutofillGroup(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text('Login',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.copyWith(
-                                    color: Theme.of(context).cardColor,
-                                    fontSize: 25)),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      GetX<LoginController>(
-                        builder: (_) {
-                          return TextFormField(
-                            // enableSuggestions: true,
-                            // autocorrect: true,
-                            autofillHints: const [AutofillHints.email],
-                            focusNode: username_focusNode,
-                            keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.next,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text('Login',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(fontSize: 25)),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    GetX<LoginController>(
+                      builder: (_) {
+                        return TextFormField(
+                          // enableSuggestions: true,
+                          // autocorrect: true,
+                          // autofillHints: const [AutofillHints.email],
+                          focusNode: username_focusNode,
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
 
-                            controller: changeController.username,
-                            enabled: !_.loading.value,
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                            decoration: InputDecoration(
-                              labelText: 'Username',
-                              filled: true,
-                              fillColor: Theme.of(context).cardColor,
-                            ),
-                            // onFieldSubmitted: (value) {
-                            //   _focusNode.requestFocus();
-                            // },
-                            onChanged: (value) {
-                              changeController.validateInputs();
-                            },
-                            validator: (value) {
-                              if (isInputNull(value) || value!.isEmpty) {
-                                return 'Username must be provided';
-                              } else if (!emailRegExp.hasMatch(value)) {
-                                return 'Invalid Email Address';
-                              }
+                          controller: changeController.username,
+                          enabled: !_.loading.value,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          decoration: const InputDecoration(
+                            labelText: 'Username',
+                            // filled: true,
+                            // fillColor: Theme.of(context).cardColor,
+                          ),
+                          // onFieldSubmitted: (value) {
+                          //   _focusNode.requestFocus();
+                          // },
+                          onChanged: (value) {
+                            changeController.validateInputs();
+                          },
+                          validator: (value) {
+                            if (isInputNull(value) || value!.isEmpty) {
+                              return 'Username must be provided';
+                            } else if (!emailRegExp.hasMatch(value)) {
+                              return 'Invalid Email Address';
+                            }
 
-                              return null;
-                            },
-                          );
-                        },
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      GetX<LoginController>(
-                        builder: (_) {
-                          return TextFormField(
-                            // enableSuggestions: true,
-                            // autocorrect: true,
-                            autofillHints: const [AutofillHints.password],
-                            focusNode: password_focusNode,
-                            controller: changeController.password,
-                            enabled: !_.loading.value,
-                            textInputAction: TextInputAction.next,
-                            keyboardType: TextInputType.visiblePassword,
-                            obscureText: _.visibility.value,
-                            // obscuringCharacter: '.',
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                            decoration: InputDecoration(
-                              suffixIcon: passwordIcon(_.visibility.value),
-                              labelText: 'Password',
-                              filled: true,
-                              fillColor: Theme.of(context).cardColor,
-                            ),
-                            onChanged: (value) {
-                              changeController.validateInputs();
-                            },
-                            validator: (value) {
-                              if (isInputNull(value) || value!.isEmpty) {
-                                return 'Password can not be empty';
-                              }
-                              return null;
-                            },
-                          );
-                        },
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      GetX<LoginController>(builder: (controller) {
-                        return controller.loading.value
-                            ? Container(
-                                height: 50,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                decoration: BoxDecoration(
-                                    color: Theme.of(context).cardColor,
-                                    borderRadius: BorderRadius.circular(7)),
-                                width: width,
-                                child: const Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    LinearProgress(),
-                                    GText(
-                                      'Authenticating...',
-                                      fontSize: 11,
-                                    )
-                                  ],
-                                ),
-                              )
-                            : ElevatedButton(
-                                style: ButtonStyle(
-                                    maximumSize:
-                                        MaterialStateProperty.all<Size>(
-                                            Size(SizeConfig.screenHeight, 60)),
-                                    minimumSize:
-                                        MaterialStateProperty.all<Size>(
-                                            Size(SizeConfig.screenHeight, 50))),
+                            return null;
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    GetX<LoginController>(
+                      builder: (_) {
+                        return TextFormField(
+                          // enableSuggestions: true,
+                          // autocorrect: true,
+                          autofillHints: const [AutofillHints.password],
+                          focusNode: password_focusNode,
+                          controller: changeController.password,
+                          enabled: !_.loading.value,
+                          textInputAction: TextInputAction.next,
+                          keyboardType: TextInputType.visiblePassword,
+                          obscureText: _.visibility.value,
+                          // obscuringCharacter: '.',
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          decoration: InputDecoration(
+                            suffixIcon: passwordIcon(_.visibility.value),
+                            labelText: 'Password',
+                            // filled: true,
+                            // fillColor: Theme.of(context).cardColor,
+                          ),
+                          onChanged: (value) {
+                            changeController.validateInputs();
+                          },
+                          validator: (value) {
+                            if (isInputNull(value) || value!.isEmpty) {
+                              return 'Password can not be empty';
+                            }
+                            return null;
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    GetX<LoginController>(builder: (controller) {
+                      return controller.loading.value
+                          ? Container(
+                              height: 50,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                  color: Theme.of(context).cardColor,
+                                  borderRadius: BorderRadius.circular(7)),
+                              width: width,
+                              child: const Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  LinearProgress(),
+                                  GText(
+                                    'Authenticating...',
+                                    fontSize: 11,
+                                  )
+                                ],
+                              ),
+                            )
+                          : SizedBox(
+                              width: SizeConfig.screenWidth,
+                              height: 50,
+                              child: Button(
+                                labelText: 'Login',
+                                // style: ButtonStyle(
+                                //     // backgroundColor: MaterialStatePropertyAll(
+                                //     //     Theme.of(context).primaryColor),
+                                //     maximumSize:
+                                //         MaterialStateProperty.all<Size>(
+                                //             Size(SizeConfig.screenHeight, 60)),
+                                //     minimumSize:
+                                //         MaterialStateProperty.all<Size>(
+                                //             Size(SizeConfig.screenHeight, 50))),
                                 onPressed: controller.isButtonEnabled.value
-                                    ? () =>
-                                        controller.login(context, navigateTo)
+                                    ? () => controller.login(
+                                        context,
+                                        navigateTo,
+                                        '${portChecking(Environment.getInstance().getServerUrlPort())}/oauth/token')
                                     : null,
-                                child: GText(
-                                  'Login',
-                                  color: !controller.isButtonEnabled.value
-                                      ? ThemeController.getInstance().darkMode(
-                                          darkColor: Colors.white60,
-                                          lightColor:
-                                              !controller.isButtonEnabled.value
-                                                  ? Colors.black26
-                                                  : Colors.black)
-                                      : Theme.of(context).disabledColor,
-                                ));
-                      })
-                    ],
-                  ),
+                                // child: GText(
+                                //   'Login',
+                                //   color: !controller.isButtonEnabled.value
+                                //       ? ThemeController.getInstance().darkMode(
+                                //           darkColor: Colors.white60,
+                                //           lightColor:
+                                //               !controller.isButtonEnabled.value
+                                //                   ? Colors.black26
+                                //                   : Colors.black)
+                                //       : Theme.of(context).disabledColor,
+                                // )
+                              ),
+                            );
+                    })
+                  ],
                 ),
               ),
             ),
@@ -267,13 +271,14 @@ class LoginController extends GetxController {
     visibility.value = value;
   }
 
-  void login(context, String navigateTo) async {
+  void login(context, String navigateTo, String url) async {
     loading.value = true;
 
     Checking state = await SettingsService().login(
         context: context,
         password: password.text,
         userName: username.text,
+        url: url,
         navigateTo: navigateTo);
     loading.value = false;
     if (state == Checking.firstLogin || state == Checking.passwordExpired) {

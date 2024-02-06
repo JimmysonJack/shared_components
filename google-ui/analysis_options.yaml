@@ -40,7 +40,7 @@ linter:
     # Might become obsolete with Non-Nullable types
     # pedantic: enabled
     # http://dart-lang.github.io/linter/lints/always_require_non_null_named_parameters.html
-    - always_require_non_null_named_parameters
+    # - always_require_non_null_named_parameters
 
     # Since dart 2.0 dart is a sound language, specifying types is not required anymore.
     # `var foo = 10;` is enough information for the compiler to make foo a int.

@@ -2,6 +2,7 @@ class Environment {
   String? _serverUrl;
   String? _clientId;
   String? _clientSecret;
+  String? _port;
   static Environment? _instance;
 
   static Environment getInstance() {
@@ -31,5 +32,13 @@ class Environment {
 
   String? getServerUrl() {
     return _serverUrl;
+  }
+
+  setServerUrlPort(String port) {
+    _port = port;
+  }
+
+  String? getServerUrlPort() {
+    return _port;
   }
 }

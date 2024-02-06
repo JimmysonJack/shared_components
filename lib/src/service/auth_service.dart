@@ -41,11 +41,14 @@ class AuthServiceController extends GetxController {
       required String password,
       String? url,
       bool showLoading = false}) async {
+    console('............................................$url');
     Map<String, String> credentials = {
       'grant_type': 'password',
       'username': username,
       'password': password
     };
+    // 'Basic ${base64Encode(utf8.encode('${Environment.getInstance().getClientId()}:${Environment.getInstance().getClientSecret()}'))}'
+
     Options requestOptions =
         Options(contentType: 'application/x-www-form-urlencoded', headers: {
       'Accept': 'application/json',

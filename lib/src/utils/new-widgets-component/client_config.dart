@@ -9,12 +9,19 @@ Future<ValueNotifier<GraphQLClient>> graphClient(context) async {
   //   token = "5b5be6d8-9afd-41bb-88cf-da5aac8e15fb";
   // }
   // final HttpLink httpLink = HttpLink('http://192.1.2.10:7100/graphql');
-  final HttpLink httpLink =
-      HttpLink('${Environment.getInstance().getServerUrl()}/graphql');
+  final HttpLink httpLink = HttpLink(
+      '${Environment.getInstance().getServerUrl()}${portChecking(Environment.getInstance().getServerUrlPort())}/graphql');
   final AuthLink authLink = AuthLink(getToken: () async => 'Bearer $token');
   final Link link = authLink.concat(httpLink);
 
   ValueNotifier<GraphQLClient> client = ValueNotifier(
       GraphQLClient(link: link, cache: GraphQLCache(store: HiveStore())));
   return client;
+}
+
+portChecking(String? port) {
+  if (SettingsService.use.isEmptyOrNull(port)) {
+    return '';
+  }
+  return ':$port';
 }

@@ -580,8 +580,8 @@ class _CustomDateState extends State<CustomDate> {
         decoration: InputDecoration(
           suffixIcon: const Icon(Icons.date_range),
           labelText: widget.labelText,
-          filled: widget.filled,
-          fillColor: Theme.of(context).cardColor,
+          // filled: widget.filled,
+          // fillColor: Theme.of(context).cardColor,
         ),
         onTap: widget.onTap ??
             () {

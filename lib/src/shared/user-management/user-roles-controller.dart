@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:shared_component/shared_component.dart';
 
 class UserRolesController extends GetxController {
@@ -7,29 +6,35 @@ class UserRolesController extends GetxController {
   List<Map<String, dynamic>> storedRoles = [];
   RxList<Map<String, dynamic>> assgnedRoleList = <Map<String, dynamic>>[].obs;
   List<Map<String, dynamic>> usersList = [];
+  final userListData = [].obs;
   final loading = false.obs;
   final loadingUsers = false.obs;
   final noMoreData = false.obs;
   final requestFailed = false.obs;
   final onSaveChangesLoader = false.obs;
+  final loadingUser = false.obs;
+  final disableAllFields = false.obs;
   String? responseMessage;
   int nextPage = 0;
   int totalPages = -1;
   int currentPage = 0;
   String? searchParam;
 
-  getUserRolesByUser(String userUid, BuildContext context) async {
+  ///response field mus contains name, description, active and uid
+  getUserRolesByUser(String userUid, BuildContext context,
+      {required String getRolesByUserEndpoint,
+      required String getRolesByUserResponseFields}) async {
     loading.value = true;
     var res = await GraphQLService.query(
-        endPointName: 'getRolesByUser',
-        responseFields: 'name description active uid',
+        endPointName: getRolesByUserEndpoint,
+        responseFields: getRolesByUserResponseFields,
         // fetchPolicy: FetchPolicy
         parameters: [
           OtherParameters(
               keyName: 'userUid', keyValue: userUid, keyType: 'String')
         ],
         context: context);
-    filterAssignedRoles(res.data);
+    filterAssignedRoles(List<Map<String, dynamic>>.from(res.data));
     loading.value = false;
   }
 
@@ -45,6 +50,8 @@ class UserRolesController extends GetxController {
   getUsers(BuildContext context,
       {String? searchKey,
       bool onSearch = false,
+      required String responseFields,
+      required String endpointName,
       bool updateUserList = false,
       String? removeUserUid}) async {
     SettingsService.use.isEmptyOrNull(searchKey) ? null : nextPage = 0;
@@ -52,22 +59,8 @@ class UserRolesController extends GetxController {
     if (currentPage != totalPages && !updateUserList ||
         onSearch && !updateUserList) {
       var res = await GraphQLService.queryPageable(
-          endPointName: 'getUsers',
-          responseFields: '''
-                    name 
-                    email
-                    facility{
-                      uid 
-                      name
-                      } 
-                      accountNonExpired
-                      credentialsNonExpired
-                      lastLogin
-                      phoneNumber
-                      enabled
-                      isActive
-                      uid
-                      ''',
+          endPointName: endpointName,
+          responseFields: responseFields,
           response: (PageableResponse? data, bool loading) {
             if (data != null && data.status) {
               currentPage = data.currentPage;
@@ -103,13 +96,48 @@ class UserRolesController extends GetxController {
     loadingUsers.value = false;
   }
 
-  saveChanges(
+  Future<List<Map<String, dynamic>>> getSoldierDetails(
+      String serviceNumber, BuildContext context) async {
+    loadingUser.value = true;
+
+    final res = await GraphQLService.query(
+        endPointName: 'getSoldierDetails',
+        responseFields:
+            'birthDate comptrollerNumber firstName lastName middleName ',
+        parameters: [
+          OtherParameters(
+              keyName: 'serviceNumber',
+              keyValue: serviceNumber,
+              keyType: 'String')
+        ],
+        context: context);
+    loadingUser.value = false;
+    var resData = res.data
+        .map((item) => Map<String, dynamic>.from(
+            {...item, 'comptNumber': item['comptrollerNumber']}))
+        .toList();
+    userListData.value = List<Map<String, dynamic>>.from(resData);
+    return List<Map<String, dynamic>>.from(res.data);
+  }
+
+  void saveChanges(
       {required String endPointName,
       required List<InputParameter> inputs,
+      String? userUid,
+      // bool isRole = false,
       required Function(Map<String, dynamic>?) onResponse,
       required BuildContext context}) {
     onSaveChangesLoader.value = true;
+    List<InputParameter> data = inputs
+        .map((e) => InputParameter(
+            fieldName: e.fieldName,
+            inputType: e.inputType,
+            fieldValue:
+                SettingsService.use.convertListOfMapToMap(e.fieldValue)))
+        .toList();
+
     GraphQLService.mutate(
+        updateUid: userUid,
         response: (data, loading) {
           onSaveChangesLoader.value = loading;
           if (data != null) {
@@ -118,7 +146,11 @@ class UserRolesController extends GetxController {
         },
         endPointName: endPointName,
         queryFields: 'uid',
-        inputs: inputs,
+        inputs: data,
         context: context);
+  }
+
+  changeActiveStatus(bool status) {
+    disableAllFields.value = status;
   }
 }

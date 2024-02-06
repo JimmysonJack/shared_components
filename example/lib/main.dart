@@ -8,6 +8,7 @@ import 'loading_environment.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   initApp(
+      appColors: AppColors(),
       appName: 'Shared Components',
       loadEnvFile: () async {
         // debugDisableShadows = true;
@@ -20,9 +21,10 @@ void main() {
             child: Scaffold(
               body: SideNavigation(
                 appBarPosition: AppBarPosition.side,
+                showSideNav: true,
                 version: '2.0.3',
                 topAppBarDetails: TopAppBarDetails(
-                    title: 'Top Bar',
+                    title: 'DHMS | LUGALO',
                     menuItems: [
                       MenuItem<String>(
                           title: 'Change Password',
@@ -67,8 +69,48 @@ void main() {
             children: [
               RouteService.childRoute(
                   routeName: '/dashboard',
-                  child: const SizedBox(
-                    child: UserManager(),
+                  child: SizedBox(
+                    child: UserManager(
+                      roleConfig: RoleConfig(
+                          assignPermissionToRoleEndpoint: '',
+                          deleteRoleEndpoint: 'deleteRole',
+                          getPermissionsEndpoint: 'getPermissions',
+                          getPermissionsResponseField:
+                              'uid name description active',
+                          getRoleResponseFields: 'uid name description',
+                          getRolesEndpoint: 'getRoles',
+                          saveRoleEndpoint: 'saveRole',
+                          saveRoleInputFieldName: 'roleDto',
+                          saveRoleInputType: 'SaveRoleDtoInput',
+                          deleteUIdFieldName: 'roleUid'),
+                      userConfig: UserConfig(
+                        assignRoleToUserEndpoint: 'assignRoleToUser',
+                        deleteUserEndpoint: 'deleteUser',
+                        getRolesByUserEndpoint: 'getRolesByUser',
+                        getRolesByUserResponseFields:
+                            'uid name description active',
+                        getUsersEndpoint: 'getUsers',
+                        saveUserEndpoint: 'saveUser',
+                        saveUserInputFieldName: 'userDto',
+                        saveUserInputType: 'SaveUserDtoInput',
+                        deleteUIdFieldName: 'uid',
+                        getUserResponseFields: '''
+                                    name 
+                                    email
+                                    facility{
+                                      uid 
+                                      name
+                                      } 
+                                      accountNonExpired
+                                      credentialsNonExpired
+                                      lastLogin
+                                      phoneNumber
+                                      enabled
+                                      isActive
+                                      uid
+                                      ''',
+                      ),
+                    ),
                   )),
               ChildRoute('/user-management',
                   child: (context, args) => const SizedBox(

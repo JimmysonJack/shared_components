@@ -45,6 +45,7 @@ class ThemeChangerPopuoMenuItem<T> extends PopupMenuItem<T> {
                                         : Colors.transparent)),
                             child: const GText(
                               'Dark Mode',
+                              fontSize: 10,
                             ),
                           ),
                         ),
@@ -69,6 +70,7 @@ class ThemeChangerPopuoMenuItem<T> extends PopupMenuItem<T> {
                                         : Colors.transparent)),
                             child: const GText(
                               'Light Mode',
+                              fontSize: 10,
                             ),
                           ),
                         ),

@@ -24,6 +24,7 @@ class GraphQLService {
     Function(PageableResponse?, bool)? response,
     List<OtherParameters>? parameters,
     PageableParams pageableParams = const PageableParams(),
+    bool dontUsePageInPageable = false,
     FetchPolicy? fetchPolicy,
     required BuildContext context,
   }) async {
@@ -57,10 +58,15 @@ class GraphQLService {
   ''';
     // GraphQLService.getService.endPoint = _endpoint;
     // GraphQLService.getService.endPointName = endPointName;
+    Map<String, dynamic> params = pageableParams.toJson();
+    if (dontUsePageInPageable) {
+      params.removeWhere((key, value) => key == 'page');
+    }
     final QueryOptions options = QueryOptions(
       operationName: endPointName,
       document: gql(endpoint),
-      variables: {'pageableParam': pageableParams.toJson(), ...otherParams},
+      // variables:  {'pageableParam': usePageableResponse && !SettingsService.use.isEmptyOrNull(pageableResponse) ? pageableResponse!.toMap() : pageableParams.toJson(), ...otherParams},
+      variables: {'pageableParam': params, ...otherParams},
       fetchPolicy: fetchPolicy ?? FetchPolicy.networkOnly,
     );
 
@@ -381,6 +387,7 @@ class GraphQLService {
       required String endPointName,
       required String queryFields,
       String? successMessage,
+      String? updateUid,
       bool refetchData = false,
       required List<InputParameter> inputs,
       required BuildContext context,
@@ -399,7 +406,16 @@ class GraphQLService {
           otherParams.addAll(
               {element.fieldName: convertListToMap(element.objectValues!)});
         } else {
-          otherParams.addAll({element.fieldName: element.fieldValue});
+          var dataValues = element.fieldValue;
+          if (updateUid != null) {
+            dataValues = {...element.fieldValue, 'uid': updateUid};
+          }
+          console('..............xx.........$dataValues');
+          if (dataValues is Map) {
+            dataValues.removeWhere((key, value) => key == 'inputType');
+          }
+
+          otherParams.addAll({element.fieldName: dataValues});
         }
       }
       mapVariable =

@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_component/shared_component.dart';
@@ -158,6 +160,8 @@ class _TableCustomState<T> extends State<TableCustom<T>> {
                       : widget.color ?? Theme.of(context).primaryColor,
                   child: ListTile(
                     onTap: () {},
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     dense: true,
                     title: Row(
                       children: [

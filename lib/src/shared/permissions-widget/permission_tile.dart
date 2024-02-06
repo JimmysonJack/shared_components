@@ -7,20 +7,26 @@ import 'dart:math';
 class PermissionTile extends StatefulWidget {
   final Widget bodyWidget;
   final int? activeElement;
+  final int? totalElement;
   final String titleValue;
+  final int tileIndex;
 
   final List<ActionButtonItem>? actionButton;
-  final Function()? onSetPermission;
+  final Function(String)? onSetPermission;
   final bool Function()? onExpansion;
   final SwitchController? controller;
   final ChangeDetectController? changeController;
+  final PermissionController permissionController;
 
   const PermissionTile(
       {super.key,
       required this.bodyWidget,
+      required this.tileIndex,
       this.activeElement,
+      this.totalElement,
       this.changeController,
       this.onExpansion,
+      required this.permissionController,
       this.controller,
       this.actionButton,
       required this.onSetPermission,
@@ -34,9 +40,8 @@ class _PermissionTileState extends State<PermissionTile>
     with SingleTickerProviderStateMixin {
   bool isExpanded = false;
   bool loading = false;
-  bool toggleStatus = false;
+  // bool toggleStatus = false;
   final dataTableController = Get.put(DataTableController());
-  final permissionController = Get.put(PermissionController());
 
   late final AnimationController _controller = AnimationController(
     vsync: this,
@@ -80,9 +85,12 @@ class _PermissionTileState extends State<PermissionTile>
     return Card(
       elevation: cardElevation,
       child: ExpansionTile(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        leading: const Icon(Icons.sync_lock),
         onExpansionChanged: (bool expanded) {
           if (expanded) {
-            toggleStatus = widget.onExpansion!();
+            widget.permissionController.activateTheToggle[widget.tileIndex] =
+                widget.onExpansion!();
           }
           setState(() {
             isExpanded = expanded;
@@ -93,9 +101,9 @@ class _PermissionTileState extends State<PermissionTile>
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(widget.titleValue),
+                  Text(widget.titleValue.toString().replaceAll('_', ' ')),
                   GText(
-                    '${widget.activeElement} Active',
+                    '${widget.activeElement}/${widget.totalElement} Active',
                     color: ThemeController.getInstance().darkMode(
                         darkColor: Colors.white24, lightColor: Colors.black26),
                   )
@@ -122,14 +130,16 @@ class _PermissionTileState extends State<PermissionTile>
                   const SizedBox(
                     height: 10,
                   ),
-                  Obx(() => permissionController.onLoad.value &&
+                  Obx(() => widget.permissionController
+                                  .onSavingPermission[widget.tileIndex]
+                              [widget.titleValue] &&
                           widget.changeController!.value
                       ? IndicateProgress.cardLinear('Setting Permission')
                       : Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Obx(() {
-                            permissionController.checkboxValue.value;
-                            permissionController.changeDetected.value;
+                            widget.permissionController.checkboxValue.value;
+                            widget.permissionController.changeDetected;
 
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -145,12 +155,16 @@ class _PermissionTileState extends State<PermissionTile>
                                       width: 10,
                                     ),
                                     Switch(
-                                        value: toggleStatus,
+                                        value: widget.permissionController
+                                                .activateTheToggle[
+                                            widget.tileIndex],
                                         onChanged: (value) {
-                                          toggleStatus = value;
-                                          permissionController
+                                          widget.permissionController
+                                                  .activateTheToggle[
+                                              widget.tileIndex] = value;
+                                          widget.permissionController
                                                   .checkboxValue.value =
-                                              !permissionController
+                                              !widget.permissionController
                                                   .checkboxValue.value;
                                           widget.controller!.toggle(value
                                               ? SwitchState.on
@@ -159,16 +173,20 @@ class _PermissionTileState extends State<PermissionTile>
                                   ],
                                 ),
                                 SizedBox(
-                                    width: 150,
+                                    // width: 150,
                                     child: Button(
-                                      labelText: 'Set Permission',
-                                      onPressed:
-                                          widget.changeController!.value &&
-                                                  permissionController
-                                                      .changeDetected.value
-                                              ? widget.onSetPermission
-                                              : null,
-                                    ))
+                                  labelText: 'Set Permission',
+                                  onPressed: widget.changeController!.value &&
+                                          widget.permissionController
+                                                      .changeDetected[
+                                                  widget.tileIndex]
+                                              [widget.titleValue]
+                                      ? () {
+                                          widget.onSetPermission!(
+                                              widget.titleValue);
+                                        }
+                                      : null,
+                                ))
                               ],
                             );
                           }))),

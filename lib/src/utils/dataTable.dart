@@ -53,6 +53,11 @@ class DataSourceTable<T> extends StatefulWidget {
 class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
   TextEditingController searchController = TextEditingController();
   bool searchIsOn = false;
+  @override
+  void initState() {
+    // console('this is the data list...............${widget.dataList}');
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -91,8 +96,13 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
 
                                     ///Search field
                                     child: TextFormField(
+                                  cursorHeight: 20,
+                                  cursorRadius: const Radius.circular(20),
                                   controller: searchController,
                                   decoration: InputDecoration(
+                                    filled: false,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 20),
                                     prefixIcon: const Icon(Icons.search),
                                     suffixIcon: searchController.text.isEmpty
                                         ? null
@@ -120,7 +130,7 @@ class _DataSourceTableState<T> extends State<DataSourceTable<T>> {
                                           ),
                                     isDense: true,
                                     border: InputBorder.none,
-                                    labelText: 'Search',
+                                    hintText: 'Search',
                                     // fillColor: Theme.of(context).secondaryHeaderColor,
                                     // filled: true
                                   ),

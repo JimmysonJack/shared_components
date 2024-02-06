@@ -3,13 +3,31 @@ import 'package:flutter/material.dart';
 class User {
   String email;
   String? name;
+  String? facilityName;
+  String? firstName;
+  String? lastName;
+  String? middleName;
+  List<Map<String, dynamic>>? facilities;
   String? phone;
-  User({required this.email, required this.name, this.phone});
+  User(
+      {required this.email,
+      required this.name,
+      this.phone,
+      // this.facilities,
+      this.facilityName,
+      this.firstName,
+      this.lastName,
+      this.middleName});
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       email: json['email'] as String,
       name: json['name'] as String?,
       phone: json['phone'] as String?,
+      // facilities: List<Map<String, dynamic>>.from(json['facilities']),
+      facilityName: json['facilityName'] as String?,
+      firstName: json['firstName'] as String?,
+      middleName: json['middleName'] as String?,
+      lastName: json['lastName'] as String?,
     );
   }
   Map<String, dynamic> toJson() {
@@ -17,6 +35,11 @@ class User {
       'email': email,
       'name': name,
       'phone': phone,
+      // 'facilities': facilities,
+      'facilityName': facilityName,
+      'firstName': firstName,
+      'lastName': lastName,
+      'middleName': middleName,
     };
   }
 }

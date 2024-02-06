@@ -75,7 +75,8 @@ export 'src/shared/top-app-bar/user_profile_popup_menu_item.dart';
 export 'src/shared/animated-expansion-tile/mobile-data-table.dart';
 export 'src/shared/permissions-widget/permission_set.dart';
 export 'src/shared/customPdfViewer/customPdfViewer.dart';
-export 'src/shared/user-management/users-manager.dart';
+export 'src/shared/user-management/users_manager.dart';
+export 'src/shared/user-management/role-widget.dart';
 export 'src/service/navigation.service.dart';
 export 'src/service/route.service.dart';
 export 'package:get/get.dart'

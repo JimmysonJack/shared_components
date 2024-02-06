@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:shared_component/shared_component.dart';
 
 class AppWidget extends StatelessWidget {
   final String appName;
-  const AppWidget({super.key, required this.appName});
+  final AppColors appColors;
+  const AppWidget({super.key, required this.appName, required this.appColors});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class AppWidget extends StatelessWidget {
         return Obx(() {
           ThemeController.getInstance().isDarkTheme.value;
           return Theme(
-            data: ThemeController.getInstance().customTheme(),
+            data: ThemeController.getInstance().themeChanger(appColors),
             child: Navigator(
               key: NavigationService.get.navigatorKey,
               onGenerateRoute: (settings) => MaterialPageRoute(

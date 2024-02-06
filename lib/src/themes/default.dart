@@ -1,99 +1,222 @@
 import 'package:flutter/material.dart';
+import 'package:shared_component/shared_component.dart';
 
 class Palette {
-  static const MaterialColor defaultDark = MaterialColor(
-    0xffe55f48, // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
+  static Color darken(Color color, [double amount = .1]) {
+    assert(amount >= 0 && amount <= 1);
+    final hsl = HSLColor.fromColor(color);
+    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+    return hslDark.toColor();
+  }
+
+  static Color lighten(Color color, [double amount = .1]) {
+    assert(amount >= 0 && amount <= 1);
+    final hsl = HSLColor.fromColor(color);
+    final hslLight =
+        hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
+    return hslLight.toColor();
+  }
+
+  static Color hexToColor(String code) {
+    return Color(int.parse(code.substring(0, 6), radix: 16) + 0xFF000000);
+  }
+
+  static MaterialColor defaultDark = MaterialColor(
+    int.parse(
+        '0xff${AppColors.appInstance().get.primary!}'), // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
     <int, Color>{
-      50: Color(0xff009788), //10%
-      100: Color(0xff00887a), //20%
-      200: Color(0xff00796d), //30%
-      300: Color(0xff005b52), //40%
-      400: Color(0xff004c44), //50%
-      500: Color(0xff003c36), //60%
-      600: Color(0xff002d29), //70%
-      700: Color(0xff001e1b), //80%
-      800: Color(0xff000f0e), //90%
-      900: Color(0xff000000), //100%
+      50: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), -1.0), //10%
+      100: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), -0.8), //20%
+      200: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), -0.6), //30%
+      300: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), -0.4), //40%
+      400: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), -0.2), //50%
+      500: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), 0.2), //60%
+      600: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), 0.4), //70%
+      700: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), 0.6), //80%
+      800: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), 0.8), //90%
+      900: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), 1.0), //100%
     },
   );
 
-  static const MaterialColor defaultLight = MaterialColor(
-    0xffe55f48, // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
+  static MaterialColor defaultLight = MaterialColor(
+    int.parse(
+        '0xff${AppColors.appInstance().get.primary!}'), // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
     <int, Color>{
-      50: Color(0xff009788), //10%
-      100: Color(0xff1aa194), //20%
-      200: Color(0xff33aca0), //30%
-      300: Color(0xff66c1b8), //40%
-      400: Color(0xff80cbc4), //50%
-      500: Color(0xff99d5cf), //60%
-      600: Color(0xffb3e0db), //70%
-      700: Color(0xffcceae7), //80%
-      800: Color(0xffe6f5f3), //90%
-      900: Color(0xffffffff), //100%
+      50: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), 1.0), //10%
+      100: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), 0.8), //20%
+      200: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), 0.6), //30%
+      300: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), 0.4), //40%
+      400: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), 0.2), //50%
+      500: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), -0.2), //60%
+      600: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), -0.4), //70%
+      700: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), -0.6), //80%
+      800: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), -0.8), //90%
+      900: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.primary!), -1.0), //100%
     },
   );
 
-  static const MaterialColor textLight = MaterialColor(
-    0xff808080, // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
+  static MaterialColor textLight = MaterialColor(
+    int.parse(
+        '0xff${AppColors.appInstance().get.text!}'), // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
     <int, Color>{
-      50: Color(0xff737373), //10%
-      100: Color(0xff666666), //20%
-      200: Color(0xff5a5a5a), //30%
-      300: Color(0xff4d4d4d), //40%
-      400: Color(0xff404040), //50%
-      500: Color(0xff333333), //60%
-      600: Color(0xff262626), //70%
-      700: Color(0xff1a1a1a), //80%
-      800: Color(0xff0d0d0d), //90%
-      900: Color(0xff000000), //100%
+      50: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), 1.0), //10%
+      100: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), 0.8), //20%
+      200: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), 0.6), //30%
+      300: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), 0.4), //40%
+      400: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), 0.2), //50%
+      500: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), -0.2), //60%
+      600: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), -0.4), //70%
+      700: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), -0.6), //80%
+      800: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), -0.8), //90%
+      900: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), -1.0), //100%
     },
   );
 
-  static const MaterialColor textDark = MaterialColor(
-    0xff808080, // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
+  static MaterialColor textDark = MaterialColor(
+    int.parse(
+        '0xff${AppColors.appInstance().get.text!}'), // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
     <int, Color>{
-      50: Color(0xff8d8d8d), //10%
-      100: Color(0xff999999), //20%
-      200: Color(0xffa6a6a6), //30%
-      300: Color(0xffb3b3b3), //40%
-      400: Color(0xffc0c0c0), //50%
-      500: Color(0xffcccccc), //60%
-      600: Color(0xffd9d9d9), //70%
-      700: Color(0xffe6e6e6), //80%
-      800: Color(0xfff2f2f2), //90%
-      900: Color(0xffffffff), //100%
+      50: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), -1.0), //10%
+      100: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), -0.8), //20%
+      200: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), -0.6), //30%
+      300: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), -0.4), //40%
+      400: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), -0.2), //50%
+      500: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), 0.2), //60%
+      600: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), 0.4), //70%
+      700: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), 0.6), //80%
+      800: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), 0.8), //90%
+      900: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.text!), 1.0), //100%
     },
   );
 
-  static const MaterialColor shadeDark = MaterialColor(
-    0xff808080, // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
+  static MaterialColor shadeDark = MaterialColor(
+    int.parse(
+        '0xff${AppColors.appInstance().get.shade!}'), // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
     <int, Color>{
-      50: Color.fromARGB(255, 115, 115, 115), //10%
-      100: Color.fromARGB(255, 102, 102, 102), //20%
-      200: Color.fromARGB(255, 90, 90, 90), //30%
-      300: Color.fromARGB(255, 77, 77, 77), //40%
-      400: Color.fromARGB(255, 64, 64, 64), //50%
-      500: Color.fromARGB(255, 51, 51, 51), //60%
-      600: Color.fromARGB(255, 38, 38, 38), //70%
-      700: Color.fromARGB(255, 26, 26, 26), //80%
-      800: Color.fromARGB(255, 13, 13, 13), //90%
-      900: Color.fromARGB(255, 0, 0, 0), //100%
+      50: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), -1.0), //10%
+      100: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), -0.8), //20%
+      200: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), -0.6), //30%
+      300: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), -0.4), //40%
+      400: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), -0.2), //50%
+      500: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), 0.2), //60%
+      600: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), 0.4), //70%
+      700: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), 0.6), //80%
+      800: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), 0.8), //90%
+      900: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), 1.0), //100%
     },
   );
 
-  static const MaterialColor shadeLight = MaterialColor(
-    0xff808080, // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
+  static MaterialColor shadeLight = MaterialColor(
+    int.parse(
+        '0xff${AppColors.appInstance().get.shade!}'), // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
     <int, Color>{
-      50: Color(0xff8d8d8d), //10%
-      100: Color(0xff999999), //20%
-      200: Color(0xffa6a6a6), //30%
-      300: Color(0xffb3b3b3), //40%
-      400: Color(0xffc0c0c0), //50%
-      500: Color(0xffcccccc), //60%
-      600: Color(0xffd9d9d9), //70%
-      700: Color(0xffe6e6e6), //80%
-      800: Color(0xfff2f2f2), //90%
-      900: Color(0xffffffff), //100%
+      50: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), 1.0), //10%
+      100: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), 0.8), //20%
+      200: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), 0.6), //30%
+      300: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), 0.4), //40%
+      400: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), 0.2), //50%
+      500: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), -0.2), //60%
+      600: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), -0.4), //70%
+      700: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), -0.6), //80%
+      800: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), -0.8), //90%
+      900: AppColors.adjustBrightness(
+          hexToColor(AppColors.appInstance().get.shade!), -1.0), //100%
     },
   );
+}
+
+class AppColors {
+  static AppColors? _instance;
+  String? primary;
+  String? text;
+  String? shade;
+  AppColors({this.primary, this.text, this.shade});
+
+  static Color adjustBrightness(Color color, double factor) {
+    ///Make sure the factor is between -1.0 and 1.0
+    factor = factor.clamp(-1.0, 1.0);
+
+    ///Convert the color to HLS(Hue, Satuation, Lightness)
+    final HSLColor hslColor = HSLColor.fromColor(color);
+
+    ///Modefy the lightness
+    final HSLColor adjustedHslColor =
+        hslColor.withLightness((hslColor.lightness + factor).clamp(0.0, 1.0));
+
+    ///Convert back to RGB
+    return adjustedHslColor.toColor();
+  }
+
+  static AppColors appInstance() {
+    _instance ??= AppColors();
+    // primary: 0xff009788, text: 0xff8d8d8d, shade: 0xff8d8d8d
+    console(_instance?.primary);
+    return _instance!;
+  }
+
+  setColors(AppColors appColors) {
+    _instance = appColors;
+    console(_instance?.primary);
+  }
+
+  AppColors get get => AppColors(primary: primary, text: text, shade: shade);
 }

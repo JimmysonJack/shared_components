@@ -287,6 +287,7 @@ class Api {
           title: res['message'],
         );
       }
+      console('...........................$res');
       return res['data'];
     } on DioError catch (e) {
       if (e.response != null) {

@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_component/shared_component.dart';
 
@@ -283,5 +282,12 @@ class SettingsService {
     }
     map.remove(fieldToBeDeleted);
     return Map<String, dynamic>.from(map);
+  }
+
+  getSingleValueFromListOfMapByKey(
+      List<Map<String, dynamic>> listOfMaps, String key) {
+    var value =
+        listOfMaps.firstWhereOrNull((map) => map.containsKey(key))?[key];
+    return value;
   }
 }

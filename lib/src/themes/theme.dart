@@ -45,7 +45,60 @@ class ThemeController extends GetxController {
     }
   }
 
-  ThemeData customTheme() {
+  themeChanger(AppColors appColors) {
+    AppColors.appInstance().setColors(appColors);
+    MaterialColor color =
+        isDarkTheme.value ? Palette.defaultDark : Palette.defaultLight;
+    MaterialColor text =
+        isDarkTheme.value ? Palette.textDark : Palette.textLight;
+    MaterialColor back =
+        isDarkTheme.value ? Palette.shadeDark : Palette.shadeLight;
+    final ThemeData base =
+        isDarkTheme.value ? ThemeData.dark() : ThemeData.light();
+    return base.copyWith(
+      primaryColor: isDarkTheme.value
+          ? Palette.darken(Palette.hexToColor(appColors.primary!), .2)
+          : Palette.lighten(Palette.hexToColor(appColors.primary!), .3),
+      appBarTheme: AppBarTheme(
+        color: isDarkTheme.value
+            ? Palette.darken(Palette.hexToColor(appColors.primary!), .2)
+            : Palette.lighten(Palette.hexToColor(appColors.primary!)),
+      ),
+      colorScheme: isDarkTheme.value
+          ? const ColorScheme.dark().copyWith(
+              primary:
+                  Palette.darken(Palette.hexToColor(appColors.primary!), .2),
+              primaryContainer: color.shade900,
+              secondary: color.shade200,
+              secondaryContainer: color.shade900,
+              surface: back.shade200,
+              background: back.shade700,
+              error: Colors.red,
+              onPrimary: text.shade800,
+              onSecondary: text.shade800,
+              onSurface: text.shade800,
+              onBackground: text.shade600,
+              onError: text.shade800,
+              // brightness: isDarkTheme.value ? Brightness.dark : Brightness.light,
+            )
+          : const ColorScheme.light().copyWith(
+              primary: Palette.lighten(Palette.hexToColor(appColors.primary!))),
+      inputDecorationTheme:
+          const InputDecorationTheme(filled: true, fillColor: Colors.black12),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ButtonStyle(
+            // backgroundColor: MaterialStateProperty.all<Color>(color.shade50),
+            enableFeedback: true,
+            minimumSize: MaterialStateProperty.all<Size?>(const Size(50, 50)),
+            foregroundColor: isDarkTheme.value
+                ? MaterialStateProperty.all<Color?>(const Color(0xfff2f2f2))
+                : MaterialStateProperty.all<Color?>(const Color(0xfff2f2f2))),
+      ),
+    );
+  }
+
+  ThemeData customTheme(AppColors appColors) {
+    AppColors.appInstance().setColors(appColors);
     final ThemeData base =
         isDarkTheme.value ? ThemeData.dark() : ThemeData.light();
     MaterialColor color =
@@ -57,25 +110,31 @@ class ThemeController extends GetxController {
     ColorScheme defaultColorScheme = ColorScheme(
       primary: color.shade400,
       primaryContainer: color.shade900,
-      secondary: color.shade50,
+      secondary: color.shade200,
       secondaryContainer: color.shade900,
-      surface: back.shade600,
+      surface: back.shade200,
       background: back.shade700,
       error: Colors.red,
       onPrimary: text.shade800,
       onSecondary: text.shade800,
       onSurface: text.shade800,
-      onBackground: text.shade800,
+      onBackground: text.shade600,
       onError: text.shade800,
       brightness: isDarkTheme.value ? Brightness.dark : Brightness.light,
     );
     return base.copyWith(
+      // useMaterial3: false,
       colorScheme: defaultColorScheme,
       primaryColor: color.shade400,
       scaffoldBackgroundColor:
           isDarkTheme.value ? null : Colors.blueGrey.shade50,
       buttonTheme: ButtonThemeData(buttonColor: color.shade400),
-      // appBarTheme: AppBarTheme(backgroundColor: color.shade50),
+      inputDecorationTheme:
+          InputDecorationTheme(filled: true, fillColor: back.shade300),
+      appBarTheme: AppBarTheme(
+        backgroundColor: color.shade400.withAlpha(001),
+        foregroundColor: color.shade900,
+      ),
       // cardTheme: CardTheme(color: color.shade100),
       // scaffoldBackgroundColor: back.shade700,
       // canvasColor: back.shade800,

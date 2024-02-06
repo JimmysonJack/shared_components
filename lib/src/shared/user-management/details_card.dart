@@ -21,10 +21,18 @@ class DetailCard extends StatefulWidget {
   final UserDetails? userDetails;
   final Function() onDeleteUser;
   final Function() onCloseDetailes;
+  final String updateUserEndpoint;
+  final String getRolesByUserEndpoint;
+  final String getRolesByUserResponseFields;
+  final String assignRoleToUserEndpoint;
+  final String getUserResponseFields;
+  final String getUserEndpointName;
+  final FieldController fieldController;
 
   final Function(Map<String, dynamic> data) onEditUser;
   const DetailCard(
       {super.key,
+      required this.fieldController,
       required this.height,
       required this.onCloseDetailes,
       required this.userUid,
@@ -35,6 +43,12 @@ class DetailCard extends StatefulWidget {
       required this.shakeIt,
       required this.onEditUser,
       required this.onDeleteUser,
+      required this.getRolesByUserEndpoint,
+      required this.getRolesByUserResponseFields,
+      required this.updateUserEndpoint,
+      required this.getUserEndpointName,
+      required this.getUserResponseFields,
+      required this.assignRoleToUserEndpoint,
       required this.showDetails});
 
   @override
@@ -58,17 +72,25 @@ class _DetailCardState extends State<DetailCard> {
   bool resetUserLoader = false;
   bool saveUserLoader = false;
 
-  FieldController fieldController = FieldController();
   List<Map<String, dynamic>>? userInfors;
   List<String> selectedRoles = [];
 
   @override
   void initState() {
-    controller.getUserRolesByUser(widget.userUid, context);
-    fieldController.fieldUpdates.listen((event) {
+    controller.getUserRolesByUser(widget.userUid, context,
+        getRolesByUserEndpoint: widget.getRolesByUserEndpoint,
+        getRolesByUserResponseFields: widget.getRolesByUserResponseFields);
+    widget.fieldController.fieldUpdates.listen((event) {
       userInfors = event['data'];
+      console(userInfors);
     });
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant DetailCard oldWidget) {
+    widget.fieldController.field.fieldValuesController.clearInstance();
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -83,6 +105,7 @@ class _DetailCardState extends State<DetailCard> {
     return mobileSize && widget.width != 0
         ? mobileView()
         : AnimatedContainer(
+            color: Theme.of(context).scaffoldBackgroundColor,
             duration: const Duration(milliseconds: 1000),
             width: widget.width,
             curve: Curves.fastOutSlowIn,
@@ -104,680 +127,871 @@ class _DetailCardState extends State<DetailCard> {
                                 // width: width,
                                 child: LayoutBuilder(
                                     builder: (context, constraint) {
-                                  return Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                  return Obx(() => Column(
+                                        mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Row(
-                                            children: [
-                                              CircleAvatar(
-                                                radius: 40,
-                                                backgroundColor: ThemeController
-                                                        .getInstance()
-                                                    .darkMode(
-                                                        darkColor:
-                                                            Colors.white24,
-                                                        lightColor:
-                                                            Colors.black12),
-                                                child: Icon(
-                                                  Icons.person,
-                                                  size: 60,
-                                                  color: ThemeController
-                                                          .getInstance()
-                                                      .darkMode(
-                                                          darkColor:
-                                                              Colors.white38,
-                                                          lightColor:
-                                                              Colors.black26),
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                width: 20,
-                                              ),
-                                              Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        widget.userDetails
-                                                                ?.fullName ??
-                                                            ' Name Not Available',
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .headlineSmall
-                                                            ?.copyWith(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 17,
-                                                                color: ThemeController
-                                                                        .getInstance()
-                                                                    .darkMode(
-                                                                        darkColor:
-                                                                            Colors
-                                                                                .white54,
-                                                                        lightColor:
-                                                                            Colors.grey)),
-                                                      ),
-                                                      const SizedBox(
-                                                        width: 30,
-                                                      ),
-                                                      Tooltip(
-                                                        message: 'Edit User',
-                                                        child: IconButton(
-                                                            onPressed: () =>
-                                                                widget.onEditUser(
-                                                                    widget
-                                                                        .user),
-                                                            icon: Icon(
-                                                              Icons.edit,
-                                                              color: Colors
-                                                                  .red[500],
-                                                            )),
-                                                      )
-                                                    ],
-                                                  ),
-                                                  Text(
-                                                    '${widget.userDetails?.email ?? ' Not Available'}  |  ${widget.userDetails?.phone ?? 'Not Provided'}',
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleSmall,
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Text(
-                                                    widget.userDetails
-                                                            ?.region ??
-                                                        'Not Provided',
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleSmall,
-                                                  ),
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                          Column(
-                                            mainAxisSize: MainAxisSize.min,
+                                            mainAxisSize: MainAxisSize.max,
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.end,
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
-                                              deleteUserLoader
-                                                  ? Container(
-                                                      width: 150,
-                                                      alignment:
-                                                          Alignment.center,
-                                                      child: IndicateProgress
-                                                          .circular())
-                                                  : TextButton(
-                                                      style:
-                                                          TextButton.styleFrom(
-                                                        fixedSize:
-                                                            const Size(150, 40),
-                                                        // shadowColor: Colors.black,
-                                                        foregroundColor: ThemeController
+                                              Row(
+                                                children: [
+                                                  CircleAvatar(
+                                                    radius: 40,
+                                                    backgroundColor:
+                                                        ThemeController
                                                                 .getInstance()
                                                             .darkMode(
                                                                 darkColor: Colors
-                                                                    .white54,
+                                                                    .white24,
                                                                 lightColor: Colors
-                                                                    .black87),
-                                                        backgroundColor: Colors
-                                                            .red
-                                                            .withOpacity(0.3),
-                                                      ),
-                                                      onPressed: () {
-                                                        deleteUser(
-                                                            widget.userUid);
-                                                      },
-                                                      child: const Text(
-                                                          'Delete User')),
-                                              const SizedBox(
-                                                height: 10,
-                                              ),
-                                              resetUserLoader
-                                                  ? Container(
-                                                      width: 150,
-                                                      alignment:
-                                                          Alignment.center,
-                                                      child: IndicateProgress
-                                                          .circular(),
-                                                    )
-                                                  : TextButton(
-                                                      style:
-                                                          TextButton.styleFrom(
-                                                        fixedSize:
-                                                            const Size(150, 40),
-                                                        // shadowColor: Colors.black,
-                                                        foregroundColor: ThemeController
-                                                                .getInstance()
-                                                            .darkMode(
-                                                                darkColor: Colors
-                                                                    .white54,
-                                                                lightColor: Colors
-                                                                    .black87),
-                                                        backgroundColor:
-                                                            const Color
-                                                                    .fromARGB(
-                                                                    255,
-                                                                    54,
-                                                                    209,
-                                                                    244)
-                                                                .withOpacity(
-                                                                    0.3),
-                                                      ),
-                                                      onPressed: () {
-                                                        resetUser(
-                                                            widget.userUid);
-                                                      },
-                                                      child: const Text(
-                                                          'Reset Password')),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-
-                                      ///IS LOCKED ACTION
-                                      SizedBox(
-                                        height: constraint.maxHeight * 0.05,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'User is Locked',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium,
-                                          ),
-                                          fieldController.field.toggle(
-                                            context: context,
-                                            currentValue:
-                                                widget.userDetails?.isLoked ??
-                                                    false,
-                                            inputType: 'Boolean',
-                                            key: 'userLocked',
-                                          ),
-                                        ],
-                                      ),
-                                      const Divider(),
-
-                                      ///USER ACCESS ACTIONS
-                                      SizedBox(
-                                        height: constraint.maxHeight * 0.02,
-                                      ),
-                                      AnimatedOpacity(
-                                        curve: curves,
-                                        duration:
-                                            Duration(milliseconds: duration),
-                                        opacity: opacityLevel,
-                                        child: AnimatedContainer(
-                                          curve: curves,
-                                          duration:
-                                              Duration(milliseconds: duration),
-                                          height: userDetailHeight ??
-                                              constraint.maxHeight * 0.3,
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: SingleChildScrollView(
-                                                  physics:
-                                                      const NeverScrollableScrollPhysics(),
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        'User Access Actions',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .bodySmall,
-                                                      ),
-
-                                                      ///USER DISABLED
-                                                      Row(
-                                                        children: [
-                                                          Text(
-                                                            'User Is Disabled',
-                                                            style: Theme.of(
-                                                                    context)
-                                                                .textTheme
-                                                                .titleMedium,
-                                                          ),
-                                                          fieldController.field
-                                                              .checkBox(
-                                                            currentValue: widget
-                                                                    .userDetails
-                                                                    ?.disabled ??
-                                                                false,
-                                                            context: context,
-                                                            key: 'disableUser',
-                                                            inputType:
-                                                                'Boolean',
-                                                          ),
-                                                        ],
-                                                      ),
-
-                                                      ///PASSWORD CAN EXPIRE
-                                                      Row(
-                                                        children: [
-                                                          Text(
-                                                            'User Password Can Expire',
-                                                            style: Theme.of(
-                                                                    context)
-                                                                .textTheme
-                                                                .titleMedium,
-                                                          ),
-                                                          fieldController.field
-                                                              .checkBox(
-                                                            currentValue: widget
-                                                                    .userDetails
-                                                                    ?.passwordCanExpire ??
-                                                                false,
-                                                            context: context,
-                                                            key:
-                                                                'passwordCanExpire',
-                                                            inputType:
-                                                                'Boolean',
-                                                          ),
-                                                        ],
-                                                      ),
-
-                                                      ///IF PASSWORD EXPIRED
-                                                      widget.userDetails
-                                                                  ?.passwordExpired ??
-                                                              false
-                                                          ? Text(
-                                                              'Password Expired',
-                                                              style: Theme.of(
-                                                                      context)
-                                                                  .textTheme
-                                                                  .labelSmall
-                                                                  ?.copyWith(
-                                                                      color: Colors
-                                                                              .red[
-                                                                          400]),
-                                                            )
-                                                          : const SizedBox(),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 100,
-                                                width: 1,
-                                                child: DecoratedBox(
-                                                  decoration: BoxDecoration(
+                                                                    .black12),
+                                                    child: Icon(
+                                                      Icons.person,
+                                                      size: 60,
                                                       color: ThemeController
                                                               .getInstance()
                                                           .darkMode(
                                                               darkColor: Colors
                                                                   .white38,
                                                               lightColor: Colors
-                                                                  .black38)),
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: SingleChildScrollView(
-                                                  physics:
-                                                      const NeverScrollableScrollPhysics(),
-                                                  child: Column(
+                                                                  .black26),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 20,
+                                                  ),
+                                                  Column(
                                                     mainAxisSize:
                                                         MainAxisSize.min,
-                                                    // crossAxisAlignment:
-                                                    //     CrossAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                            widget.userDetails
+                                                                    ?.fullName ??
+                                                                ' Name Not Available',
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .headlineSmall
+                                                                ?.copyWith(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        17,
+                                                                    color: ThemeController.getInstance().darkMode(
+                                                                        darkColor:
+                                                                            Colors
+                                                                                .white54,
+                                                                        lightColor:
+                                                                            Colors.grey)),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 30,
+                                                          ),
+                                                          Tooltip(
+                                                            message:
+                                                                'Edit User',
+                                                            child: IconButton(
+                                                                onPressed: () =>
+                                                                    widget.onEditUser(
+                                                                        widget
+                                                                            .user),
+                                                                icon: Icon(
+                                                                  Icons.edit,
+                                                                  color: Colors
+                                                                      .red[500],
+                                                                )),
+                                                          )
+                                                        ],
+                                                      ),
                                                       Text(
-                                                        'Last Login',
+                                                        '${widget.userDetails?.email ?? ' Not Available'}  |  ${widget.userDetails?.phone ?? 'Not Provided'}',
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
                                                         style: Theme.of(context)
                                                             .textTheme
-                                                            .bodySmall,
+                                                            .titleSmall,
                                                       ),
                                                       const SizedBox(
                                                         height: 5,
                                                       ),
                                                       Text(
-                                                        DateFormat(
-                                                                'MMM d, yyyy HH:mm')
-                                                            .format(DateTime.parse(widget
-                                                                    .loggedInUserDetails
-                                                                    ?.lastLogin ??
-                                                                '2022-03-27 0814')),
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .labelLarge,
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 10,
-                                                      ),
-                                                      Text(
-                                                        'Logged In Device',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .bodySmall,
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 5,
-                                                      ),
-                                                      Text(
-                                                        widget.loggedInUserDetails ==
-                                                                null
-                                                            ? 'Not Provided'
-                                                            : '${widget.loggedInUserDetails?.loggedInDevice?.devicename} | Mac: ${widget.loggedInUserDetails?.loggedInDevice?.macAddress} | OS: ${widget.loggedInUserDetails?.loggedInDevice?.operatingSystem} | IP: ${widget.loggedInUserDetails?.loggedInDevice?.ipAddress}',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .labelLarge,
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 10,
-                                                      ),
-                                                      Text(
-                                                        'Last Logged In Location',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .bodySmall,
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 5,
-                                                      ),
-                                                      Text(
-                                                        widget.loggedInUserDetails
-                                                                ?.lastLoginLocation ??
+                                                        widget.userDetails
+                                                                ?.region ??
                                                             'Not Provided',
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
                                                         style: Theme.of(context)
                                                             .textTheme
-                                                            .labelLarge,
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 10,
-                                                      ),
-                                                      Text(
-                                                        'Authenticated Divice',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .bodySmall,
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 5,
-                                                      ),
-                                                      Text(
-                                                        widget.loggedInUserDetails ==
-                                                                null
-                                                            ? 'Not Provided'
-                                                            : '${widget.loggedInUserDetails?.authenticatedDevice?.devicename} | Mac: ${widget.loggedInUserDetails?.authenticatedDevice?.macAddress} | OS: ${widget.loggedInUserDetails?.authenticatedDevice?.operatingSystem} | IP: ${widget.loggedInUserDetails?.authenticatedDevice?.ipAddress}',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .labelLarge,
+                                                            .titleSmall,
                                                       ),
                                                     ],
+                                                  )
+                                                ],
+                                              ),
+                                              Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.end,
+                                                children: [
+                                                  deleteUserLoader
+                                                      ? Container(
+                                                          width: 150,
+                                                          alignment:
+                                                              Alignment.center,
+                                                          child:
+                                                              IndicateProgress
+                                                                  .circular())
+                                                      : TextButton(
+                                                          style: TextButton
+                                                              .styleFrom(
+                                                            fixedSize:
+                                                                const Size(
+                                                                    150, 40),
+                                                            // shadowColor: Colors.black,
+                                                            foregroundColor: ThemeController
+                                                                    .getInstance()
+                                                                .darkMode(
+                                                                    darkColor:
+                                                                        Colors
+                                                                            .white54,
+                                                                    lightColor:
+                                                                        Colors
+                                                                            .black87),
+                                                            backgroundColor:
+                                                                Colors.red
+                                                                    .withOpacity(
+                                                                        0.3),
+                                                          ),
+                                                          onPressed: () {
+                                                            deleteUser(
+                                                                widget.userUid);
+                                                          },
+                                                          child: const Text(
+                                                              'Delete User')),
+                                                  const SizedBox(
+                                                    height: 10,
                                                   ),
-                                                ),
+                                                  resetUserLoader
+                                                      ? Container(
+                                                          width: 150,
+                                                          alignment:
+                                                              Alignment.center,
+                                                          child:
+                                                              IndicateProgress
+                                                                  .circular(),
+                                                        )
+                                                      : TextButton(
+                                                          style: TextButton
+                                                              .styleFrom(
+                                                            fixedSize:
+                                                                const Size(
+                                                                    150, 40),
+                                                            // shadowColor: Colors.black,
+                                                            foregroundColor: ThemeController
+                                                                    .getInstance()
+                                                                .darkMode(
+                                                                    darkColor:
+                                                                        Colors
+                                                                            .white54,
+                                                                    lightColor:
+                                                                        Colors
+                                                                            .black87),
+                                                            backgroundColor:
+                                                                const Color
+                                                                        .fromARGB(
+                                                                        255,
+                                                                        54,
+                                                                        209,
+                                                                        244)
+                                                                    .withOpacity(
+                                                                        0.3),
+                                                          ),
+                                                          onPressed: () {
+                                                            resetUser(
+                                                                widget.userUid);
+                                                          },
+                                                          child: const Text(
+                                                              'Reset Password')),
+                                                ],
                                               ),
                                             ],
                                           ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: constraint.maxHeight * 0.02,
-                                      ),
-                                      const Divider(),
 
-                                      SizedBox(
-                                        height: constraint.maxHeight * 0.02,
-                                      ),
-                                      controller.onSaveChangesLoader.value
-                                          ? IndicateProgress.cardLinear(
-                                              'Saving Changes')
-                                          : Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  'Role Section',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .titleMedium,
-                                                ),
-                                                TextButton(
-                                                    style: TextButton.styleFrom(
-                                                      fixedSize:
-                                                          const Size(150, 40),
-                                                      // shadowColor: Colors.black,
-                                                      foregroundColor: ThemeController
-                                                              .getInstance()
-                                                          .darkMode(
-                                                              darkColor: Colors
-                                                                  .white54,
-                                                              lightColor: Colors
-                                                                  .black87),
-                                                      backgroundColor:
-                                                          Theme.of(context)
-                                                              .primaryColor
-                                                              .withOpacity(0.3),
+                                          ///IS LOCKED ACTION
+                                          SizedBox(
+                                            height: constraint.maxHeight * 0.05,
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                'User is Locked',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleMedium!
+                                                    .copyWith(
+                                                        color: widget.userDetails
+                                                                        ?.isLoked ==
+                                                                    true ||
+                                                                widget
+                                                                    .fieldController
+                                                                    .field
+                                                                    .fieldValuesController
+                                                                    .instanceValues
+                                                                    .where((element) =>
+                                                                        element[
+                                                                            'accountNonLocked'] ==
+                                                                        true)
+                                                                    .isNotEmpty
+                                                            ? Colors.amber
+                                                            : null),
+                                              ),
+                                              widget.fieldController.field
+                                                  .toggle(
+                                                context: context,
+                                                onChanged: ((value) {
+                                                  for (var element in widget
+                                                      .fieldController
+                                                      .instanceValues) {
+                                                    if (element.keys.first ==
+                                                        'accountNonLocked') {
+                                                      widget.fieldController
+                                                          .updateValue(
+                                                              !value!,
+                                                              'accountNonLocked',
+                                                              widget
+                                                                  .fieldController
+                                                                  .instanceValues
+                                                                  .indexOf(
+                                                                      element));
+                                                    }
+                                                  }
+                                                  // for (var element in widget
+                                                  //     .fieldController
+                                                  //     .field
+                                                  //     .fieldValuesController
+                                                  //     .instanceValues) {
+                                                  //   widget.fieldController.field
+                                                  //       .fieldValuesController
+                                                  //       .updateValue(
+                                                  //           !value!,
+                                                  //           'accountNonLocked',
+                                                  //           widget.fieldController
+                                                  //               .instanceValues
+                                                  //               .indexOf(element));
+                                                  // }
+                                                  setState(() {});
+                                                }),
+                                                currentValue: widget
+                                                        .userDetails?.isLoked ??
+                                                    false,
+                                                inputType: 'Boolean',
+                                                key: 'accountNonLocked',
+                                              ),
+                                            ],
+                                          ),
+                                          const Divider(),
+
+                                          ///USER ACCESS ACTIONS
+                                          SizedBox(
+                                            height: constraint.maxHeight * 0.02,
+                                          ),
+                                          AnimatedOpacity(
+                                            curve: curves,
+                                            duration: Duration(
+                                                milliseconds: duration),
+                                            opacity: opacityLevel,
+                                            child: AnimatedContainer(
+                                              curve: curves,
+                                              duration: Duration(
+                                                  milliseconds: duration),
+                                              height: userDetailHeight ??
+                                                  constraint.maxHeight * 0.3,
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child:
+                                                        SingleChildScrollView(
+                                                      physics:
+                                                          const NeverScrollableScrollPhysics(),
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            'User Access Actions',
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .bodySmall,
+                                                          ),
+
+                                                          ///USER DISABLED
+                                                          Row(
+                                                            children: [
+                                                              Text(
+                                                                'User Is Disabled',
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .titleMedium!
+                                                                    .copyWith(
+                                                                      color: widget.userDetails?.disabled == true ||
+                                                                              widget.fieldController.field.fieldValuesController.instanceValues.where((element) => element['enabled'] == true).isNotEmpty
+                                                                          ? Colors.amber
+                                                                          : null,
+                                                                    ),
+                                                              ),
+                                                              widget
+                                                                  .fieldController
+                                                                  .field
+                                                                  .checkBox(
+                                                                onChanged:
+                                                                    (value) {
+                                                                  for (var element
+                                                                      in widget
+                                                                          .fieldController
+                                                                          .instanceValues) {
+                                                                    if (element
+                                                                            .keys
+                                                                            .first ==
+                                                                        'enabled') {
+                                                                      widget.fieldController.updateValue(
+                                                                          !value!,
+                                                                          'enabled',
+                                                                          widget
+                                                                              .fieldController
+                                                                              .instanceValues
+                                                                              .indexOf(element));
+                                                                    }
+                                                                  }
+                                                                  setState(
+                                                                      () {});
+                                                                },
+                                                                currentValue: widget
+                                                                        .userDetails
+                                                                        ?.disabled ??
+                                                                    false,
+                                                                context:
+                                                                    context,
+                                                                key: 'enabled',
+                                                                inputType:
+                                                                    'Boolean',
+                                                              ),
+                                                            ],
+                                                          ),
+
+                                                          ///PASSWORD CAN EXPIRE
+                                                          Row(
+                                                            children: [
+                                                              Text(
+                                                                'User Password Can Expire',
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .titleMedium!
+                                                                    .copyWith(
+                                                                      color: widget.userDetails?.passwordCanExpire == true ||
+                                                                              widget.fieldController.field.fieldValuesController.instanceValues.where((element) => element['passwordCanExpire'] == true).isNotEmpty
+                                                                          ? Colors.amber
+                                                                          : null,
+                                                                    ),
+                                                              ),
+                                                              widget
+                                                                  .fieldController
+                                                                  .field
+                                                                  .checkBox(
+                                                                onChanged:
+                                                                    (value) {
+                                                                  setState(
+                                                                      () {});
+                                                                },
+                                                                currentValue: widget
+                                                                        .userDetails
+                                                                        ?.passwordCanExpire ??
+                                                                    false,
+                                                                context:
+                                                                    context,
+                                                                key:
+                                                                    'passwordCanExpire',
+                                                                inputType:
+                                                                    'Boolean',
+                                                              ),
+                                                            ],
+                                                          ),
+
+                                                          ///IF PASSWORD EXPIRED
+                                                          widget.userDetails
+                                                                      ?.passwordExpired ??
+                                                                  false
+                                                              ? Text(
+                                                                  'Password Expired',
+                                                                  style: Theme.of(
+                                                                          context)
+                                                                      .textTheme
+                                                                      .labelSmall
+                                                                      ?.copyWith(
+                                                                          color:
+                                                                              Colors.red[400]),
+                                                                )
+                                                              : const SizedBox(),
+                                                        ],
+                                                      ),
                                                     ),
-                                                    onPressed: () {
-                                                      NotificationService
-                                                          .confirm(
-                                                        context: context,
-                                                        showCancelBtn: true,
-                                                        content:
-                                                            'Are You Sure?',
-                                                        confirmBtnText: 'Save',
-                                                        cancelBtnText: 'Cancel',
-                                                        title:
-                                                            'Saving User Changes!',
-                                                        onConfirmBtnTap: () {
-                                                          if (!SettingsService
-                                                              .use
-                                                              .isEmptyOrNull(
-                                                                  selectedRoles)) {
-                                                            ///Saving Role Here
-                                                            controller
-                                                                .saveChanges(
-                                                                    onResponse:
-                                                                        (data) {
-                                                                      selectedRoles
-                                                                          .clear();
-                                                                    },
-                                                                    endPointName:
-                                                                        'assignRoleToUser',
-                                                                    inputs: [
-                                                                      InputParameter(
-                                                                          fieldName:
-                                                                              'roleUids',
-                                                                          fieldValue:
-                                                                              selectedRoles,
-                                                                          inputType:
-                                                                              'String'),
-                                                                      InputParameter(
-                                                                          fieldName:
-                                                                              'userUid',
-                                                                          fieldValue: widget
-                                                                              .userUid,
-                                                                          inputType:
-                                                                              'String'),
-                                                                    ],
-                                                                    context:
-                                                                        context);
-                                                            Navigator.pop(
-                                                                NavigationService
-                                                                    .get
-                                                                    .currentContext!,
-                                                                true);
-                                                          }
-                                                          if (!SettingsService
-                                                              .use
-                                                              .isEmptyOrNull(
-                                                                  userInfors)) {
-                                                            ///Saving UserInfor here
-                                                            controller
-                                                                .saveChanges(
-                                                                    onResponse:
-                                                                        (data) {
-                                                                      userInfors!
-                                                                          .clear();
-                                                                    },
-                                                                    endPointName:
-                                                                        'updateUser',
-                                                                    inputs: [
-                                                                      InputParameter(
-                                                                          fieldName:
-                                                                              'userUid',
-                                                                          fieldValue: widget
-                                                                              .userUid,
-                                                                          inputType:
-                                                                              'String'),
-                                                                      InputParameter(
-                                                                          fieldName:
-                                                                              'userUid',
-                                                                          fieldValue:
-                                                                              userInfors,
-                                                                          inputType:
-                                                                              '[String]'),
-                                                                    ],
-                                                                    context:
-                                                                        context);
-                                                            Navigator.pop(
-                                                                NavigationService
-                                                                    .get
-                                                                    .currentContext!,
-                                                                true);
-                                                          }
-
-                                                          if (SettingsService
-                                                                  .use
-                                                                  .isEmptyOrNull(
-                                                                      userInfors) &&
-                                                              SettingsService
-                                                                  .use
-                                                                  .isEmptyOrNull(
-                                                                      selectedRoles)) {
-                                                            NotificationService
-                                                                .snackBarWarn(
-                                                                    context:
-                                                                        context,
-                                                                    title:
-                                                                        'No Changes Detected!');
-                                                          }
-                                                        },
-                                                      );
-                                                    },
-                                                    child: const Text(
-                                                        'Save Changes')),
-                                              ],
-                                            ),
-                                      Flexible(
-                                        child: AnimatedContainer(
-                                          curve: curves,
-                                          duration:
-                                              Duration(milliseconds: duration),
-                                          height: roleDetailHeight,
-                                          child: MouseRegion(
-                                            onEnter: (value) {
-                                              setState(() {
-                                                roleDetailHeight =
-                                                    constraint.maxHeight * 0.8;
-                                                userDetailHeight =
-                                                    constraint.maxHeight * 0.03;
-                                                opacityLevel = 0;
-                                              });
-                                            },
-                                            onExit: (value) {
-                                              setState(() {
-                                                userDetailHeight = null;
-                                                roleDetailHeight = null;
-                                                opacityLevel = 1.0;
-                                              });
-                                            },
-                                            child: Row(
-                                              children: [
-                                                Expanded(
-                                                  child: RolesListWidget(
-                                                    animate: selectedData,
-                                                    onSearch: (searchKey) {
-                                                      var roleList = controller
-                                                          .storedRoles;
-                                                      setState(() {
-                                                        if (searchKey
-                                                            .isNotEmpty) {
-                                                          controller.unAssignedRoleList = roleList
-                                                              .where((element) => element[
-                                                                      'name']
-                                                                  .toString()
-                                                                  .toLowerCase()
-                                                                  .contains(
-                                                                      searchKey
-                                                                          .toLowerCase()))
-                                                              .toList();
-                                                        }
-                                                      });
-                                                    },
-                                                    roleList: controller
-                                                        .unAssignedRoleList,
-                                                    onSelected: (data) {
-                                                      controller.assgnedRoleList
-                                                          .add(data);
-                                                      selectedRoles
-                                                          .add(data['uid']);
-                                                      controller
-                                                          .unAssignedRoleList
-                                                          .remove(data);
-                                                      setState(() {});
-                                                    },
                                                   ),
-                                                ),
-                                                Expanded(
-                                                  child: Obx(() {
-                                                    return SelectedRoleWidget(
-                                                      animate: selectedData,
-                                                      selectedList: controller
-                                                          .assgnedRoleList
-                                                          .value,
-                                                      onDelete: (data) {
-                                                        controller
-                                                            .assgnedRoleList
-                                                            .remove(data);
-                                                        selectedRoles.remove(
-                                                            data['uid']);
-                                                        controller
-                                                            .unAssignedRoleList
-                                                            .insert(0, data);
-                                                        setState(() {});
-                                                      },
-                                                    );
-                                                  }),
-                                                ),
-                                              ],
+                                                  SizedBox(
+                                                    height: 100,
+                                                    width: 1,
+                                                    child: DecoratedBox(
+                                                      decoration: BoxDecoration(
+                                                          color: ThemeController
+                                                                  .getInstance()
+                                                              .darkMode(
+                                                                  darkColor: Colors
+                                                                      .white38,
+                                                                  lightColor: Colors
+                                                                      .black38)),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child:
+                                                        SingleChildScrollView(
+                                                      physics:
+                                                          const NeverScrollableScrollPhysics(),
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        // crossAxisAlignment:
+                                                        //     CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text(
+                                                            'Last Login',
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .bodySmall,
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 5,
+                                                          ),
+                                                          Text(
+                                                            DateFormat(
+                                                                    'MMM d, yyyy HH:mm')
+                                                                .format(DateTime.parse(widget
+                                                                        .loggedInUserDetails
+                                                                        ?.lastLogin ??
+                                                                    '2022-03-27 0814')),
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .labelLarge,
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          Text(
+                                                            'Logged In Device',
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .bodySmall,
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 5,
+                                                          ),
+                                                          Text(
+                                                            widget.loggedInUserDetails ==
+                                                                    null
+                                                                ? 'Not Provided'
+                                                                : '${widget.loggedInUserDetails?.loggedInDevice?.devicename} | Mac: ${widget.loggedInUserDetails?.loggedInDevice?.macAddress} | OS: ${widget.loggedInUserDetails?.loggedInDevice?.operatingSystem} | IP: ${widget.loggedInUserDetails?.loggedInDevice?.ipAddress}',
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .labelLarge,
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          Text(
+                                                            'Last Logged In Location',
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .bodySmall,
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 5,
+                                                          ),
+                                                          Text(
+                                                            widget.loggedInUserDetails
+                                                                    ?.lastLoginLocation ??
+                                                                'Not Provided',
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .labelLarge,
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          Text(
+                                                            'Authenticated Divice',
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .bodySmall,
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 5,
+                                                          ),
+                                                          Text(
+                                                            widget.loggedInUserDetails ==
+                                                                    null
+                                                                ? 'Not Provided'
+                                                                : '${widget.loggedInUserDetails?.authenticatedDevice?.devicename} | Mac: ${widget.loggedInUserDetails?.authenticatedDevice?.macAddress} | OS: ${widget.loggedInUserDetails?.authenticatedDevice?.operatingSystem} | IP: ${widget.loggedInUserDetails?.authenticatedDevice?.ipAddress}',
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .labelLarge,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      )
-                                    ],
-                                  );
+                                          SizedBox(
+                                            height: constraint.maxHeight * 0.02,
+                                          ),
+                                          const Divider(),
+
+                                          SizedBox(
+                                            height: constraint.maxHeight * 0.02,
+                                          ),
+                                          controller.onSaveChangesLoader.value
+                                              ? IndicateProgress.cardLinear(
+                                                  'Saving Changes')
+                                              : Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      'Role Section',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .titleMedium,
+                                                    ),
+                                                    TextButton(
+                                                        style: TextButton
+                                                            .styleFrom(
+                                                          fixedSize: const Size(
+                                                              150, 40),
+                                                          // shadowColor: Colors.black,
+                                                          foregroundColor: ThemeController
+                                                                  .getInstance()
+                                                              .darkMode(
+                                                                  darkColor: Colors
+                                                                      .white54,
+                                                                  lightColor: Colors
+                                                                      .black87),
+                                                          backgroundColor:
+                                                              Theme.of(context)
+                                                                  .primaryColor
+                                                                  .withOpacity(
+                                                                      0.3),
+                                                        ),
+                                                        onPressed: () {
+                                                          NotificationService
+                                                              .confirm(
+                                                            context: context,
+                                                            showCancelBtn: true,
+                                                            content:
+                                                                'Are You Sure?',
+                                                            confirmBtnText:
+                                                                'Save',
+                                                            cancelBtnText:
+                                                                'Cancel',
+                                                            title:
+                                                                'Saving User Changes!',
+                                                            onConfirmBtnTap:
+                                                                () {
+                                                              console(
+                                                                  selectedRoles);
+                                                              if (!SettingsService
+                                                                      .use
+                                                                      .isEmptyOrNull(
+                                                                          selectedRoles) &&
+                                                                  SettingsService
+                                                                      .use
+                                                                      .isEmptyOrNull(
+                                                                          userInfors)) {
+                                                                console(
+                                                                    '......xxx.......saving roles');
+
+                                                                ///Saving Role Here
+                                                                controller
+                                                                    .saveChanges(
+                                                                        onResponse:
+                                                                            (data) {
+                                                                          selectedRoles
+                                                                              .clear();
+                                                                        },
+                                                                        endPointName:
+                                                                            widget
+                                                                                .assignRoleToUserEndpoint,
+                                                                        inputs: [
+                                                                          InputParameter(
+                                                                              fieldName: 'userRolesDto',
+                                                                              fieldValue: List<Map<String, dynamic>>.from([
+                                                                                {
+                                                                                  'userUid': widget.userUid,
+                                                                                  'inputType': 'String'
+                                                                                },
+                                                                                {
+                                                                                  'roles': selectedRoles,
+                                                                                  'inputType': '[String]'
+                                                                                }
+                                                                              ]),
+                                                                              inputType: 'UserRolesDtoInput'),
+                                                                        ],
+                                                                        context:
+                                                                            context);
+                                                                Navigator.pop(
+                                                                    NavigationService
+                                                                        .get
+                                                                        .currentContext!,
+                                                                    true);
+                                                              }
+                                                              if (!SettingsService
+                                                                      .use
+                                                                      .isEmptyOrNull(
+                                                                          userInfors) &&
+                                                                  SettingsService
+                                                                      .use
+                                                                      .isEmptyOrNull(
+                                                                          selectedRoles)) {
+                                                                console(
+                                                                    ',...............zzzz......saving User info');
+
+                                                                ///Saving UserInfor here
+                                                                controller
+                                                                    .saveChanges(
+                                                                        userUid:
+                                                                            widget
+                                                                                .userUid,
+                                                                        onResponse:
+                                                                            (data) {
+                                                                          userInfors!
+                                                                              .clear();
+                                                                        },
+                                                                        endPointName:
+                                                                            widget
+                                                                                .updateUserEndpoint,
+                                                                        inputs: [
+                                                                          InputParameter(
+                                                                              fieldName: 'userDto',
+                                                                              fieldValue: userInfors,
+                                                                              inputType: 'UserDtoInput'),
+                                                                        ],
+                                                                        context:
+                                                                            context);
+                                                                Navigator.pop(
+                                                                    NavigationService
+                                                                        .get
+                                                                        .currentContext!,
+                                                                    true);
+                                                              }
+
+                                                              if (!SettingsService
+                                                                      .use
+                                                                      .isEmptyOrNull(
+                                                                          userInfors) &&
+                                                                  !SettingsService
+                                                                      .use
+                                                                      .isEmptyOrNull(
+                                                                          selectedRoles)) {
+                                                                console(
+                                                                    'Saving both of them.................');
+                                                                controller
+                                                                    .saveChanges(
+                                                                        userUid:
+                                                                            widget
+                                                                                .userUid,
+                                                                        onResponse:
+                                                                            (data) {
+                                                                          userInfors!
+                                                                              .clear();
+
+                                                                          ///Saving Role Here
+                                                                          controller.saveChanges(
+                                                                              onResponse: (data) {
+                                                                                selectedRoles.clear();
+                                                                              },
+                                                                              endPointName: widget.assignRoleToUserEndpoint,
+                                                                              inputs: [
+                                                                                InputParameter(fieldName: 'roleUids', fieldValue: selectedRoles, inputType: 'String'),
+                                                                                InputParameter(fieldName: 'userUid', fieldValue: widget.userUid, inputType: 'String'),
+                                                                              ],
+                                                                              context: context);
+                                                                        },
+                                                                        endPointName:
+                                                                            widget
+                                                                                .updateUserEndpoint,
+                                                                        inputs: [
+                                                                          InputParameter(
+                                                                              fieldName: 'userDto',
+                                                                              fieldValue: userInfors,
+                                                                              inputType: 'UserDtoInput'),
+                                                                        ],
+                                                                        context:
+                                                                            context);
+
+                                                                Navigator.pop(
+                                                                    NavigationService
+                                                                        .get
+                                                                        .currentContext!,
+                                                                    true);
+                                                              }
+
+                                                              if (SettingsService
+                                                                      .use
+                                                                      .isEmptyOrNull(
+                                                                          userInfors) &&
+                                                                  SettingsService
+                                                                      .use
+                                                                      .isEmptyOrNull(
+                                                                          selectedRoles)) {
+                                                                NotificationService
+                                                                    .snackBarWarn(
+                                                                        context:
+                                                                            context,
+                                                                        title:
+                                                                            'No Changes Detected!');
+                                                              }
+                                                            },
+                                                          );
+                                                        },
+                                                        child: const Text(
+                                                            'Save Changes')),
+                                                  ],
+                                                ),
+                                          Flexible(
+                                            child: AnimatedContainer(
+                                              curve: curves,
+                                              duration: Duration(
+                                                  milliseconds: duration),
+                                              height: roleDetailHeight,
+                                              child: MouseRegion(
+                                                onEnter: (value) {
+                                                  setState(() {
+                                                    roleDetailHeight =
+                                                        constraint.maxHeight *
+                                                            0.8;
+                                                    userDetailHeight =
+                                                        constraint.maxHeight *
+                                                            0.03;
+                                                    opacityLevel = 0;
+                                                  });
+                                                },
+                                                onExit: (value) {
+                                                  setState(() {
+                                                    userDetailHeight = null;
+                                                    roleDetailHeight = null;
+                                                    opacityLevel = 1.0;
+                                                  });
+                                                },
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: RolesListWidget(
+                                                        animate: selectedData,
+                                                        onSearch: (searchKey) {
+                                                          var roleList =
+                                                              controller
+                                                                  .storedRoles;
+                                                          setState(() {
+                                                            if (searchKey
+                                                                .isNotEmpty) {
+                                                              controller.unAssignedRoleList = roleList
+                                                                  .where((element) => element[
+                                                                          'name']
+                                                                      .toString()
+                                                                      .toLowerCase()
+                                                                      .contains(
+                                                                          searchKey
+                                                                              .toLowerCase()))
+                                                                  .toList();
+                                                            }
+                                                          });
+                                                        },
+                                                        roleList: controller
+                                                            .unAssignedRoleList,
+                                                        onSelected: (data) {
+                                                          controller
+                                                              .assgnedRoleList
+                                                              .add(data);
+                                                          selectedRoles
+                                                              .add(data['uid']);
+                                                          controller
+                                                              .unAssignedRoleList
+                                                              .remove(data);
+                                                          setState(() {});
+                                                        },
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Obx(() {
+                                                        return SelectedRoleWidget(
+                                                          animate: selectedData,
+                                                          selectedList: controller
+                                                              .assgnedRoleList
+                                                              .value,
+                                                          onDelete: (data) {
+                                                            controller
+                                                                .assgnedRoleList
+                                                                .remove(data);
+                                                            selectedRoles
+                                                                .remove(data[
+                                                                    'uid']);
+                                                            controller
+                                                                .unAssignedRoleList
+                                                                .insert(
+                                                                    0, data);
+                                                            setState(() {});
+                                                          },
+                                                        );
+                                                      }),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ));
                                 }),
                               ),
                             ),
@@ -943,12 +1157,12 @@ class _DetailCardState extends State<DetailCard> {
                                           .textTheme
                                           .titleMedium,
                                     ),
-                                    fieldController.field.toggle(
+                                    widget.fieldController.field.toggle(
                                       context: context,
                                       currentValue:
                                           widget.userDetails?.isLoked ?? false,
                                       inputType: 'Boolean',
-                                      key: 'userLocked',
+                                      key: 'accountNonLocked',
                                     ),
                                   ],
                                 ),
@@ -987,11 +1201,11 @@ class _DetailCardState extends State<DetailCard> {
                                     style:
                                         Theme.of(context).textTheme.titleMedium,
                                   ),
-                                  fieldController.field.checkBox(
+                                  widget.fieldController.field.checkBox(
                                     currentValue:
                                         widget.userDetails?.disabled ?? false,
                                     context: context,
-                                    key: 'disableUser',
+                                    key: 'enabled',
                                     inputType: 'Boolean',
                                   ),
                                 ],
@@ -1006,7 +1220,7 @@ class _DetailCardState extends State<DetailCard> {
                                     style:
                                         Theme.of(context).textTheme.titleMedium,
                                   ),
-                                  fieldController.field.checkBox(
+                                  widget.fieldController.field.checkBox(
                                     currentValue:
                                         widget.userDetails?.passwordCanExpire ??
                                             false,
@@ -1206,6 +1420,7 @@ class _DetailCardState extends State<DetailCard> {
                                               .withOpacity(0.3),
                                         ),
                                         onPressed: () {
+                                          console('............save change');
                                           NotificationService.confirm(
                                             context: context,
                                             showCancelBtn: true,
@@ -1214,16 +1429,23 @@ class _DetailCardState extends State<DetailCard> {
                                             cancelBtnText: 'Cancel',
                                             title: 'Saving User Changes!',
                                             onConfirmBtnTap: () {
+                                              console(selectedRoles);
                                               if (!SettingsService.use
-                                                  .isEmptyOrNull(
-                                                      selectedRoles)) {
+                                                      .isEmptyOrNull(
+                                                          selectedRoles) &&
+                                                  SettingsService.use
+                                                      .isEmptyOrNull(
+                                                          userInfors)) {
+                                                console(
+                                                    '......xxx.......saving roles');
+
                                                 ///Saving Role Here
                                                 controller.saveChanges(
                                                     onResponse: (data) {
                                                       selectedRoles.clear();
                                                     },
-                                                    endPointName:
-                                                        'assignRoleToUser',
+                                                    endPointName: widget
+                                                        .assignRoleToUserEndpoint,
                                                     inputs: [
                                                       InputParameter(
                                                           fieldName: 'roleUids',
@@ -1243,27 +1465,89 @@ class _DetailCardState extends State<DetailCard> {
                                                     true);
                                               }
                                               if (!SettingsService.use
-                                                  .isEmptyOrNull(userInfors)) {
+                                                      .isEmptyOrNull(
+                                                          userInfors) &&
+                                                  SettingsService.use
+                                                      .isEmptyOrNull(
+                                                          selectedRoles)) {
+                                                console(
+                                                    ',...............zzzz......saving User info');
+
                                                 ///Saving UserInfor here
                                                 controller.saveChanges(
+                                                    userUid: widget.userUid,
                                                     onResponse: (data) {
                                                       userInfors!.clear();
                                                     },
-                                                    endPointName: 'updateUser',
+                                                    endPointName: widget
+                                                        .updateUserEndpoint,
                                                     inputs: [
                                                       InputParameter(
-                                                          fieldName: 'userUid',
-                                                          fieldValue:
-                                                              widget.userUid,
-                                                          inputType: 'String'),
-                                                      InputParameter(
-                                                          fieldName: 'userUid',
+                                                          fieldName: 'userDto',
                                                           fieldValue:
                                                               userInfors,
                                                           inputType:
-                                                              '[String]'),
+                                                              'UserDtoInput'),
                                                     ],
                                                     context: context);
+                                                Navigator.pop(
+                                                    NavigationService
+                                                        .get.currentContext!,
+                                                    true);
+                                              }
+
+                                              if (!SettingsService.use
+                                                      .isEmptyOrNull(
+                                                          userInfors) &&
+                                                  !SettingsService.use
+                                                      .isEmptyOrNull(
+                                                          selectedRoles)) {
+                                                console(
+                                                    'Saving both of them.................');
+                                                controller.saveChanges(
+                                                    userUid: widget.userUid,
+                                                    onResponse: (data) {
+                                                      userInfors!.clear();
+
+                                                      ///Saving Role Here
+                                                      controller.saveChanges(
+                                                          onResponse: (data) {
+                                                            selectedRoles
+                                                                .clear();
+                                                          },
+                                                          endPointName: widget
+                                                              .assignRoleToUserEndpoint,
+                                                          inputs: [
+                                                            InputParameter(
+                                                                fieldName:
+                                                                    'roleUids',
+                                                                fieldValue:
+                                                                    selectedRoles,
+                                                                inputType:
+                                                                    'String'),
+                                                            InputParameter(
+                                                                fieldName:
+                                                                    'userUid',
+                                                                fieldValue:
+                                                                    widget
+                                                                        .userUid,
+                                                                inputType:
+                                                                    'String'),
+                                                          ],
+                                                          context: context);
+                                                    },
+                                                    endPointName: widget
+                                                        .updateUserEndpoint,
+                                                    inputs: [
+                                                      InputParameter(
+                                                          fieldName: 'userDto',
+                                                          fieldValue:
+                                                              userInfors,
+                                                          inputType:
+                                                              'UserDtoInput'),
+                                                    ],
+                                                    context: context);
+
                                                 Navigator.pop(
                                                     NavigationService
                                                         .get.currentContext!,
@@ -1330,7 +1614,10 @@ class _DetailCardState extends State<DetailCard> {
                   deleteUserLoader = loader;
                   if (value != null) {
                     controller.getUsers(context,
-                        updateUserList: true, removeUserUid: widget.userUid);
+                        endpointName: widget.getUserEndpointName,
+                        responseFields: widget.getUserResponseFields,
+                        updateUserList: true,
+                        removeUserUid: widget.userUid);
                     widget.onDeleteUser();
                   }
                 });
@@ -1376,7 +1663,7 @@ class _DetailCardState extends State<DetailCard> {
                   }
                 });
               },
-              endPointName: 'resetPassword',
+              endPointName: 'resetUserPassword',
               queryFields: 'uid otp',
               inputs: [
                 InputParameter(
@@ -1388,5 +1675,5 @@ class _DetailCardState extends State<DetailCard> {
         });
   }
 
-  saveChanges() {}
+  // saveChanges() {}
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:shared_component/shared_component.dart';
 
 import 'user-roles-controller.dart';
@@ -8,11 +7,21 @@ class UserListWidget extends StatefulWidget {
   final Function(Map<String, dynamic>) onTap;
   final Function() onExit;
   final Function() onCreateUser;
+  final String responseFields;
+  final String endpointName;
+  final String getRolesByUserResponseFields;
+  final String getRolesByUserEndpoint;
+  final UserRolesController userRolesController;
 
   const UserListWidget(
       {super.key,
       required this.onTap,
       required this.onExit,
+      required this.endpointName,
+      required this.getRolesByUserEndpoint,
+      required this.getRolesByUserResponseFields,
+      required this.responseFields,
+      required this.userRolesController,
       required this.onCreateUser});
 
   @override
@@ -21,21 +30,26 @@ class UserListWidget extends StatefulWidget {
 
 class _UserListWidgetState extends State<UserListWidget> {
   ScrollController scrollController = ScrollController();
-  UserRolesController userRolesController = Get.put(UserRolesController());
+  // UserRolesController userRolesController = Get.put(UserRolesController());
   TextEditingController textEditingController = TextEditingController();
   int stopCall = 2;
   bool showEmail = true;
+  int currentSelected = -1;
 
   @override
   void initState() {
-    textEditingController.text = userRolesController.searchParam ?? '';
-    userRolesController.getUsers(context);
+    textEditingController.text = widget.userRolesController.searchParam ?? '';
+    widget.userRolesController.getUsers(context,
+        endpointName: widget.endpointName,
+        responseFields: widget.responseFields);
     scrollController.addListener(() {
       if (scrollController.position.pixels ==
           scrollController.position.maxScrollExtent) {
         stopCall++;
         if (stopCall % 2 == 0) {
-          userRolesController.getUsers(context);
+          widget.userRolesController.getUsers(context,
+              endpointName: widget.endpointName,
+              responseFields: widget.responseFields);
         }
       }
     });
@@ -54,14 +68,16 @@ class _UserListWidgetState extends State<UserListWidget> {
     return Obx(() => SizedBox(
           // width: sixe.width,
           height: sixe.height,
-          child: userRolesController.requestFailed.value
+          child: widget.userRolesController.requestFailed.value
               ? GErrorMessage(
                   icon: const Icon(Icons.error),
-                  title: userRolesController.responseMessage ?? '',
+                  title: widget.userRolesController.responseMessage ?? '',
                   buttonLabel: 'Reload',
                   onPressed: () {
-                    userRolesController.requestFailed.value = false;
-                    userRolesController.getUsers(context);
+                    widget.userRolesController.requestFailed.value = false;
+                    widget.userRolesController.getUsers(context,
+                        endpointName: widget.endpointName,
+                        responseFields: widget.responseFields);
                   },
                 )
               : Scaffold(
@@ -69,6 +85,10 @@ class _UserListWidgetState extends State<UserListWidget> {
                       message: 'Create User',
                       child: FloatingActionButton(
                         mini: true,
+                        backgroundColor:
+                            ThemeController.getInstance().isDarkTheme.value
+                                ? Colors.white
+                                : Theme.of(context).primaryColor,
                         onPressed: widget.onCreateUser,
                         child: const Icon(Icons.add),
                       )),
@@ -78,7 +98,7 @@ class _UserListWidgetState extends State<UserListWidget> {
                     child: Stack(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
                           child: Column(
                             // mainAxisSize: MainAxisSize.min,
                             // crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,9 +106,13 @@ class _UserListWidgetState extends State<UserListWidget> {
                               TextFormField(
                                 controller: textEditingController,
                                 onChanged: (value) {
-                                  userRolesController.searchParam = value;
-                                  userRolesController.getUsers(context,
-                                      searchKey: value, onSearch: true);
+                                  widget.userRolesController.searchParam =
+                                      value;
+                                  widget.userRolesController.getUsers(context,
+                                      endpointName: widget.endpointName,
+                                      responseFields: widget.responseFields,
+                                      searchKey: value,
+                                      onSearch: true);
                                 },
                                 decoration: const InputDecoration(
                                     hintText: 'Search',
@@ -96,11 +120,11 @@ class _UserListWidgetState extends State<UserListWidget> {
                                     // filled: true,
                                     prefixIcon: Icon(Icons.search_rounded)),
                               ),
-                              userRolesController.loadingUsers.value
+                              widget.userRolesController.loadingUsers.value
                                   ? IndicateProgress.linear()
-                                  : SettingsService.use.isEmptyOrNull(
-                                              userRolesController.usersList) &&
-                                          !userRolesController
+                                  : SettingsService.use.isEmptyOrNull(widget
+                                              .userRolesController.usersList) &&
+                                          !widget.userRolesController
                                               .loadingUsers.value
                                       ? Expanded(
                                           child: GErrorMessage(
@@ -108,8 +132,12 @@ class _UserListWidgetState extends State<UserListWidget> {
                                             title: 'Nothing Found',
                                             buttonLabel: 'Reload',
                                             onPressed: () {
-                                              userRolesController
-                                                  .getUsers(context);
+                                              widget.userRolesController
+                                                  .getUsers(context,
+                                                      endpointName:
+                                                          widget.endpointName,
+                                                      responseFields: widget
+                                                          .responseFields);
                                             },
                                           ),
                                         )
@@ -153,7 +181,7 @@ class _UserListWidgetState extends State<UserListWidget> {
                                                     alignment:
                                                         Alignment.centerLeft,
                                                     child: Text(
-                                                      'Facility',
+                                                      'Active Facility',
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .titleMedium,
@@ -164,8 +192,8 @@ class _UserListWidgetState extends State<UserListWidget> {
                                             ),
                                           );
                                         }),
-                              if (!SettingsService.use
-                                  .isEmptyOrNull(userRolesController.usersList))
+                              if (!SettingsService.use.isEmptyOrNull(
+                                  widget.userRolesController.usersList))
                                 Flexible(
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
@@ -174,25 +202,47 @@ class _UserListWidgetState extends State<UserListWidget> {
                                         child: ListView.builder(
                                             controller: scrollController,
                                             shrinkWrap: true,
-                                            itemCount: userRolesController
-                                                .usersList.length,
+                                            itemCount: widget
+                                                .userRolesController
+                                                .usersList
+                                                .length,
                                             itemBuilder: (context, index) {
                                               return LayoutBuilder(builder:
                                                   (context, constraint) {
                                                 return Card(
                                                   child: ListTile(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10)),
+                                                      tileColor:
+                                                          currentSelected ==
+                                                                  index
+                                                              ? Theme.of(
+                                                                      context)
+                                                                  .primaryColor
+                                                                  .withOpacity(
+                                                                      0.5)
+                                                              : null,
                                                       onTap: () {
-                                                        userRolesController
-                                                            .getUserRolesByUser(
-                                                                userRolesController
-                                                                        .usersList[
-                                                                    index]['uid'],
-                                                                context);
-                                                        showEmail = false;
-                                                        widget.onTap(
-                                                            userRolesController
+                                                        currentSelected = index;
+                                                        widget.userRolesController.getUserRolesByUser(
+                                                            widget.userRolesController
                                                                     .usersList[
-                                                                index]);
+                                                                index]['uid'],
+                                                            context,
+                                                            getRolesByUserEndpoint:
+                                                                widget
+                                                                    .getRolesByUserEndpoint,
+                                                            getRolesByUserResponseFields:
+                                                                widget
+                                                                    .getRolesByUserResponseFields);
+                                                        showEmail = false;
+                                                        widget.onTap(widget
+                                                            .userRolesController
+                                                            .usersList[index]);
                                                       },
                                                       title: Row(
                                                         mainAxisAlignment:
@@ -202,7 +252,7 @@ class _UserListWidgetState extends State<UserListWidget> {
                                                           Flexible(
                                                             fit: FlexFit.tight,
                                                             child: Text(
-                                                              userRolesController
+                                                              widget.userRolesController
                                                                               .usersList[
                                                                           index]
                                                                       [
@@ -223,7 +273,7 @@ class _UserListWidgetState extends State<UserListWidget> {
                                                                       .maxWidth *
                                                                   0.413,
                                                               child: Text(
-                                                                userRolesController
+                                                                widget.userRolesController
                                                                             .usersList[index]
                                                                         [
                                                                         'email'] ??
@@ -244,7 +294,7 @@ class _UserListWidgetState extends State<UserListWidget> {
                                                               alignment: Alignment
                                                                   .centerLeft,
                                                               child: Text(
-                                                                userRolesController.usersList[index]
+                                                                widget.userRolesController.usersList[index]
                                                                             [
                                                                             'facility']
                                                                         [
@@ -264,7 +314,8 @@ class _UserListWidgetState extends State<UserListWidget> {
                                               });
                                             }),
                                       ),
-                                      userRolesController.noMoreData.value
+                                      widget.userRolesController.noMoreData
+                                              .value
                                           ? Container(
                                               height: 50,
                                               alignment: Alignment.center,

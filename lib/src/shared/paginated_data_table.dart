@@ -11,7 +11,6 @@ class PageableDataTable extends StatefulWidget {
       this.deleteUidFieldName,
       required this.endPointName,
       required this.queryFields,
-      this.optionalResponseFields,
       this.otherParameters,
       this.tableAddButton,
       this.mapFunction,
@@ -25,7 +24,6 @@ class PageableDataTable extends StatefulWidget {
 
   final String endPointName;
   final String queryFields;
-  final String? optionalResponseFields;
   final TableAddButton? tableAddButton;
   final DataFilter? filter;
   final List<OtherParameters>? otherParameters;
@@ -76,7 +74,7 @@ class _PageableDataTableState extends State<PageableDataTable> {
     ${widget.endPointName}($pageableValue  $inputVariable){
         $pageableBaseFields
         data{
-           ${widget.optionalResponseFields ?? widget.queryFields}
+           ${widget.queryFields}
         }
     }
 }
@@ -272,8 +270,8 @@ class _PageableDataTableState extends State<PageableDataTable> {
                                   'pageableParam': {
                                     "page": (nextPage! - 1),
                                     "size": size ?? _initialSize,
-                                    ...otherParams ?? {}
-                                  }
+                                  },
+                                  ...otherParams ?? {}
                                 },
                                 updateQuery:
                                     (previousResultData, fetchMoreResultData) {
@@ -305,8 +303,8 @@ class _PageableDataTableState extends State<PageableDataTable> {
                                   'pageableParam': {
                                     "searchParam": searchKey,
                                     "size": size ?? _initialSize,
-                                    ...otherParams ?? {}
-                                  }
+                                  },
+                                  ...otherParams ?? {}
                                 },
                                 updateQuery:
                                     (previousResultData, fetchMoreResultData) {
@@ -456,6 +454,7 @@ class _PageableDataTableState extends State<PageableDataTable> {
     if (widget.mapFunction != null) {
       return {...item, ...widget.mapFunction!(item)};
     }
+
     return item;
   }
 }

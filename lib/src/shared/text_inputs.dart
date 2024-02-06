@@ -169,8 +169,8 @@ abstract class _TextInputBase with Store {
                 ? "$_currency "
                 : null,
             labelText: label,
-            filled: true,
-            fillColor: Theme.of(context).cardColor,
+            // filled: true,
+            // fillColor: Theme.of(context).cardColor,
           ),
         ),
       );
@@ -194,6 +194,7 @@ abstract class _TextInputBase with Store {
       String? inputType = 'String',
       bool fixed = false,
       bool? isMap = false,
+      bool dontUsePageInPageable = false,
       List<OtherParameters>? otherParameters,
       FieldInputType? fieldInputType}) {
     // checkForUpdate(key, label, fieldInputType, validate, updateFields ?? []);
@@ -227,8 +228,8 @@ abstract class _TextInputBase with Store {
                 baseStyle: const TextStyle(fontSize: 16),
                 dropdownSearchDecoration: InputDecoration(
                     enabled: !readOnly,
-                    filled: true,
-                    fillColor: Theme.of(context).cardColor,
+                    // filled: true,
+                    // fillColor: Theme.of(context).cardColor,
                     border: null,
                     labelText: label,
                     // labelStyle: const TextStyle(locale: Locale('sw')),
@@ -317,6 +318,7 @@ abstract class _TextInputBase with Store {
                     context: context,
                     endPointName: endPointName ?? '',
                     parameters: otherParameters,
+                    dontUsePageInPageable: dontUsePageInPageable,
                     pageableParams: PageableParams(
                       searchKey: filter,
                       size: 20,
@@ -416,8 +418,8 @@ abstract class _TextInputBase with Store {
                 dropdownSearchDecoration: InputDecoration(
                     contentPadding: const EdgeInsets.symmetric(
                         vertical: 21.5, horizontal: 10),
-                    filled: true,
-                    fillColor: Theme.of(context).cardColor,
+                    // filled: true,
+                    // fillColor: Theme.of(context).cardColor,
                     border: null,
                     labelText: label,
                     // labelStyle: const TextStyle(locale: Locale('sw')),
@@ -534,12 +536,16 @@ abstract class _TextInputBase with Store {
             itemAsString: inFieldString ??
                 (value) => "${value[customDisplayKey.titleDisplayLabelKey]}",
             selectedItems: onInitialValue(updateFields, key, fieldInputType,
-                validate ?? false, label, inputType),
+                    validate ?? false, label, inputType) ??
+                [],
             onChanged: (data) {
               validateErrors(key, label, fieldInputType, validate, data);
               data.map((e) =>
                   {...e, 'inputValueField': customDisplayKey.inputValueField});
-              _onUpdate(key, data, inputType);
+              List<String> filteredData = List<String>.from(data
+                  .map((e) => e[customDisplayKey.inputValueField])
+                  .toList());
+              _onUpdate(key, filteredData, inputType);
             }),
       );
     });
@@ -584,7 +590,7 @@ abstract class _TextInputBase with Store {
           textTypeInput: TextInputType.datetime,
           disableFuture: disableFuture,
           disablePast: disablePast,
-          filled: true,
+          // filled: true,
           flowTop: flowTop,
           enabled: !disable,
           labelText: label,
@@ -642,8 +648,8 @@ abstract class _TextInputBase with Store {
           },
           decoration: InputDecoration(
               labelText: label,
-              filled: true,
-              fillColor: Theme.of(context).cardColor,
+              // filled: true,
+              // fillColor: Theme.of(context).cardColor,
               suffixIcon: const Icon(Icons.attach_file),
               prefixText: 'File Name: '),
         ),
@@ -998,7 +1004,6 @@ abstract class _TextInputBase with Store {
     fieldValuesController.setValue(uniqueListData);
     dataMap = uniqueListData.firstWhere((data) => data.keys.first == key,
         orElse: () => <String, dynamic>{});
-
     checkForUpdate(key, validationName, fieldInputType, validate,
         dataMap.isEmpty ? null : dataMap.values.first);
     return dataMap.isEmpty ? null : dataMap.values.first;

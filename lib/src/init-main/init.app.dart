@@ -32,6 +32,7 @@ void initApp({
   required String appName,
   required Future<void> Function() loadEnvFile,
   required List<ParallelRoute> routes,
+  required AppColors appColors,
 }) async {
   try {
     // Parallelize initialization tasks using Future.wait
@@ -57,7 +58,10 @@ void initApp({
     }
     runApp(ModularApp(
       module: AppModule(routes),
-      child: AppWidget(appName: appName),
+      child: AppWidget(
+        appName: appName,
+        appColors: appColors,
+      ),
     ));
   } catch (error) {
     // Handle errors gracefully, you can log the error for debugging

@@ -138,8 +138,8 @@ abstract class _PopupModelBase with Store {
         buildSize = MediaQuery.of(context).size.width;
         bool mobileSize = buildSize < 500;
         var size = MediaQuery.of(context).size;
-        return WillPopScope(
-          onWillPop: () async => false,
+        return PopScope(
+          canPop: false,
           child: Observer(builder: (context) {
             return Container(
               // color: Colors.cyanAccent,
@@ -267,7 +267,8 @@ abstract class _PopupModelBase with Store {
   }
 
   List<InputParameter> inputMaker() {
-    // console(fieldController.field.fieldValuesController.instanceValues);
+    ///
+    console(fieldController.field.fieldValuesController.instanceValues);
     if (inputObjectFieldName != null) {
       return [
         InputParameter(
