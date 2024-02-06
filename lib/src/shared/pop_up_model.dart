@@ -138,8 +138,9 @@ abstract class _PopupModelBase with Store {
         buildSize = MediaQuery.of(context).size.width;
         bool mobileSize = buildSize < 500;
         var size = MediaQuery.of(context).size;
-        return PopScope(
-          canPop: false,
+        return WillPopScope(
+          // canPop: false,
+          onWillPop: (() async => false),
           child: Observer(builder: (context) {
             return Container(
               // color: Colors.cyanAccent,
