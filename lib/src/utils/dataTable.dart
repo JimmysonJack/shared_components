@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:shared_component/src/utils/filter.dart';
+import 'package:shared_component/src/utils/g_ui/g_card.dart';
+import 'package:shared_component/src/utils/g_ui/g_error_message.dart';
 import '../../shared_component.dart';
 
 class DataSourceTable<T> extends StatefulWidget {

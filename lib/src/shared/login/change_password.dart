@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
+import 'package:shared_component/src/utils/g_ui/g_text.dart';
 
 import 'login_inputs.dart';
 

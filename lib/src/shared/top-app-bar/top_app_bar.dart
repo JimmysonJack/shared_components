@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_ui/google_ui.dart';
 import 'package:shared_component/src/shared/top-app-bar/theme_changer_popup_menu_item.dart';
 import 'package:shared_component/src/shared/top-app-bar/user_profile_popup_menu_item.dart';
+import 'package:shared_component/src/utils/g_ui/g_text.dart';
 
 import 'custom_popup_menu_item.dart';
 import 'menu_item.dart';

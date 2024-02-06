@@ -58,7 +58,6 @@ export 'src/shared/login/login_page.dart';
 export 'src/shared/tile/tiles_search.dart';
 export 'src/shared/login/background.dart';
 export 'package:dio/dio.dart';
-export 'package:google_ui/google_ui.dart';
 export 'package:flutter_dotenv/flutter_dotenv.dart';
 export 'package:layout/layout.dart';
 export 'package:file_picker/file_picker.dart' show FileType;

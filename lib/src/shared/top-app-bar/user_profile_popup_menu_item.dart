@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_component/src/utils/g_ui/g_text.dart';
 
 import '../../../shared_component.dart';
 

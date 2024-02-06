@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_component/src/utils/g_ui/g_elevated_button.dart';
 // import 'package:flutter_modular/flutter_modular.dart';
 import '../../shared_component.dart';
 

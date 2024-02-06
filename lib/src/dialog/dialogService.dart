@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 // import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_component/shared_component.dart';
+import 'package:shared_component/src/utils/g_ui/g_elevated_button.dart';
 
 import 'dialogManager.dart';
 // import 'package:xagent/app/shared/dialog/dialogManager.dart';

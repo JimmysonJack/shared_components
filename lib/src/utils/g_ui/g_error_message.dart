@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_ui/src/widgets/g_text_button/g_text_button.dart';
-
-import '../g_text/g_text.dart';
-import '../g_text/g_text_variant.dart';
+import 'package:shared_component/src/utils/g_ui/g_text.dart';
+import 'package:shared_component/src/utils/g_ui/g_text_button.dart';
+import 'package:shared_component/src/utils/g_ui/g_text_variant.dart';
 
 /// Create a error message,
 /// usually displayed on the page when an error occurs

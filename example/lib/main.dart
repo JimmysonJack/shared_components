@@ -72,6 +72,10 @@ void main() {
                   child: SizedBox(
                     child: UserManager(
                       roleConfig: RoleConfig(
+                        permissionsFieldName: '',
+                        permissionsFieldType: '',
+                        roleFieldName: '',
+                        roleFieldType: '',
                           assignPermissionToRoleEndpoint: '',
                           deleteRoleEndpoint: 'deleteRole',
                           getPermissionsEndpoint: 'getPermissions',
@@ -316,6 +320,10 @@ class UsersWidget extends StatelessWidget {
           group: const [
             Group(children: [
               PermissionSettings(
+                permissionsFieldName: '',
+                permissionsFieldType: '',
+                roleFieldName: '',
+                roleFieldType: '',
                 endPointName: 'savePermissions',
                 roleUid: '',
               )

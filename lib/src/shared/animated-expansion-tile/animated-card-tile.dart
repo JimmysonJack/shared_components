@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../utils/table.dart';
-import 'body-widget.dart';
+import 'body_widget.dart';
 import 'custom-expansion-tile.dart';
 
 class AnimatedCardTile extends StatefulWidget {

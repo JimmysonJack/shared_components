@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_ui/google_ui.dart';
+import 'package:shared_component/src/utils/g_ui/g_text.dart';
 
 import '../../themes/theme.dart';
 

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_component/shared_component.dart';
+import 'package:shared_component/src/utils/g_ui/g_text.dart';
 
 import '../popUpMenu/custom_pop_up_menu.dart';
 

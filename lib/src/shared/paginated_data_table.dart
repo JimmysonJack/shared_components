@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:shared_component/shared_component.dart';
+import 'package:shared_component/src/utils/g_ui/g_error_message.dart';
 
 import '../utils/new-widgets-component/base_fields.dart';
 
