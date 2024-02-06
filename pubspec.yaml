@@ -20,6 +20,7 @@ dependencies:
   dio: ^4.0.6
   get: ^4.6.5
   layout:
+    # path: layout
     git:
       url: https://github.com/JimmysonJack/layout.git
       ref: master
@@ -33,12 +34,21 @@ dependencies:
   currency_text_input_formatter: ^2.1.8
   getwidget: ^3.0.1
   dropdown_search:
-    path: "./dropdown_search-5.0.6"
+    # path: "./dropdown_search-5.0.6"
+    git:
+      url: https://github.com/JimmysonJack/dropdown_search.git
+      ref: master
   graphql_flutter: ^5.2.0-beta.5
   file_picker:
-    path: "./file_picker-5.3.2"
+    # path: "./file_picker-5.3.2"
+    git:
+      url: https://github.com/JimmysonJack/file_picker.git
+      ref: master
   flutter_side_menu:
-    path: "./flutter_side_menu-0.3.1"
+    # path: "./flutter_side_menu-0.3.1"
+    git:
+      url: https://github.com/JimmysonJack/flutter_side_menu.git
+      ref: master
   quickalert: ^1.0.0
   shaky_animated_listview: ^0.0.5
   printing: ^5.11.0
