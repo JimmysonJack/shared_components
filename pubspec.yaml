@@ -20,7 +20,9 @@ dependencies:
   dio: ^4.0.6
   get: ^4.6.5
   layout:
-    path: ./layout
+    git:
+      url: https://github.com/JimmysonJack/layout.git
+      ref: master
   flutter_dotenv: ^5.1.0
   syncfusion_flutter_datepicker: ^22.2.10
   syncfusion_flutter_pdfviewer: ^22.2.10
