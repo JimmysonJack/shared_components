@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:layout/layout.dart';
+import 'package:shared_component/src/shared/layout/layout.dart';
 
 import '../../models/user_model.dart';
 import '../../utils/size_config.dart';

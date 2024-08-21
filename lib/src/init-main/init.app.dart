@@ -33,7 +33,9 @@ void initApp({
   required Future<void> Function() loadEnvFile,
   required List<ParallelRoute> routes,
   required AppColors appColors,
+  CustomTheme? customTheme,
 }) async {
+  console('Init app is called');
   try {
     // Parallelize initialization tasks using Future.wait
     await Future.wait([
@@ -47,6 +49,7 @@ void initApp({
       authorities,
     ));
 
+    /// Checking platform theme mode
     final brightness =
         SchedulerBinding.instance.platformDispatcher.platformBrightness;
     final isDarkMode = brightness == Brightness.dark;
@@ -56,9 +59,11 @@ void initApp({
     if (principalUser is Map<String, dynamic>) {
       StorageService.get.setUser(principalUser);
     }
+    console('Running App now');
     runApp(ModularApp(
       module: AppModule(routes),
       child: AppWidget(
+        customTheme: customTheme,
         appName: appName,
         appColors: appColors,
       ),

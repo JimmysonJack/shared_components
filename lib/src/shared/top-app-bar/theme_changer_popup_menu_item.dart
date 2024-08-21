@@ -4,7 +4,7 @@ import 'package:shared_component/src/utils/g_ui/g_text.dart';
 import '../../../shared_component.dart';
 
 class ThemeChangerPopuoMenuItem<T> extends PopupMenuItem<T> {
-  final Function() onSettings;
+  final VoidCallback onSettings;
   ThemeChangerPopuoMenuItem({super.key, required this.onSettings})
       : super(
             enabled: false,

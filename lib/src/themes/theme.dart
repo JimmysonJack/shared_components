@@ -45,7 +45,17 @@ class ThemeController extends GetxController {
     }
   }
 
-  themeChanger(AppColors appColors) {
+  ThemeData customThemeChanger(CustomTheme customTheme) {
+    if (isDarkTheme.value) {
+      return customTheme.dark ?? ThemeData.dark();
+    }
+    if (!isDarkTheme.value) {
+      return customTheme.light ?? ThemeData.light();
+    }
+    return ThemeData();
+  }
+
+  themeChanger(AppColors appColors, CustomTheme? customTheme) {
     AppColors.appInstance().setColors(appColors);
     MaterialColor color =
         isDarkTheme.value ? Palette.defaultDark : Palette.defaultLight;
@@ -55,6 +65,9 @@ class ThemeController extends GetxController {
         isDarkTheme.value ? Palette.shadeDark : Palette.shadeLight;
     final ThemeData base =
         isDarkTheme.value ? ThemeData.dark() : ThemeData.light();
+    if (customTheme != null) {
+      return customThemeChanger(customTheme);
+    }
     return base.copyWith(
       primaryColor: isDarkTheme.value
           ? Palette.darken(Palette.hexToColor(appColors.primary!), .2)
@@ -64,35 +77,36 @@ class ThemeController extends GetxController {
             ? Palette.darken(Palette.hexToColor(appColors.primary!), .2)
             : Palette.lighten(Palette.hexToColor(appColors.primary!)),
       ),
-      colorScheme: isDarkTheme.value
-          ? const ColorScheme.dark().copyWith(
-              primary:
-                  Palette.darken(Palette.hexToColor(appColors.primary!), .2),
-              primaryContainer: color.shade900,
-              secondary: color.shade200,
-              secondaryContainer: color.shade900,
-              surface: back.shade200,
-              background: back.shade700,
-              error: Colors.red,
-              onPrimary: text.shade800,
-              onSecondary: text.shade800,
-              onSurface: text.shade800,
-              onBackground: text.shade600,
-              onError: text.shade800,
-              // brightness: isDarkTheme.value ? Brightness.dark : Brightness.light,
-            )
-          : const ColorScheme.light().copyWith(
-              primary: Palette.lighten(Palette.hexToColor(appColors.primary!))),
+      // colorScheme: isDarkTheme.value
+      //     ? const ColorScheme.dark().copyWith(
+      //         primary:
+      //             Palette.darken(Palette.hexToColor(appColors.primary!), .2),
+      //         primaryContainer: color.shade900,
+      //         secondary: color.shade200,
+      //         secondaryContainer: color.shade900,
+      //         surface: back.shade200,
+      //         // background: back.shade700,
+      //         error: Colors.red,
+      //         onPrimary: text.shade800,
+      //         onSecondary: text.shade800,
+      //         onSurface: text.shade800,
+      //         // onBackground: text.shade600,
+      //         onError: text.shade800,
+      //         brightness:
+      //             isDarkTheme.value ? Brightness.dark : Brightness.light,
+      //       )
+      //     : const ColorScheme.light().copyWith(
+      //         primary: Palette.lighten(Palette.hexToColor(appColors.primary!))),
       inputDecorationTheme:
           const InputDecorationTheme(filled: true, fillColor: Colors.black12),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
             // backgroundColor: MaterialStateProperty.all<Color>(color.shade50),
             enableFeedback: true,
-            minimumSize: MaterialStateProperty.all<Size?>(const Size(50, 50)),
+            minimumSize: WidgetStateProperty.all<Size?>(const Size(50, 50)),
             foregroundColor: isDarkTheme.value
-                ? MaterialStateProperty.all<Color?>(const Color(0xfff2f2f2))
-                : MaterialStateProperty.all<Color?>(const Color(0xfff2f2f2))),
+                ? WidgetStateProperty.all<Color?>(const Color(0xfff2f2f2))
+                : WidgetStateProperty.all<Color?>(const Color(0xfff2f2f2))),
       ),
     );
   }
@@ -113,12 +127,12 @@ class ThemeController extends GetxController {
       secondary: color.shade200,
       secondaryContainer: color.shade900,
       surface: back.shade200,
-      background: back.shade700,
+      // background: back.shade700,
       error: Colors.red,
       onPrimary: text.shade800,
       onSecondary: text.shade800,
       onSurface: text.shade800,
-      onBackground: text.shade600,
+      // onBackground: text.shade600,
       onError: text.shade800,
       brightness: isDarkTheme.value ? Brightness.dark : Brightness.light,
     );
@@ -146,12 +160,19 @@ class ThemeController extends GetxController {
         style: ButtonStyle(
             // backgroundColor: MaterialStateProperty.all<Color>(color.shade50),
             enableFeedback: true,
-            minimumSize: MaterialStateProperty.all<Size?>(const Size(50, 50)),
+            minimumSize: WidgetStateProperty.all<Size?>(const Size(50, 50)),
             foregroundColor:
-                MaterialStateProperty.all<Color?>(const Color(0xfff2f2f2))),
+                WidgetStateProperty.all<Color?>(const Color(0xfff2f2f2))),
       ),
     );
 
     // return base;
   }
+}
+
+class CustomTheme {
+  final ThemeData? dark;
+  final ThemeData? light;
+
+  CustomTheme({this.dark, this.light});
 }

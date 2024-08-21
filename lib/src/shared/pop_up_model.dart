@@ -138,9 +138,8 @@ abstract class _PopupModelBase with Store {
         buildSize = MediaQuery.of(context).size.width;
         bool mobileSize = buildSize < 500;
         var size = MediaQuery.of(context).size;
-        return WillPopScope(
-          // canPop: false,
-          onWillPop: (() async => false),
+        return PopScope(
+          canPop: false,
           child: Observer(builder: (context) {
             return Container(
               // color: Colors.cyanAccent,
@@ -148,7 +147,7 @@ abstract class _PopupModelBase with Store {
                   maxHeight: size.height * 0.95, minHeight: size.height * 0.0),
               child: Dialog(
                 child: Container(
-                  color: Theme.of(context).cardColor,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   width:
                       mobileSize ? buildSize : buildSize * (modelWidth ?? 0.5),
                   child: Column(
@@ -268,8 +267,6 @@ abstract class _PopupModelBase with Store {
   }
 
   List<InputParameter> inputMaker() {
-    ///
-    console(fieldController.field.fieldValuesController.instanceValues);
     if (inputObjectFieldName != null) {
       return [
         InputParameter(

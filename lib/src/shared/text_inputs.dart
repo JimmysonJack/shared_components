@@ -4,14 +4,13 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
-import 'package:dropdown_search/dropdown_search.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
 import 'package:mobx/mobx.dart';
-import '../../shared_component.dart' hide FilePicker;
+import '../../shared_component.dart';
+import 'dropdown_search/dropdown_search.dart';
 
 part 'text-inputs.g.dart';
 
@@ -84,6 +83,8 @@ abstract class _TextInputBase with Store {
   @action
   setSwitchState(bool? value) => _switchState = !_switchState;
 
+  Map<String, TextEditingController> textEditControllerMap = {};
+
   Widget input(
       {required BuildContext context,
       required String label,
@@ -93,19 +94,29 @@ abstract class _TextInputBase with Store {
       bool isTextArea = false,
       int maxLines = 1,
       bool fixed = false,
+      bool useAsHint = false,
       int minLines = 1,
       String? inputType = 'String',
       bool readOnly = false,
       bool enabled = true,
       bool? validate = false,
+      double? hintFontSize,
       bool show = false,
       FieldInputType? fieldInputType}) {
     // checkForUpdate(key, label, fieldInputType, validate, null);
 
     return LayoutBuilder(builder: (context, x) {
+      textEditControllerMap.addIf(
+          !textEditControllerMap.keys.contains(key),
+          key,
+          TextEditingController(
+              text: onInitialValue(updateFields, key, fieldInputType,
+                  validate ?? false, label, inputType!)));
       return SizedBox(
         width: sizeSet(widthSize, context, fixed: fixed),
         child: TextFormField(
+          controller: textEditControllerMap[key],
+          style: TextStyle(fontSize: hintFontSize),
           inputFormatters: inputFormatter(fieldInputType),
           textInputAction: TextInputAction.next,
           onFieldSubmitted: (value) {},
@@ -140,8 +151,8 @@ abstract class _TextInputBase with Store {
                   : minLines,
           readOnly: readOnly,
           enabled: enabled,
-          initialValue: onInitialValue(updateFields, key, fieldInputType,
-              validate ?? false, label, inputType!),
+          // initialValue: onInitialValue(updateFields, key, fieldInputType,
+          //     validate ?? false, label, inputType!),
           autovalidateMode: onInitialValue(updateFields, key, fieldInputType,
                       validate ?? false, label, inputType) ==
                   null
@@ -151,27 +162,29 @@ abstract class _TextInputBase with Store {
           //   return editableState.widget.
           // },
           decoration: InputDecoration(
-            border: isTextArea
-                ? OutlineInputBorder(borderRadius: BorderRadius.circular(0))
-                : null,
-            suffixIcon: isPassword
-                ? InkWell(
-                    onTap: () {
-                      show = !show;
-                      _showPassword = show;
-                    },
-                    child: Icon(!_showPassword
-                        ? Icons.visibility
-                        : Icons.visibility_off),
-                  )
-                : null,
-            prefixText: fieldInputType == FieldInputType.Currency
-                ? "$_currency "
-                : null,
-            labelText: label,
-            // filled: true,
-            // fillColor: Theme.of(context).cardColor,
-          ),
+              border: isTextArea
+                  ? OutlineInputBorder(borderRadius: BorderRadius.circular(0))
+                  : null,
+              suffixIcon: isPassword
+                  ? InkWell(
+                      onTap: () {
+                        show = !show;
+                        _showPassword = show;
+                      },
+                      child: Icon(!_showPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off),
+                    )
+                  : null,
+              prefixText: fieldInputType == FieldInputType.Currency
+                  ? "$_currency "
+                  : null,
+              labelText: useAsHint ? null : label,
+              hintText: useAsHint ? label : null,
+              hintStyle: TextStyle(fontSize: hintFontSize)
+              // filled: true,
+              // fillColor: Theme.of(context).cardColor,
+              ),
         ),
       );
     });
@@ -358,7 +371,8 @@ abstract class _TextInputBase with Store {
             itemAsString: inFieldString ??
                 (value) => "${value[customDisplayKey.titleDisplayLabelKey]}",
             selectedItem: onInitialValue(updateFields, key, fieldInputType,
-                validate ?? false, label, inputType),
+                validate ?? false, label, inputType,
+                dataInputType: DataInputType.Select),
             onChanged: (data) {
               if (isMap == false) {
                 data?['inputValueField'] = customDisplayKey.inputValueField;
@@ -614,16 +628,25 @@ abstract class _TextInputBase with Store {
       required String key,
       required String fileNameKey,
       bool fixed = false,
+      bool useAsHint = false,
+      double? hintFontSize,
       required BuildContext context}) {
     // checkForUpdate(key, label, fieldInputType, validate, updateFields ?? []);
+    textEditControllerMap.addIf(
+        !textEditControllerMap.keys.contains(key),
+        key,
+        TextEditingController(
+            text: onInitialValue(updateFields, key, fieldInputType,
+                validate ?? false, label, inputType!)));
 
     TextEditingController controller = TextEditingController();
     return LayoutBuilder(builder: (context, x) {
       return SizedBox(
         width: sizeSet(widthSize, context, fixed: fixed),
         child: TextFormField(
-          initialValue: onInitialValue(updateFields, key, fieldInputType,
-              validate ?? false, label, inputType!),
+          style: TextStyle(fontSize: hintFontSize),
+          // initialValue: onInitialValue(updateFields, key, fieldInputType,
+          //     validate ?? false, label, inputType!),
           onTap: () async {
             // FilePickerCross resultx = await FilePickerCross.importFromStorage(
             //   type: fileType ?? FileTypeCross.any,
@@ -647,9 +670,11 @@ abstract class _TextInputBase with Store {
             return generalValidator(value, label, fieldInputType, validate);
           },
           decoration: InputDecoration(
-              labelText: label,
+              labelText: !useAsHint ? label : null,
               // filled: true,
               // fillColor: Theme.of(context).cardColor,
+              hintText: useAsHint ? label : null,
+              hintStyle: TextStyle(fontSize: hintFontSize),
               suffixIcon: const Icon(Icons.attach_file),
               prefixText: 'File Name: '),
         ),
@@ -805,23 +830,8 @@ abstract class _TextInputBase with Store {
                 : null,
           ),
           child: ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                  (Set<MaterialState> states) {
-                    if (states.contains(MaterialState.pressed)) {
-                      return Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withOpacity(0.5);
-                    } else if (states.contains(MaterialState.disabled)) {
-                      return Theme.of(context).disabledColor;
-                    }
-                    return backgroundColor ??
-                        Theme.of(context)
-                            .primaryColor; // Use the component's default.
-                  },
-                ),
-              ),
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).primaryColor),
               onPressed: validate
                   ? updateState &&
                           !SettingsService.use.isEmptyOrNull(updateFields)
@@ -830,8 +840,37 @@ abstract class _TextInputBase with Store {
                           ? null
                           : onPressed
                   : onPressed,
-              child: Text(label)),
+              child:
+                  Text(label, style: Theme.of(context).textTheme.labelLarge)),
         );
+        //   child: ElevatedButton(
+        //       style: ButtonStyle(
+        //         backgroundColor: MaterialStateProperty.resolveWith<Color>(
+        //           (Set<MaterialState> states) {
+        //             if (states.contains(MaterialState.pressed)) {
+        //               return Theme.of(context)
+        //                   .colorScheme
+        //                   .primary
+        //                   .withOpacity(0.5);
+        //             } else if (states.contains(MaterialState.disabled)) {
+        //               return Theme.of(context).disabledColor;
+        //             }
+        //             return backgroundColor ??
+        //                 Theme.of(context)
+        //                     .primaryColor; // Use the component's default.
+        //           },
+        //         ),
+        //       ),
+        //       onPressed: validate
+        //           ? updateState &&
+        //                   !SettingsService.use.isEmptyOrNull(updateFields)
+        //               ? null
+        //               : hasErrors
+        //                   ? null
+        //                   : onPressed
+        //           : onPressed,
+        //       child: Text(label)),
+        // );
       });
     }
     return Observer(
@@ -966,7 +1005,7 @@ abstract class _TextInputBase with Store {
       ]);
     }
     if (fieldInputType == FieldInputType.Currency) {
-      list.addAll([CurrencyTextInputFormatter(symbol: '', decimalDigits: 0)]);
+      list.addAll([CurrencyTextInputFormatter.currency(enableNegative: false)]);
     }
     if (fieldInputType == FieldInputType.ServiceNumber) {
       list.add(UpperCaseTextFormatter());
@@ -980,7 +1019,8 @@ abstract class _TextInputBase with Store {
       FieldInputType? fieldInputType,
       bool validate,
       String validationName,
-      String inputType) {
+      String inputType,
+      {DataInputType? dataInputType}) {
     ///setting [dataList] to null becouse it might throw a Bad state error when [dataList] is empty
     dataList = SettingsService.use.isEmptyOrNull(dataList) ? null : dataList;
     Map<String, dynamic>? dataMap;
@@ -1006,6 +1046,13 @@ abstract class _TextInputBase with Store {
         orElse: () => <String, dynamic>{});
     checkForUpdate(key, validationName, fieldInputType, validate,
         dataMap.isEmpty ? null : dataMap.values.first);
+
+    if (dataInputType == DataInputType.Select &&
+        dataMap.isNotEmpty &&
+        dataMap.values.first is String) {
+      return {'name': dataMap.values.first, 'value': dataMap.values.first};
+    }
+    console(dataMap);
     return dataMap.isEmpty ? null : dataMap.values.first;
   }
 
@@ -1252,3 +1299,13 @@ class FieldValuesController {
 }
 
 ValueNotifier<bool> hasError = ValueNotifier(true);
+
+enum DataInputType {
+  Input,
+  Select,
+  MultSelect,
+  Togggle,
+  Attachment,
+  Date,
+  Checkbox
+}

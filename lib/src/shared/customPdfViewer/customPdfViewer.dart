@@ -2,7 +2,9 @@ import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:printing/printing.dart';
+// import 'package:printing/printing.dart';
 import 'package:shared_component/shared_component.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
@@ -356,10 +358,16 @@ class _CustomPdfViewerState extends State<CustomPdfViewer> {
             child: Container(
               child: widget.showAvatar == true
                   ? Center(
-                      child: SizedBox(
-                        height: 200,
-                        width: 200,
-                        child: Image.asset('images/doc.png'),
+                      child: SvgPicture.asset(
+                        'assets/pdf-file-icon.svg',
+                        package: 'shared_component',
+                        width: 50,
+                        colorFilter: ColorFilter.mode(
+                          ThemeController.getInstance().darkMode(
+                              darkColor: Colors.white24,
+                              lightColor: Colors.black26),
+                          BlendMode.srcATop,
+                        ),
                       ),
                     )
                   : child ?? IndicateProgress.circular(),

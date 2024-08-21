@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:shared_component/shared_component.dart';
+import 'package:shared_component/src/utils/g_ui/g_text_variant.dart';
 import 'background.dart';
 import 'change_password.dart';
 import 'conditional.dart';
@@ -28,18 +31,34 @@ class Login extends StatelessWidget {
               ),
             ],
           ),
-          child: Background(
-            backgroudTheme: backgroundTheme,
-            child: GetX<LoginController>(
-              builder: (_) {
-                return Conditional(
-                    condition: _.isFirstLogin.value,
-                    altinateChild: ChangePassword(),
-                    child: LoginInputs(
-                      navigateTo: navigateTo,
-                    ));
-              },
-            ),
+          child: Stack(
+            children: [
+              Background(
+                backgroudTheme: backgroundTheme,
+                child: GetX<LoginController>(
+                  builder: (_) {
+                    return Conditional(
+                        condition: _.isFirstLogin.value,
+                        altinateChild: ChangePassword(),
+                        child: LoginInputs(
+                          navigateTo: navigateTo,
+                        ));
+                  },
+                ),
+              ),
+              Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 30,
+                  child: Center(
+                    child: GText(
+                      '\u00a9 ${DateTime.now().year.toString()} TPDF. All Rights Reserved.',
+                      fontFamily: 'Inconsolata',
+                      fontWeight: FontWeight.w100,
+                      variant: GTextVariant.caption,
+                    ),
+                  ))
+            ],
           ),
         ));
   }

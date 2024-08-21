@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
 import 'package:shared_component/src/utils/g_ui/g_text.dart';
 
+import '../side_menu/data/resizer_toggle_data.dart';
+import '../side_menu/data/side_menu_data.dart';
+import '../side_menu/side_menu.dart';
+import '../side_menu/side_menu_controller.dart';
+import '../side_menu/side_menu_mode.dart';
 import 'side_menu_tile_controller.dart';
 
 enum AppBarPosition { top, side }
@@ -15,6 +20,7 @@ class SideNavigation extends StatefulWidget {
       required this.sideMenuTile,
       this.version,
       this.showSideNav = true,
+      this.icon,
       this.appBarPosition = AppBarPosition.side,
       this.selectedColor,
       this.useBorderRadius = false});
@@ -27,6 +33,7 @@ class SideNavigation extends StatefulWidget {
   final TopAppBarDetails? topAppBarDetails;
   final List<SideMenuTile> sideMenuTile;
   final bool showSideNav;
+  final IconData? icon;
 
   @override
   State<SideNavigation> createState() => _SideNavigationState();
@@ -82,8 +89,10 @@ class _SideNavigationState extends State<SideNavigation>
           ? PreferredSize(
               preferredSize: const Size.fromHeight(60),
               child: TopAppBar(
-                onSettings: () {},
-                title: widget.topAppBarDetails!.title ?? '',
+                usePadding: widget.topAppBarDetails?.usePadding,
+                onSettings: widget.topAppBarDetails!.onSettings,
+                appLogo: widget.topAppBarDetails?.appLogo,
+                title: widget.topAppBarDetails!.title,
                 userDetails: widget.topAppBarDetails!.userProfileDetails,
                 onTap: widget.topAppBarDetails!.onTap,
                 menuItems: widget.topAppBarDetails!.menuItems,
@@ -94,8 +103,10 @@ class _SideNavigationState extends State<SideNavigation>
               : PreferredSize(
                   preferredSize: const Size.fromHeight(60),
                   child: TopAppBar(
-                    onSettings: () {},
-                    title: widget.topAppBarDetails!.title ?? '',
+                    usePadding: widget.topAppBarDetails?.usePadding,
+                    onSettings: widget.topAppBarDetails!.onSettings,
+                    appLogo: widget.topAppBarDetails?.appLogo,
+                    title: widget.topAppBarDetails!.title,
                     userDetails: widget.topAppBarDetails!.userProfileDetails,
                     onTap: widget.topAppBarDetails!.onTap,
                     menuItems: widget.topAppBarDetails!.menuItems,
@@ -109,25 +120,36 @@ class _SideNavigationState extends State<SideNavigation>
                   SideMenu(
                       toggleController: toggleController,
                       backgroundColor: Colors.black12,
+                      resizerToggleData: ResizerToggleData(
+                          iconColor: Theme.of(context).iconTheme.color!),
                       hasResizer: false,
                       hasResizerToggle: true,
                       mode: SideMenuMode.auto,
                       builder: (data) => sideMenuTiles(
                           sideMenuTile: widget.sideMenuTile,
                           selectedIndex: selectedIndex,
+                          icon: widget.icon,
                           version: widget.version,
                           selectedColor: widget.selectedColor,
                           useBorderRadius: widget.useBorderRadius,
-                          onTap: (index) => selectedIndex = index)),
+                          onTap: (index) {
+                            if (widget.sideMenuTile[index].onTap != null) {
+                              widget.sideMenuTile[index]
+                                  .onTap!(widget.sideMenuTile[index].title);
+                            }
+                            return selectedIndex = index;
+                          })),
                 Expanded(
                   child: widget.useAppBar &&
                           widget.topAppBarDetails != null &&
                           widget.appBarPosition == AppBarPosition.side
                       ? TopAppBar(
-                          onSettings: () {},
+                          usePadding: widget.topAppBarDetails?.usePadding,
+                          onSettings: widget.topAppBarDetails!.onSettings,
+                          appLogo: widget.topAppBarDetails?.appLogo,
                           title: mobileWidthSize
-                              ? selectedTitle ?? ''
-                              : widget.topAppBarDetails!.title ?? '',
+                              ? GText(selectedTitle ?? '')
+                              : widget.topAppBarDetails!.title,
                           userDetails:
                               widget.topAppBarDetails!.userProfileDetails,
                           onTap: widget.topAppBarDetails!.onTap,
@@ -228,6 +250,12 @@ class _SideNavigationState extends State<SideNavigation>
                                           barHeight = 30;
                                         });
                                       });
+                                      if (widget.sideMenuTile[index].onTap !=
+                                          null) {
+                                        widget.sideMenuTile[index].onTap!(
+                                            widget.sideMenuTile[index].title);
+                                      }
+
                                       Modular.to.navigate(
                                           widget.sideMenuTile[index].url);
                                       setState(() {
@@ -318,6 +346,7 @@ class _SideNavigationState extends State<SideNavigation>
       required int Function(int index) onTap,
       bool useBorderRadius = false,
       final String? version,
+      final IconData? icon,
       Color? selectedColor}) {
     return SideMenuData(
         // customChild: customChild,
@@ -336,7 +365,7 @@ class _SideNavigationState extends State<SideNavigation>
                           child: FadeTransition(
                             opacity: _animation,
                             child: Icon(
-                              Icons.person,
+                              icon ?? Icons.person,
                               color: ThemeController.getInstance().darkMode(
                                   darkColor: Colors.white.withOpacity(0.3),
                                   lightColor: Colors.black26),
@@ -370,11 +399,18 @@ class _SideNavigationState extends State<SideNavigation>
 class TopAppBarDetails {
   final UserProfileItem userProfileDetails;
   final Function(String) onTap;
+  final VoidCallback onSettings;
   final List<MenuItem> menuItems;
-  final String? title;
+  final Widget? title;
+  final Widget? appLogo;
+  final bool? usePadding;
+
   TopAppBarDetails(
       {this.title,
       required this.userProfileDetails,
       required this.menuItems,
+      required this.appLogo,
+      required this.onSettings,
+      this.usePadding,
       required this.onTap});
 }

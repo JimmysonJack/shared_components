@@ -289,7 +289,7 @@ class Api {
       }
       console('...........................$res');
       return res['data'];
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response != null) {
         var res = e.response!.data as Map<String, dynamic>;
         if (res['error_description'] != null) {
@@ -314,19 +314,19 @@ class Api {
           }
         }
         return res['data'];
-      } else if (e.type == DioErrorType.connectTimeout) {
+      } else if (e.type == DioExceptionType.connectionTimeout) {
         NotificationService.snackBarError(
             context: context,
             title: 'Connection timed out',
             subTitle: 'Please make sure you are connected to the Internet');
         return e.message;
-      } else if (e.type == DioErrorType.receiveTimeout) {
+      } else if (e.type == DioExceptionType.receiveTimeout) {
         NotificationService.snackBarError(
             context: context,
             title: 'Receiver timed out',
             subTitle: 'There might be a problem with your Servers');
         return e.message;
-      } else if (e.type == DioErrorType.sendTimeout) {
+      } else if (e.type == DioExceptionType.sendTimeout) {
         NotificationService.snackBarError(
             context: context,
             title: 'Sender timed out',

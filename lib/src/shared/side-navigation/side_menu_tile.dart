@@ -6,6 +6,7 @@ class SideMenuTile {
   final String? tooltip;
   final String? badgeContent;
   final String url;
+  final void Function(String)? onTap;
   final List<String> permissions;
   SideMenuTile(
       {required this.title,
@@ -13,5 +14,6 @@ class SideMenuTile {
       required this.url,
       this.tooltip,
       this.badgeContent,
+      this.onTap,
       required this.permissions});
 }

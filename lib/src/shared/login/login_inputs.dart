@@ -4,7 +4,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
-import 'package:shared_component/src/utils/g_ui/g_text.dart';
+import 'package:shared_component/src/shared/layout/layout.dart';
 
 RegExp regex = RegExp(
     r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
@@ -78,7 +78,7 @@ class LoginInputs extends StatelessWidget {
                           style: Theme.of(context)
                               .textTheme
                               .titleLarge
-                              ?.copyWith(fontSize: 25)),
+                              ?.copyWith(fontSize: 25, fontFamily: 'Geoplace')),
                     ),
                     const SizedBox(
                       height: 20,
@@ -101,9 +101,7 @@ class LoginInputs extends StatelessWidget {
                             // filled: true,
                             // fillColor: Theme.of(context).cardColor,
                           ),
-                          // onFieldSubmitted: (value) {
-                          //   _focusNode.requestFocus();
-                          // },
+
                           onChanged: (value) {
                             changeController.validateInputs();
                           },
@@ -142,6 +140,9 @@ class LoginInputs extends StatelessWidget {
                             // filled: true,
                             // fillColor: Theme.of(context).cardColor,
                           ),
+                          onFieldSubmitted: (value) {
+                            password_focusNode.requestFocus();
+                          },
                           onChanged: (value) {
                             changeController.validateInputs();
                           },

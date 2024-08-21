@@ -28,12 +28,14 @@ class DetailCard extends StatefulWidget {
   final String getUserResponseFields;
   final String getUserEndpointName;
   final FieldController fieldController;
+  final UserRolesController userRolesController;
 
   final Function(Map<String, dynamic> data) onEditUser;
   const DetailCard(
       {super.key,
       required this.fieldController,
       required this.height,
+      required this.userRolesController,
       required this.onCloseDetailes,
       required this.userUid,
       this.userDetails,
@@ -61,7 +63,6 @@ class _DetailCardState extends State<DetailCard> {
   bool animateSelected = false;
   bool animateRoleList = false;
   Map<String, dynamic> selectedData = {};
-  UserRolesController controller = Get.put(UserRolesController());
   double? userDetailHeight;
   double? roleDetailHeight;
   double opacityLevel = 1.0;
@@ -77,7 +78,7 @@ class _DetailCardState extends State<DetailCard> {
 
   @override
   void initState() {
-    controller.getUserRolesByUser(widget.userUid, context,
+    widget.userRolesController.getUserRolesByUser(widget.userUid, context,
         getRolesByUserEndpoint: widget.getRolesByUserEndpoint,
         getRolesByUserResponseFields: widget.getRolesByUserResponseFields);
     widget.fieldController.fieldUpdates.listen((event) {
@@ -207,10 +208,11 @@ class _DetailCardState extends State<DetailCard> {
                                                             message:
                                                                 'Edit User',
                                                             child: IconButton(
-                                                                onPressed: () =>
-                                                                    widget.onEditUser(
-                                                                        widget
-                                                                            .user),
+                                                                onPressed: () {
+                                                                  widget.onEditUser(
+                                                                      widget
+                                                                          .user);
+                                                                },
                                                                 icon: Icon(
                                                                   Icons.edit,
                                                                   color: Colors
@@ -690,7 +692,8 @@ class _DetailCardState extends State<DetailCard> {
                                           SizedBox(
                                             height: constraint.maxHeight * 0.02,
                                           ),
-                                          controller.onSaveChangesLoader.value
+                                          widget.userRolesController
+                                                  .onSaveChangesLoader.value
                                               ? IndicateProgress.cardLinear(
                                                   'Saving Changes')
                                               : Row(
@@ -752,8 +755,12 @@ class _DetailCardState extends State<DetailCard> {
                                                                     '......xxx.......saving roles');
 
                                                                 ///Saving Role Here
-                                                                controller
+                                                                widget
+                                                                    .userRolesController
                                                                     .saveChanges(
+                                                                        responseFields:
+                                                                            widget
+                                                                                .getUserResponseFields,
                                                                         onResponse:
                                                                             (data) {
                                                                           selectedRoles
@@ -797,8 +804,11 @@ class _DetailCardState extends State<DetailCard> {
                                                                     ',...............zzzz......saving User info');
 
                                                                 ///Saving UserInfor here
-                                                                controller
+                                                                widget
+                                                                    .userRolesController
                                                                     .saveChanges(
+                                                                        responseFields: widget
+                                                                            .getUserResponseFields,
                                                                         userUid:
                                                                             widget
                                                                                 .userUid,
@@ -835,8 +845,11 @@ class _DetailCardState extends State<DetailCard> {
                                                                           selectedRoles)) {
                                                                 console(
                                                                     'Saving both of them.................');
-                                                                controller
+                                                                widget
+                                                                    .userRolesController
                                                                     .saveChanges(
+                                                                        responseFields: widget
+                                                                            .getUserResponseFields,
                                                                         userUid:
                                                                             widget
                                                                                 .userUid,
@@ -846,7 +859,8 @@ class _DetailCardState extends State<DetailCard> {
                                                                               .clear();
 
                                                                           ///Saving Role Here
-                                                                          controller.saveChanges(
+                                                                          widget.userRolesController.saveChanges(
+                                                                              responseFields: widget.getUserResponseFields,
                                                                               onResponse: (data) {
                                                                                 selectedRoles.clear();
                                                                               },
@@ -929,13 +943,13 @@ class _DetailCardState extends State<DetailCard> {
                                                       child: RolesListWidget(
                                                         animate: selectedData,
                                                         onSearch: (searchKey) {
-                                                          var roleList =
-                                                              controller
-                                                                  .storedRoles;
+                                                          var roleList = widget
+                                                              .userRolesController
+                                                              .storedRoles;
                                                           setState(() {
                                                             if (searchKey
                                                                 .isNotEmpty) {
-                                                              controller.unAssignedRoleList = roleList
+                                                              widget.userRolesController.unAssignedRoleList = roleList
                                                                   .where((element) => element[
                                                                           'name']
                                                                       .toString()
@@ -947,15 +961,18 @@ class _DetailCardState extends State<DetailCard> {
                                                             }
                                                           });
                                                         },
-                                                        roleList: controller
+                                                        roleList: widget
+                                                            .userRolesController
                                                             .unAssignedRoleList,
                                                         onSelected: (data) {
-                                                          controller
+                                                          widget
+                                                              .userRolesController
                                                               .assgnedRoleList
                                                               .add(data);
                                                           selectedRoles
                                                               .add(data['uid']);
-                                                          controller
+                                                          widget
+                                                              .userRolesController
                                                               .unAssignedRoleList
                                                               .remove(data);
                                                           setState(() {});
@@ -966,17 +983,20 @@ class _DetailCardState extends State<DetailCard> {
                                                       child: Obx(() {
                                                         return SelectedRoleWidget(
                                                           animate: selectedData,
-                                                          selectedList: controller
+                                                          selectedList: widget
+                                                              .userRolesController
                                                               .assgnedRoleList
                                                               .value,
                                                           onDelete: (data) {
-                                                            controller
+                                                            widget
+                                                                .userRolesController
                                                                 .assgnedRoleList
                                                                 .remove(data);
                                                             selectedRoles
                                                                 .remove(data[
                                                                     'uid']);
-                                                            controller
+                                                            widget
+                                                                .userRolesController
                                                                 .unAssignedRoleList
                                                                 .insert(
                                                                     0, data);
@@ -1337,23 +1357,30 @@ class _DetailCardState extends State<DetailCard> {
                             child: RolesListWidget(
                               animate: selectedData,
                               onSearch: (searchKey) {
-                                var roleList = controller.storedRoles;
+                                var roleList =
+                                    widget.userRolesController.storedRoles;
                                 setState(() {
                                   if (searchKey.isNotEmpty) {
-                                    controller.unAssignedRoleList = roleList
-                                        .where((element) => element['name']
-                                            .toString()
-                                            .toLowerCase()
-                                            .contains(searchKey.toLowerCase()))
-                                        .toList();
+                                    widget.userRolesController
+                                            .unAssignedRoleList =
+                                        roleList
+                                            .where((element) => element['name']
+                                                .toString()
+                                                .toLowerCase()
+                                                .contains(
+                                                    searchKey.toLowerCase()))
+                                            .toList();
                                   }
                                 });
                               },
-                              roleList: controller.unAssignedRoleList,
+                              roleList:
+                                  widget.userRolesController.unAssignedRoleList,
                               onSelected: (data) {
-                                controller.assgnedRoleList.add(data);
+                                widget.userRolesController.assgnedRoleList
+                                    .add(data);
                                 selectedRoles.add(data['uid']);
-                                controller.unAssignedRoleList.remove(data);
+                                widget.userRolesController.unAssignedRoleList
+                                    .remove(data);
                                 setState(() {});
                               },
                             ),
@@ -1378,12 +1405,14 @@ class _DetailCardState extends State<DetailCard> {
                                 minHeight: 100, maxHeight: 300),
                             child: Obx(() => SelectedRoleWidget(
                                   animate: selectedData,
-                                  selectedList:
-                                      controller.assgnedRoleList.value,
+                                  selectedList: widget.userRolesController
+                                      .assgnedRoleList.value,
                                   onDelete: (data) {
-                                    controller.assgnedRoleList.remove(data);
+                                    widget.userRolesController.assgnedRoleList
+                                        .remove(data);
                                     selectedRoles.remove(data['uid']);
-                                    controller.unAssignedRoleList
+                                    widget
+                                        .userRolesController.unAssignedRoleList
                                         .insert(0, data);
                                     setState(() {});
                                   },
@@ -1393,7 +1422,7 @@ class _DetailCardState extends State<DetailCard> {
                           const SizedBox(
                             height: 20,
                           ),
-                          controller.onSaveChangesLoader.value
+                          widget.userRolesController.onSaveChangesLoader.value
                               ? IndicateProgress.cardLinear('Saving Changes')
                               : Row(
                                   mainAxisAlignment:
@@ -1440,25 +1469,32 @@ class _DetailCardState extends State<DetailCard> {
                                                     '......xxx.......saving roles');
 
                                                 ///Saving Role Here
-                                                controller.saveChanges(
-                                                    onResponse: (data) {
-                                                      selectedRoles.clear();
-                                                    },
-                                                    endPointName: widget
-                                                        .assignRoleToUserEndpoint,
-                                                    inputs: [
-                                                      InputParameter(
-                                                          fieldName: 'roleUids',
-                                                          fieldValue:
-                                                              selectedRoles,
-                                                          inputType: 'String'),
-                                                      InputParameter(
-                                                          fieldName: 'userUid',
-                                                          fieldValue:
-                                                              widget.userUid,
-                                                          inputType: 'String'),
-                                                    ],
-                                                    context: context);
+                                                widget.userRolesController
+                                                    .saveChanges(
+                                                        responseFields: widget
+                                                            .getUserResponseFields,
+                                                        onResponse: (data) {
+                                                          selectedRoles.clear();
+                                                        },
+                                                        endPointName: widget
+                                                            .assignRoleToUserEndpoint,
+                                                        inputs: [
+                                                          InputParameter(
+                                                              fieldName:
+                                                                  'roleUids',
+                                                              fieldValue:
+                                                                  selectedRoles,
+                                                              inputType:
+                                                                  'String'),
+                                                          InputParameter(
+                                                              fieldName:
+                                                                  'userUid',
+                                                              fieldValue: widget
+                                                                  .userUid,
+                                                              inputType:
+                                                                  'String'),
+                                                        ],
+                                                        context: context);
                                                 Navigator.pop(
                                                     NavigationService
                                                         .get.currentContext!,
@@ -1474,22 +1510,26 @@ class _DetailCardState extends State<DetailCard> {
                                                     ',...............zzzz......saving User info');
 
                                                 ///Saving UserInfor here
-                                                controller.saveChanges(
-                                                    userUid: widget.userUid,
-                                                    onResponse: (data) {
-                                                      userInfors!.clear();
-                                                    },
-                                                    endPointName: widget
-                                                        .updateUserEndpoint,
-                                                    inputs: [
-                                                      InputParameter(
-                                                          fieldName: 'userDto',
-                                                          fieldValue:
-                                                              userInfors,
-                                                          inputType:
-                                                              'UserDtoInput'),
-                                                    ],
-                                                    context: context);
+                                                widget.userRolesController
+                                                    .saveChanges(
+                                                        responseFields: widget
+                                                            .getUserResponseFields,
+                                                        userUid: widget.userUid,
+                                                        onResponse: (data) {
+                                                          userInfors!.clear();
+                                                        },
+                                                        endPointName: widget
+                                                            .updateUserEndpoint,
+                                                        inputs: [
+                                                          InputParameter(
+                                                              fieldName:
+                                                                  'userDto',
+                                                              fieldValue:
+                                                                  userInfors,
+                                                              inputType:
+                                                                  'UserDtoInput'),
+                                                        ],
+                                                        context: context);
                                                 Navigator.pop(
                                                     NavigationService
                                                         .get.currentContext!,
@@ -1504,49 +1544,61 @@ class _DetailCardState extends State<DetailCard> {
                                                           selectedRoles)) {
                                                 console(
                                                     'Saving both of them.................');
-                                                controller.saveChanges(
-                                                    userUid: widget.userUid,
-                                                    onResponse: (data) {
-                                                      userInfors!.clear();
+                                                widget.userRolesController
+                                                    .saveChanges(
+                                                        responseFields: widget
+                                                            .getUserResponseFields,
+                                                        userUid: widget.userUid,
+                                                        onResponse: (data) {
+                                                          userInfors!.clear();
 
-                                                      ///Saving Role Here
-                                                      controller.saveChanges(
-                                                          onResponse: (data) {
-                                                            selectedRoles
-                                                                .clear();
-                                                          },
-                                                          endPointName: widget
-                                                              .assignRoleToUserEndpoint,
-                                                          inputs: [
-                                                            InputParameter(
-                                                                fieldName:
-                                                                    'roleUids',
-                                                                fieldValue:
-                                                                    selectedRoles,
-                                                                inputType:
-                                                                    'String'),
-                                                            InputParameter(
-                                                                fieldName:
-                                                                    'userUid',
-                                                                fieldValue:
-                                                                    widget
-                                                                        .userUid,
-                                                                inputType:
-                                                                    'String'),
-                                                          ],
-                                                          context: context);
-                                                    },
-                                                    endPointName: widget
-                                                        .updateUserEndpoint,
-                                                    inputs: [
-                                                      InputParameter(
-                                                          fieldName: 'userDto',
-                                                          fieldValue:
-                                                              userInfors,
-                                                          inputType:
-                                                              'UserDtoInput'),
-                                                    ],
-                                                    context: context);
+                                                          ///Saving Role Here
+                                                          widget
+                                                              .userRolesController
+                                                              .saveChanges(
+                                                                  responseFields:
+                                                                      widget
+                                                                          .getUserResponseFields,
+                                                                  onResponse:
+                                                                      (data) {
+                                                                    selectedRoles
+                                                                        .clear();
+                                                                  },
+                                                                  endPointName:
+                                                                      widget
+                                                                          .assignRoleToUserEndpoint,
+                                                                  inputs: [
+                                                                    InputParameter(
+                                                                        fieldName:
+                                                                            'roleUids',
+                                                                        fieldValue:
+                                                                            selectedRoles,
+                                                                        inputType:
+                                                                            'String'),
+                                                                    InputParameter(
+                                                                        fieldName:
+                                                                            'userUid',
+                                                                        fieldValue:
+                                                                            widget
+                                                                                .userUid,
+                                                                        inputType:
+                                                                            'String'),
+                                                                  ],
+                                                                  context:
+                                                                      context);
+                                                        },
+                                                        endPointName: widget
+                                                            .updateUserEndpoint,
+                                                        inputs: [
+                                                          InputParameter(
+                                                              fieldName:
+                                                                  'userDto',
+                                                              fieldValue:
+                                                                  userInfors,
+                                                              inputType:
+                                                                  'UserDtoInput'),
+                                                        ],
+                                                        context: context);
 
                                                 Navigator.pop(
                                                     NavigationService
@@ -1613,7 +1665,7 @@ class _DetailCardState extends State<DetailCard> {
                 setState(() {
                   deleteUserLoader = loader;
                   if (value != null) {
-                    controller.getUsers(context,
+                    widget.userRolesController.getUsers(context,
                         endpointName: widget.getUserEndpointName,
                         responseFields: widget.getUserResponseFields,
                         updateUserList: true,

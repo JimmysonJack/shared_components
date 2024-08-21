@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
-import 'package:shared_component/src/utils/g_ui/g_text.dart';
+import 'package:shared_component/src/shared/layout/layout.dart';
 
 import 'login_inputs.dart';
 
@@ -70,12 +70,11 @@ class ChangePassword extends StatelessWidget {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text('Change Password',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge
-                              ?.copyWith(
-                                  color: Theme.of(context).cardColor,
-                                  fontSize: 25)),
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  // color: Theme.of(context).cardColor,
+                                  fontSize: 20,
+                                  fontFamily: 'Geoplace')),
                     ),
                     const SizedBox(
                       height: 20,
@@ -93,9 +92,12 @@ class ChangePassword extends StatelessWidget {
                           decoration: InputDecoration(
                             suffixIcon: passwordIcon(_.visibility.value, false),
                             labelText: 'Current Password',
-                            filled: true,
-                            fillColor: Theme.of(context).cardColor,
+                            // filled: true,
+                            // fillColor: Theme.of(context).cardColor,
                           ),
+                          onFieldSubmitted: (value) {
+                            newfocusNode.requestFocus();
+                          },
                           onChanged: (value) {
                             changeController.validateInputs();
                           },
@@ -126,9 +128,12 @@ class ChangePassword extends StatelessWidget {
                             suffixIcon:
                                 passwordIcon(_.newPassVisibility.value, true),
                             labelText: 'New Password',
-                            filled: true,
-                            fillColor: Theme.of(context).cardColor,
+                            // filled: true,
+                            // fillColor: Theme.of(context).cardColor,
                           ),
+                          onFieldSubmitted: (value) {
+                            verifyfocusNode.requestFocus();
+                          },
                           onChanged: (value) {
                             changeController.validateInputs();
                           },
@@ -154,11 +159,14 @@ class ChangePassword extends StatelessWidget {
                           enabled: !_.loading.value,
                           obscureText: true,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Confirm Password',
-                            filled: true,
-                            fillColor: Theme.of(context).cardColor,
+                            // filled: true,
+                            // fillColor: Theme.of(context).cardColor,
                           ),
+                          // onFieldSubmitted: (value) {
+                          //   verifyfocusNode.requestFocus();
+                          // },
                           onChanged: (value) {
                             changeController.validateInputs();
                           },
@@ -197,21 +205,27 @@ class ChangePassword extends StatelessWidget {
                                 ],
                               ),
                             )
-                          : ElevatedButton(
-                              style: ButtonStyle(
-                                  maximumSize: MaterialStateProperty.all<Size>(
-                                      Size(SizeConfig.screenHeight, 60)),
-                                  minimumSize: MaterialStateProperty.all<Size>(
-                                      Size(SizeConfig.screenHeight, 50))),
-                              onPressed: controller.isButtonEnabled.value
-                                  ? () => controller.changePassword(context)
-                                  : null,
-                              child: GText(
-                                'Change Password',
-                                color: controller.isButtonEnabled.value
-                                    ? Theme.of(context).cardColor
-                                    : Theme.of(context).disabledColor,
-                              ));
+                          : SizedBox(
+                              width: SizeConfig.screenWidth,
+                              height: 50,
+                              child: Button(
+                                labelText: 'Change Password',
+                                // style: ButtonStyle(
+                                //     maximumSize: MaterialStateProperty.all<Size>(
+                                //         Size(SizeConfig.screenHeight, 60)),
+                                //     minimumSize: MaterialStateProperty.all<Size>(
+                                //         Size(SizeConfig.screenHeight, 50))),
+                                onPressed: controller.isButtonEnabled.value
+                                    ? () => controller.changePassword(context)
+                                    : null,
+                                // child: GText(
+                                //   '',
+                                //   color: controller.isButtonEnabled.value
+                                //       ? Theme.of(context).cardColor
+                                //       : Theme.of(context).disabledColor,
+                                // )
+                              ),
+                            );
                     })
                   ],
                 ),

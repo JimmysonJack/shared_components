@@ -87,16 +87,20 @@ class AuthServiceController extends GetxController {
   }
 
   Future<Checking> getUser(BuildContext context, String? url) async {
+    console('calling user......................................xx');
     var res = await api.get(
         url != null ? url.replaceAll('oauth/token', 'user') : '/user', context);
     if (res != null) {
+      console('res is not null...............................xx');
       if (res is String) {
         StorageService.setString('user_uid', res);
         return Checking.doNotProceed;
       } else if (res is Map && !res.keys.contains('checking')) {
+        console('res is map and setting user info...................');
         StorageService.setJson('user', res);
         StorageService.setJson('principal_user', res['principal']);
         StorageService.get.setUser(res['principal']);
+        console('.............xxxx.......${StorageService.get.user?.toJson()}');
 
         var permissions = res['principal']?['authorities'];
         Permissions.instance()

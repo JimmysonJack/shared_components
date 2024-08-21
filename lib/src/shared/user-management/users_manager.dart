@@ -69,6 +69,7 @@ class _UserManagerState extends State<UserManager>
                     endpointName: widget.userConfig.saveUserEndpoint);
               },
               onTap: (Map<String, dynamic> data) {
+                // fieldController = FieldController();
                 setState(() {
                   // showDetails = !showDetails;
                   shakeIt = true;
@@ -126,6 +127,7 @@ class _UserManagerState extends State<UserManager>
             ),
           )),
         DetailCard(
+          userRolesController: userRolesController,
           fieldController: fieldController,
           assignRoleToUserEndpoint: widget.userConfig.assignRoleToUserEndpoint,
           getRolesByUserEndpoint: widget.userConfig.getRolesByUserEndpoint,
@@ -213,7 +215,6 @@ class _UserManagerState extends State<UserManager>
       currentIndex = 0;
       userRolesController.disableAllFields.value = true;
     }
-    console(updatingData);
 
     PopupModel(
         fieldController: fieldController,
@@ -223,11 +224,20 @@ class _UserManagerState extends State<UserManager>
         endpointName: endpointName,
         objectInputType: widget.userConfig.saveUserInputType,
         inputObjectFieldName: widget.userConfig.saveUserInputFieldName,
-        queryFields: 'uid',
+        queryFields: 'uid otp',
         responseResults: (data, loading) {
           if (data != null) {
+            Future.delayed(const Duration(milliseconds: 1000), () {
+              NotificationService.info(
+                  center: true,
+                  context: context,
+                  title: data['data']['otp'],
+                  content:
+                      'One Time Password (OTP) can only be used once and can expire after 30 minutes');
+            });
             userRolesController.getUsers(context,
                 endpointName: widget.userConfig.getUsersEndpoint,
+                updateNewData: true,
                 responseFields: widget.userConfig.getUserResponseFields);
           }
         },
@@ -330,9 +340,6 @@ class _UserManagerState extends State<UserManager>
                                     }
                                   });
                                 }
-
-                                console(fieldController.field
-                                    .fieldValuesController.instanceValues);
                               },
                               subtitle: Text(
                                   'Comptroller Number: ${userRolesController.userListData[index]['comptrollerNumber']}'),

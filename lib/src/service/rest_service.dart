@@ -25,10 +25,10 @@ class RestService {
   }
 
   static getRequest({required BuildContext context}) async {
-    Map<String, dynamic> res = await _api.request(context,
-        type: 'post',
-        url: '/oauth/token',
-        options: _requestOptions,
-        data: {'grant_type': 'client_credentials'});
+    // Map<String, dynamic> res = await _api.request(context,
+    //     type: 'post',
+    //     url: '/oauth/token',
+    //     options: _requestOptions,
+    //     data: {'grant_type': 'client_credentials'});
   }
 }

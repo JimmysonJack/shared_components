@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:quickalert/models/quickalert_type.dart';
-import 'package:quickalert/widgets/quickalert_dialog.dart';
-import 'package:shared_component/src/components/toast.dart';
+
+import '../../shared_component.dart';
 
 class NotificationService {
   static Future<bool> confirmInfo(

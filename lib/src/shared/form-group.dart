@@ -45,7 +45,6 @@ class _FormGroupState extends State<FormGroup> {
             });
     if (convertedUpdatedFields != null) {
       widget.fieldController.field.setUpdateFields(convertedUpdatedFields);
-
       widget.fieldController.updateFieldList = List.generate(
           widget.fieldController.updateFieldList.length,
           (index) => {
@@ -99,9 +98,7 @@ class _FormGroupState extends State<FormGroup> {
           if (!widget.fieldController.field.updateState &&
               widget.fieldController.updateFieldList.isNotEmpty)
             Container(
-                color: ThemeController.getInstance().darkMode(
-                    darkColor: const Color.fromARGB(255, 14, 146, 146),
-                    lightColor: const Color.fromARGB(255, 101, 223, 186)),
+                color: Theme.of(context).primaryColor.withOpacity(0.4),
                 width: MediaQuery.of(context).size.width,
                 padding: const EdgeInsets.all(5),
                 child: const Text(
@@ -125,7 +122,7 @@ class Group extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 20),
-      color: Theme.of(context).scaffoldBackgroundColor,
+      color: Theme.of(context).cardColor,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

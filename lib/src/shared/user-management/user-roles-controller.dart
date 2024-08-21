@@ -5,7 +5,7 @@ class UserRolesController extends GetxController {
   List<Map<String, dynamic>> unAssignedRoleList = [];
   List<Map<String, dynamic>> storedRoles = [];
   RxList<Map<String, dynamic>> assgnedRoleList = <Map<String, dynamic>>[].obs;
-  List<Map<String, dynamic>> usersList = [];
+  final usersList = [].obs;
   final userListData = [].obs;
   final loading = false.obs;
   final loadingUsers = false.obs;
@@ -53,6 +53,7 @@ class UserRolesController extends GetxController {
       required String responseFields,
       required String endpointName,
       bool updateUserList = false,
+      bool updateNewData = false,
       String? removeUserUid}) async {
     SettingsService.use.isEmptyOrNull(searchKey) ? null : nextPage = 0;
     loadingUsers.value = true;
@@ -72,15 +73,17 @@ class UserRolesController extends GetxController {
             }
           },
           pageableParams: PageableParams(
-              page: nextPage,
+              page: updateNewData ? 0 : nextPage,
               size: 20,
               searchKey: SettingsService.use.isEmptyOrNull(searchKey)
                   ? searchParam
                   : searchKey),
           context: context);
       !SettingsService.use.isEmptyOrNull(searchKey)
-          ? usersList = res
-          : usersList.addAll(res);
+          ? usersList.value = res
+          : updateNewData
+              ? usersList.value = res
+              : usersList.addAll(res);
 
       noMoreData.value = false;
       loadingUsers.value = false;
@@ -123,6 +126,7 @@ class UserRolesController extends GetxController {
   void saveChanges(
       {required String endPointName,
       required List<InputParameter> inputs,
+      String? responseFields,
       String? userUid,
       // bool isRole = false,
       required Function(Map<String, dynamic>?) onResponse,
@@ -142,6 +146,10 @@ class UserRolesController extends GetxController {
           onSaveChangesLoader.value = loading;
           if (data != null) {
             onResponse(data);
+            getUser(
+                context: context,
+                responseFields: responseFields ?? 'uid',
+                userUid: userUid ?? '');
           }
         },
         endPointName: endPointName,
@@ -152,5 +160,20 @@ class UserRolesController extends GetxController {
 
   changeActiveStatus(bool status) {
     disableAllFields.value = status;
+  }
+
+  getUser(
+      {required BuildContext context,
+      required String responseFields,
+      required String userUid}) async {
+    final res = await GraphQLService.query(
+        endPointName: 'getUser',
+        responseFields: responseFields,
+        parameters: [
+          OtherParameters(
+              keyName: 'userUid', keyValue: userUid, keyType: 'String')
+        ],
+        context: context);
+    console(res);
   }
 }

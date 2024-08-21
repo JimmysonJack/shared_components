@@ -16,6 +16,7 @@ class GText extends StatelessWidget {
     this.softWrap,
     this.fontSize,
     this.fontWeight,
+    this.fontFamily,
     this.decoration,
     this.decorationColor,
     this.decorationStyle,
@@ -51,6 +52,9 @@ class GText extends StatelessWidget {
 
   /// Set font weight.
   final FontWeight? fontWeight;
+
+  /// Set font fontFamily.
+  final String? fontFamily;
 
   /// Set text decoration
   final TextDecoration? decoration;
@@ -120,6 +124,7 @@ class GText extends StatelessWidget {
       style: _textStyle(context).copyWith(
         color: textColor,
         fontSize: fontSize,
+        fontFamily: fontFamily,
         fontWeight: fontWeight,
         decoration: decoration,
         decorationColor: decorationColor,

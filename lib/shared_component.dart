@@ -17,7 +17,7 @@ export 'src/popUpMenu/popUpMenu.dart';
 export 'src/result_state/result_state.dart';
 export 'src/searchableTextField/searchTextField.dart';
 export 'src/service/api_service.dart';
-export 'src/service/authGuard.dart';
+export 'src/service/auth_guard.dart';
 export 'src/service/auth_service.dart';
 export 'src/service/storage_service.dart';
 export 'src/shared_store/paging_store.dart';
@@ -35,7 +35,7 @@ export 'src/utils/widgetInsertGroup.dart';
 export 'src/shared/tabs_bar/tabs_bar.dart';
 export 'src/shared/tabs_bar/tabs.dart';
 export 'src/customDate/date.dart';
-export 'src/filePicker/filePicker.dart';
+export 'src/filePicker/pick_file.dart';
 export 'src/customSwitchState/custom_switch_state.dart';
 export 'src/utils/upper_case_text_formatter.dart';
 export 'src/shared/form-group.dart';
@@ -59,11 +59,8 @@ export 'src/shared/tile/tiles_search.dart';
 export 'src/shared/login/background.dart';
 export 'package:dio/dio.dart';
 export 'package:flutter_dotenv/flutter_dotenv.dart';
-export 'package:layout/layout.dart';
-export 'package:file_picker/file_picker.dart' show FileType;
 export 'src/init-main/init.app.dart';
 export 'package:flutter_modular/flutter_modular.dart';
-export 'package:flutter_side_menu/flutter_side_menu.dart';
 export 'src/shared/side-navigation/side_menu_navigation.dart';
 export 'src/shared/side-navigation/side_menu_tile.dart';
 export 'src/shared/top-app-bar/menu_item.dart';
@@ -78,6 +75,57 @@ export 'src/shared/user-management/users_manager.dart';
 export 'src/shared/user-management/role-widget.dart';
 export 'src/service/navigation.service.dart';
 export 'src/service/route.service.dart';
+export 'src/service/route_observer_service.dart';
+export 'src/service/url_guard.dart';
+export 'src/utils/g_ui/g_text.dart';
+
+/// export quickalert_dialog.dart
+export 'src/shared/quickalert/widgets/quickalert_dialog.dart';
+
+/// export quickalert_type.dart
+export 'src/shared/quickalert/models/quickalert_type.dart';
+
+/// export quickalert_animtype.dart
+export 'src/shared/quickalert/models/quickalert_animtype.dart';
+
+export './src/shared/file_picker/file_picker.dart';
+export './src/shared/file_picker/platform_file.dart';
+export './src/shared/file_picker/file_picker_result.dart';
+
+export './src/shared/side_menu/side_menu.dart';
+export './src/shared/side_menu/item/export.dart';
+export './src/shared/side_menu/side_menu_mode.dart';
+export './src/shared/side_menu/side_menu_priority.dart';
+export './src/shared/side_menu/side_menu_position.dart';
+export './src/shared/side_menu/side_menu_controller.dart';
+export './src/shared/side_menu/data/side_menu_data.dart';
+export './src/shared/side_menu/data/side_menu_item_data.dart';
+export './src/shared/side_menu/data/resizer_toggle_data.dart';
+export './src/shared/side_menu/data/resizer_data.dart';
+export 'package:badges/badges.dart';
+export 'src/shared/dropdown_search/properties/bottom_sheet_props.dart';
+export 'src/shared/dropdown_search/properties/clear_button_props.dart';
+export 'src/shared/dropdown_search/properties/dialog_props.dart';
+export 'src/shared/dropdown_search/properties/dropdown_button_props.dart';
+export 'src/shared/dropdown_search/properties/dropdown_decorator_props.dart';
+export 'src/shared/dropdown_search/properties/favorite_item_props.dart';
+export 'src/shared/dropdown_search/properties/icon_button_props.dart';
+export 'src/shared/dropdown_search/properties/list_view_props.dart';
+export 'src/shared/dropdown_search/properties/menu_props.dart';
+export 'src/shared/dropdown_search/properties/modal_bottom_sheet_props.dart';
+export 'src/shared/dropdown_search/properties/popup_props.dart';
+export 'src/shared/dropdown_search/properties/scrollbar_props.dart';
+export 'src/shared/dropdown_search/properties/text_field_props.dart';
+
+export 'src/shared/layout/value.dart';
+export 'src/shared/layout/margin.dart';
+export 'src/shared/layout/layout.dart';
+export 'src/shared/layout/breakpoint.dart';
+export 'src/shared/layout/gutter.dart';
+export 'src/shared/layout/formats/fluid_format.dart';
+export 'src/shared/layout/formats/material_format.dart';
+export 'src/shared/layout/formats/boostrap_format.dart';
+export 'src/shared/layout/adaptive_builder.dart';
 export 'package:get/get.dart'
     hide
         FormData,

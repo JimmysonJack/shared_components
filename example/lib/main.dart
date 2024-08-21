@@ -24,7 +24,7 @@ void main() {
                 showSideNav: true,
                 version: '2.0.3',
                 topAppBarDetails: TopAppBarDetails(
-                    title: 'DHMS | LUGALO',
+                    title: const Text('DHMS | LUGALO'),
                     menuItems: [
                       MenuItem<String>(
                           title: 'Change Password',
@@ -42,7 +42,9 @@ void main() {
                               NavigationService.get.currentContext!);
                         },
                         email: 'Jimmysonblack@gmail.com',
-                        userName: 'Jimmyson Jackson Mnunguri')),
+                        userName: 'Jimmyson Jackson Mnunguri'),
+                    appLogo: null,
+                    onSettings: () {}),
                 sideMenuTile: [
                   SideMenuTile(
                       title: 'Dashboard',
@@ -72,10 +74,10 @@ void main() {
                   child: SizedBox(
                     child: UserManager(
                       roleConfig: RoleConfig(
-                        permissionsFieldName: '',
-                        permissionsFieldType: '',
-                        roleFieldName: '',
-                        roleFieldType: '',
+                          permissionsFieldName: '',
+                          permissionsFieldType: '',
+                          roleFieldName: '',
+                          roleFieldType: '',
                           assignPermissionToRoleEndpoint: '',
                           deleteRoleEndpoint: 'deleteRole',
                           getPermissionsEndpoint: 'getPermissions',
