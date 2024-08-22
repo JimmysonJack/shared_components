@@ -1005,7 +1005,9 @@ abstract class _TextInputBase with Store {
       ]);
     }
     if (fieldInputType == FieldInputType.Currency) {
-      list.addAll([CurrencyTextInputFormatter.currency(enableNegative: false)]);
+      list.addAll([
+        CurrencyTextInputFormatter.currency(enableNegative: false, symbol: '')
+      ]);
     }
     if (fieldInputType == FieldInputType.ServiceNumber) {
       list.add(UpperCaseTextFormatter());
