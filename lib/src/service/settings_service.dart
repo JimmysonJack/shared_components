@@ -27,6 +27,23 @@ class SettingsService {
     return principal?['principal'];
   }
 
+  refreshToken() async {
+    final authService = Get.put(AuthServiceController());
+    var jsonToken = await StorageService.getJson('user_token');
+    Token oldToken = Token.fromJson(jsonToken);
+    var newToken = await authService.api
+        .refreshToken(oldToken, NavigationService.get.currentContext!);
+    return newToken.isNotEmpty;
+  }
+
+  getUserDetails(BuildContext context) async {
+    final authService = Get.put(AuthServiceController());
+    final addressUrl =
+        '${portChecking(Environment.getInstance().getServerUrlPort())}/oauth/token';
+    Checking userState = await authService.getUser(context, addressUrl);
+    return Checking.proceed == userState;
+  }
+
   Future<Checking> login(
       {required String userName,
       required String password,
@@ -95,8 +112,9 @@ class SettingsService {
     required String confirmPassword,
   }) async {
     final authService = Get.put(AuthServiceController());
+    final user = await getUser();
     return await authService.changePassword(context,
-        uid: getUser()['uid'],
+        uid: user['uid'],
         oldPassword: oldPassword,
         newPassword: newPassword,
         confirmPassword: confirmPassword);

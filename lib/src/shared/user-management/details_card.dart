@@ -1719,9 +1719,7 @@ class _DetailCardState extends State<DetailCard> {
               queryFields: 'uid otp',
               inputs: [
                 InputParameter(
-                    fieldName: 'userUid',
-                    inputType: 'String',
-                    fieldValue: userUid)
+                    fieldName: 'uid', inputType: 'String', fieldValue: userUid)
               ],
               context: context);
         });

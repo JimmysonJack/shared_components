@@ -286,5 +286,10 @@ class LoginController extends GetxController {
     if (state == Checking.firstLogin || state == Checking.passwordExpired) {
       isFirstLogin.value = true;
     }
+    if (![Checking.doNotProceed, Checking.idle, Checking.stay]
+        .contains(state)) {
+      password.clear();
+      username.clear();
+    }
   }
 }

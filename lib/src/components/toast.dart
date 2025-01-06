@@ -71,6 +71,7 @@ class ToastViewContainer {
           //     isMobileSize ? Alignment.topCenter : Alignment.bottomLeft,
           // top: 4,
           left: 0,
+          bottom: isMobileSize ? null : 0,
           right: isMobileSize ? 0 : null,
           child: Padding(
             padding: const EdgeInsets.all(4.0),
@@ -140,7 +141,7 @@ class ToastView {
             children: [
               Icon(
                 bgIcon,
-                color: strip ? bgColor : Theme.of(context).cardColor,
+                color: strip ? bgColor : Colors.white,
               ),
               const SizedBox(
                 width: 10,

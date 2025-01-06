@@ -36,11 +36,11 @@ class DeferredWidget extends StatefulWidget {
   }
 
   @override
-  _DeferredWidgetState createState() => _DeferredWidgetState();
+  DeferredWidgetState createState() => DeferredWidgetState();
 }
 
-class _DeferredWidgetState extends State<DeferredWidget> {
-  _DeferredWidgetState();
+class DeferredWidgetState extends State<DeferredWidget> {
+  DeferredWidgetState();
   Widget? _loadedChild;
   DeferredWidgetBuilder? _loadedCreator;
 

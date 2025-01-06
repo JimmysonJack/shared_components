@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
+import 'package:shared_component/src/shared/pop_dialog.dart';
 import 'package:shared_component/src/shared/user-management/details_card.dart';
 import 'package:shared_component/src/shared/user-management/user-roles-controller.dart';
 
+import '../pop_up_model.dart';
 import 'helper-classes.dart';
 import 'dashboard/user_dashboard.dart';
 import 'user_list_widget.dart';

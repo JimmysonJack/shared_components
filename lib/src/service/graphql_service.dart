@@ -389,6 +389,7 @@ class GraphQLService {
       String? successMessage,
       String? updateUid,
       bool refetchData = false,
+      bool hideSuccessNotification = false,
       required List<InputParameter> inputs,
       required BuildContext context,
       String? optionResponseFields}) async {
@@ -500,12 +501,12 @@ class GraphQLService {
     }
 
     if (result.data != null) {
-      if (result.data?[endPointName]['status']) {
+      if (result.data?[endPointName]['status'] && !hideSuccessNotification) {
         NotificationService.snackBarSuccess(
             context: context,
             title: result.data?[endPointName]['message'],
             subTitle: successMessage ?? 'Changes Saved Successfully');
-      } else {
+      } else if (!result.data?[endPointName]['status']) {
         NotificationService.snackBarError(
             context: context,
             title: 'Error',

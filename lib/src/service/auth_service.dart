@@ -22,6 +22,7 @@ enum Checking {
 
 class AuthServiceController extends GetxController {
   Api api = Api();
+  final http = Dio();
   final password = TextEditingController();
   final loading = false.obs;
   final isButtonEnabled = false.obs;
@@ -57,7 +58,8 @@ class AuthServiceController extends GetxController {
     });
     var res = await api.request(context,
         type: 'post',
-        url: url ?? '/oauth/token',
+        url: url ??
+            '${portChecking(Environment.getInstance().getServerUrlPort())}/oauth/token',
         data: credentials,
         options: requestOptions);
     if (res != null && res is Map && !res.keys.contains('checking')) {
@@ -88,8 +90,9 @@ class AuthServiceController extends GetxController {
 
   Future<Checking> getUser(BuildContext context, String? url) async {
     console('calling user......................................xx');
-    var res = await api.get(
-        url != null ? url.replaceAll('oauth/token', 'user') : '/user', context);
+    url = url != null ? url.replaceAll('oauth/token', 'user') : '/user';
+    console('$url matokeo......');
+    var res = await api.get(url, context);
     if (res != null) {
       console('res is not null...............................xx');
       if (res is String) {
@@ -158,15 +161,18 @@ class AuthServiceController extends GetxController {
       required String oldPassword,
       required String newPassword,
       required String confirmPassword}) async {
-    var res = await api.clientPost(
-        '/user/changePassword',
-        {
+    var res = await changeUserPassword(
+        url:
+            '${portChecking(Environment.getInstance().getServerUrlPort())}/user/changePassword',
+        data: {
           'uid': uid,
           'currentPassword': oldPassword,
           'newPassword': newPassword,
           'confirmPassword': confirmPassword
         },
         context);
+    console(res);
+
     if (res != null) {
       StorageService.setString('user_uid', null);
       NotificationService.snackBarSuccess(
@@ -186,15 +192,158 @@ class AuthServiceController extends GetxController {
       return true;
     }
     Token t = Token.fromJson(jsonToken);
-    var res = await api.clientPost(
-        '/oauth/token/revoke?access_token=${t.accessToken}&refresh_token=${t.refreshToken}',
-        {},
-        context);
-    if (res != null) {
+    var res = await logOut(
+      context,
+      data: {'token': t.accessToken, 'refresh-token': t.refreshToken},
+      url:
+          '${portChecking(Environment.getInstance().getServerUrlPort())}/oauth/token/revoke',
+    );
+    if (res != null && res['status'] == true) {
       StorageService.setJson('user_token', {});
       StorageService.setJson('user', {});
       return true;
     }
     return false;
+  }
+
+  Future logOut(
+    BuildContext context, {
+    required String url,
+    dynamic data,
+  }) async {
+    String token = await api.userToken(false, context);
+    Options options = Options(
+        contentType: 'application/x-www-form-urlencoded',
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        });
+    try {
+      var result = await http.post(
+        Environment.getInstance().getServerUrl()! + url,
+        data: data,
+        options: options,
+      );
+      Map<String, dynamic> res = jsonDecode(result.toString());
+      if (res['access_token'] != null ||
+          res['error_description'] != null ||
+          res['principal'] != null) {
+        return res;
+      }
+      if (res['status'] == false) {
+        NotificationService.snackBarError(
+          context: context,
+          title: res['message'],
+        );
+      }
+      console('...........................$res');
+      return res;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        var res = e.response!.data as Map<String, dynamic>;
+        if (res['error_description'] != null) {
+          NotificationService.snackBarError(
+              context: context,
+              title: res['error'],
+              subTitle: res['error_description']);
+          return null;
+        }
+        if (res['status'] == false) {
+          NotificationService.snackBarError(
+            context: context,
+            title: res['message'],
+          );
+        }
+        return res['data'];
+      } else if (e.type == DioExceptionType.connectionTimeout) {
+        NotificationService.snackBarError(
+            context: context,
+            title: 'Connection timed out',
+            subTitle: 'Please make sure you are connected to the Internet');
+        return e.message;
+      } else if (e.type == DioExceptionType.receiveTimeout) {
+        NotificationService.snackBarError(
+            context: context,
+            title: 'Receiver timed out',
+            subTitle: 'There might be a problem with your Servers');
+        return e.message;
+      } else if (e.type == DioExceptionType.sendTimeout) {
+        NotificationService.snackBarError(
+            context: context,
+            title: 'Sender timed out',
+            subTitle:
+                'There might be a problem with your Connection or something');
+        return e.message;
+      }
+      return e.message;
+    }
+  }
+
+  Future changeUserPassword(
+    BuildContext context, {
+    required String url,
+    dynamic data,
+  }) async {
+    console('Starting to change....');
+    String token = await api.userToken(false, context);
+    Options options = Options(contentType: 'application/json', headers: {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token'
+    });
+    try {
+      var result = await http.post(
+        Environment.getInstance().getServerUrl()! + url,
+        data: data,
+        options: options,
+      );
+      console('$result these are results');
+      Map<String, dynamic> res = jsonDecode(result.toString());
+
+      if (res['status'] == false) {
+        NotificationService.snackBarError(
+          context: context,
+          title: res['message'],
+        );
+      }
+      return res;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        var res = e.response!.data as Map<String, dynamic>;
+        if (res['error_description'] != null) {
+          NotificationService.snackBarError(
+              context: context,
+              title: res['error'],
+              subTitle: res['error_description']);
+          return null;
+        }
+        if (res['status'] == false) {
+          NotificationService.snackBarError(
+            context: context,
+            title: res['message'],
+          );
+        }
+        return res['data'];
+      } else if (e.type == DioExceptionType.connectionTimeout) {
+        NotificationService.snackBarError(
+            context: context,
+            title: 'Connection timed out',
+            subTitle: 'Please make sure you are connected to the Internet');
+        return e.message;
+      } else if (e.type == DioExceptionType.receiveTimeout) {
+        NotificationService.snackBarError(
+            context: context,
+            title: 'Receiver timed out',
+            subTitle: 'There might be a problem with your Servers');
+        return e.message;
+      } else if (e.type == DioExceptionType.sendTimeout) {
+        NotificationService.snackBarError(
+            context: context,
+            title: 'Sender timed out',
+            subTitle:
+                'There might be a problem with your Connection or something');
+        return e.message;
+      }
+      return e.message;
+    }
   }
 }

@@ -97,8 +97,13 @@ class ThemeController extends GetxController {
       //       )
       //     : const ColorScheme.light().copyWith(
       //         primary: Palette.lighten(Palette.hexToColor(appColors.primary!))),
-      inputDecorationTheme:
-          const InputDecorationTheme(filled: true, fillColor: Colors.black12),
+      inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor:
+              darkMode(darkColor: Colors.white12, lightColor: Colors.black12),
+          labelStyle: TextStyle(
+              color: darkMode(
+                  darkColor: Colors.white24, lightColor: Colors.black26))),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
             // backgroundColor: MaterialStateProperty.all<Color>(color.shade50),

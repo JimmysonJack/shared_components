@@ -136,9 +136,9 @@ class Api {
                                                                     .text) ==
                                                     Checking.proceed) {
                                                   Modular.to.pop();
-                                                  Navigator.pop(
-                                                      NavigationService
-                                                          .get.currentContext!);
+                                                  // Navigator.pop(
+                                                  //     NavigationService
+                                                  //         .get.currentContext!);
                                                 }
                                                 authServiceController
                                                     .loading.value = false;
@@ -167,7 +167,7 @@ class Api {
                                           accessToken: t.accessToken!,
                                           refreshToken: t.refreshToken!);
                                     } else {
-                                      // Modular.to.pop();
+                                      Modular.to.pop();
                                       Modular.to.navigate('/login');
                                     }
                                   },
@@ -192,13 +192,26 @@ class Api {
       'Authorization':
           'Basic ${base64Encode(utf8.encode('${Environment.getInstance().getClientId()}:${Environment.getInstance().getClientSecret()}'))}'
     });
-    Map<String, dynamic>? res = await post(
-        '/oauth/token',
-        {'grant_type': 'refresh_token', 'refresh_token': token.refreshToken},
-        context,
+
+    // Map<String, dynamic>? res = await post(
+    //     '${portChecking(Environment.getInstance().getServerUrlPort())}/oauth/token',
+    //     {'grant_type': 'refresh_token', 'refresh_token': token.refreshToken},
+    //     context,
+    //     options: requestOptions);
+
+    var res = await request(context,
+        type: 'post',
+        url:
+            '${portChecking(Environment.getInstance().getServerUrlPort())}/oauth/token',
+        data: {
+          'grant_type': 'refresh_token',
+          'refresh_token': token.refreshToken
+        },
         options: requestOptions);
+
     if (res?['access_token'] != null) {
       Token token = Token.fromJson(res!);
+      // token.expiresAt = DateTime.now().add(Duration(seconds: res['expires_in']));
       StorageService.setJson('user_token', token.toJson());
       return token.accessToken!;
     }
@@ -353,7 +366,7 @@ class Api {
   }
 
   Future clientPost(String url, dynamic data, BuildContext context) async {
-    return request(context,
+    return await request(context,
         type: 'post',
         url: url,
         data: data,

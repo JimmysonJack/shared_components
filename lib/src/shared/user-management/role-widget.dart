@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_component/shared_component.dart';
 
+import '../pop_up_model.dart';
+
 class RoleWidget extends StatelessWidget {
   RoleWidget({super.key, required this.roleConfig});
   final RoleConfig roleConfig;

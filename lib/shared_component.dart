@@ -40,6 +40,7 @@ export 'src/customSwitchState/custom_switch_state.dart';
 export 'src/utils/upper_case_text_formatter.dart';
 export 'src/shared/form-group.dart';
 export 'src/shared/pop_up_model.dart';
+export 'src/shared/pop_dialog.dart';
 export 'src/shared/text_inputs.dart';
 export 'src/service/graphql_service.dart';
 export 'src/service/settings_service.dart';
